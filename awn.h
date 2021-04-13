@@ -1,5 +1,5 @@
-#ifndef _TS_MEMCPY_H
-#define _TS_MEMCPY_H
+#ifndef _AWN_H
+#define _AWN_H
 
 #include <sys/types.h>
 /* Include guard goes here */
@@ -14,7 +14,7 @@ extern void *ts_memcpy (void * __dest, void * __src,
 /* Free a block allocated by `malloc', `realloc' or `calloc'.  */
 extern void ts_free (void *__ptr, void *__tail);
 
-extern int ts_memTraced(void* ptr);
+//extern int ts_memTraced(void* ptr);
 
 /* Copy N bytes of SRC to DEST, SRC is traced.  */
 extern void *ts_memcpy_traced(void * __dest, void * __src,
@@ -46,4 +46,4 @@ extern int munmap (void *__addr, size_t __len);
 #endif
 
 /* #endif of the include guard here */
-#endif
+#endif   //_AWN_H

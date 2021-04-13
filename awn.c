@@ -42,7 +42,7 @@ struct Fileops_p* _hub_fileops_lookup[MAX_FILEOPS];
 
 //int _hub_add_and_resolve_fileops_tree_from_file(char* filename);
 //int hub_check_resolve_fileops(char* tree);
-void _hub_init2(void);
+void init(void);
 //inline void *intel_memcpy(void * __restrict__ b, const void * __restrict__ a, size_t n);
 instrumentation_type compare_mem_time, remap_mem_rec_time, ts_write_time;
 instrumentation_type mem_from_file_trace_time, mem_from_mem_trace_time;
@@ -667,7 +667,7 @@ void delMap(RBNodePtr *root, RBNodePtr addr){
 }
 
 // Creates the set of standard posix functions as a module.
-void _hub_init2(void) {
+__attribute__((constructor))void init(void) {
 	execv_done = 0;
 	int tmp;
 	MSG("START\n");
@@ -1056,7 +1056,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 //	unsigned long ret =  _hub_fileops->WRITE(CALL_WRITE);
 	unsigned long ret =  write(CALL_WRITE);
 	END_TIMING(ts_write_t, ts_write_time);
-	DEBUG("                  ts_write: buf:%lu, file:%d, len: %llu\n", 
+	MSG("                  ts_write: buf:%lu, file:%d, len: %llu\n", 
 		buf, file, length);
 #if USE_TS_FUNC 
 	START_TIMING(compare_mem_t, compare_mem_time);
@@ -1081,7 +1081,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 			struct recBlockEntry *blockEntry = TAILQ_LAST(res[0]->listHead, tailhead);
 			//xzjin 注意这里有个foreach，这个有效吗？正确吗?
 			//xzjin 这里是不是应该从后往前比？
-			//TAILQ_FOREACH(blockEntry, headp, entries){
+			//TAILQ_FOREACH(blockEntry, headp, entries)
 			while(blockEntry){
 				int i=0;
 				mrp = blockEntry->recArr;
@@ -1097,7 +1097,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 				}
 				
 				for(; i<idx; mrp++,i++){
-					//MSG("i=%d, mrp:%lu.\n", i, mrp);
+					//DEBUG("i=%d, mrp:%lu.\n", i, mrp);
 					bufCmpStart = getAddr((void*)start, mrp->pageOffset);
 					if((unsigned long)bufCmpStart < (unsigned long) diffPos) continue;
 					if((unsigned long)bufCmpStart > (unsigned long) tail) break;
@@ -1126,7 +1126,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 			withdrawTailHead(headp);
 			delNodep = tfind(&searchNode, &recTreeRoot, recCompare);
 			if(delNodep && *delNodep){
-				MSG("Delete tree node:%lu, withdraw addr: %lu, %lu, delNodep: %lu\n", 
+				DEBUG("Delete tree node:%lu, withdraw addr: %lu, %lu, delNodep: %lu\n", 
 					delNodep[0]->pageNum, *delNodep, delNodep[0], delNodep);
 				//xzjin tdelete之后会修改delNodep指向的内容，所以要在tdelete之前保存
 				struct recTreeNode *freep = *delNodep;
@@ -1136,10 +1136,10 @@ ssize_t ts_write(int file, void *buf, size_t length){
 			}
 			*/
 		}else{
-			MSG("buf: %lu not found.\n", buf);
+			DEBUG("buf: %lu not found.\n", buf);
 		}
 	}
-//	MSG("ts_write buf:%p, tail:%p, length:%lu, fileName:%s, ret length:%lu, same content time:%d\n\n\n",
+//	DEBUG("ts_write buf:%p, tail:%p, length:%lu, fileName:%s, ret length:%lu, same content time:%d\n\n\n",
 //		 buf, tail, length, fd2path[file%10],ret, sameContentTimes);
 	END_TIMING(compare_mem_t, compare_mem_time);
 #endif //USE_TS_FUNC 
@@ -1581,4 +1581,11 @@ void ts_free(void* ptr, void* tail){
 //	}
 	free(ptr);
 	return;
+}
+
+__attribute__((destructor))void fini(void) {
+	MSG("exit handler\n");
+	MSG("Exit: print stats\n");
+	nvp_print_io_stats();
+	PRINT_TIME();
 }
