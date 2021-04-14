@@ -291,15 +291,19 @@ struct sigaction defaction;
 #define CALL_MEMCPY dest, src, n
 #define CALL_MUNMAP addr, len
 #define CALL_WRITE  file, buf, length
+#define CALL_OPEN   path, oflag
 
 #define RETT_MMAP   void*
 #define RETT_MEMCPY void*
 #define RETT_MUNMAP int
 #define RETT_WRITE  ssize_t
+#define RETT_OPEN   int
 
 #define INTF_MEMCPY void *dest, const void *src, size_t n
 #define INTF_MMAP   void *addr, size_t len, int prot, int flags, int file, off_t off
 #define INTF_MUNMAP void *addr, size_t len
 #define INTF_WRITE  int file, const void* buf, size_t length
+#define INTF_OPEN const char *path, int oflag, ...
 
 #define PFFS_WRITE  "%i, %p, %i"
+#define PFFS_OPEN   "%s, %i"

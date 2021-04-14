@@ -1589,3 +1589,36 @@ __attribute__((destructor))void fini(void) {
 	nvp_print_io_stats();
 	PRINT_TIME();
 }
+
+// xzjin _hub_managed_fileops是nvp
+RETT_OPEN ts_open(INTF_OPEN)
+{
+	char *abpath = NULL;
+    struct stat st;
+	int result, err;
+	long mmapRet;
+
+	result = open(path, oflag);
+	
+	abpath = realpath(path,NULL);
+	if(abpath){
+		fd2path[result%100] = abpath;
+//		MSG("Open %s ,Return = %d\n", fd2path[result], result);
+	}else {
+		MSG("Open %s , get realpath failed.\n", path, result);
+	}
+	if(result>0){
+		if(fstat(result, &st)){
+		    err = errno;
+		    DEBUG("fstat error, %s, errno:%d.", strerror(err), err);
+		    return err;
+		}
+		mmapRet = (long)ts_mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, result, 0);
+		err = errno;
+		if(mmapRet == -1){
+		    DEBUG("ts_mmap error, %s, errno:%d.", strerror(err), err);
+		    return err;
+		}
+	}
+	return result;
+}

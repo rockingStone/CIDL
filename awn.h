@@ -2,6 +2,7 @@
 #define _AWN_H
 
 #include <sys/types.h>
+#include <sys/mman.h>
 /* Include guard goes here */
 #ifdef __cplusplus
 extern "C" {
@@ -34,12 +35,16 @@ extern ssize_t  ts_write(int __fd, void *__buf, size_t __n);
    The return value is the actual mapping address chosen or MAP_FAILED
    for errors (in which case `errno' is set).  A successful `mmap' call
    deallocates any previous mapping for the affected region.  */
-extern void *mmap (void *__addr, size_t __len, int __prot,
+extern void *ts_mmap (void *__addr, size_t __len, int __prot,
 		   int __flags, int __fd, __off_t __offset);
 
 /* Deallocate any mapping for the region starting at ADDR and extending LEN
    bytes.  Returns 0 if successful, -1 for errors (and sets errno).  */
-extern int munmap (void *__addr, size_t __len);
+extern int ts_munmap (void *__addr, size_t __len);
+
+/* Check that calls to open and openat with O_CREAT or O_TMPFILE set have an
+   appropriate third/fourth parameter.  */
+extern int ts_open (const char *__path, int __oflag, ...);
  
 #ifdef __cplusplus
 }
