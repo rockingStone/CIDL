@@ -13,6 +13,7 @@ SOINSTALLDIR = /usr/local/lib
 HEADINSTALLDIR = /usr/local/include/awn
 #CC = /usr/bin/gcc-7
 LDFLAGS	= -ldl
+CCFLAGS += -ggdb
 
 .PHONY: all
 all: $(OUTPUTFILE)
@@ -22,13 +23,13 @@ all: $(OUTPUTFILE)
 # function demonstrated in Recipe 1.16
 
 $(OUTPUTFILE): CFILE SFILE
-	$(CC) -shared -fPIC $(LDFLAGS) -o $@ $(OFILE)
+	$(CC) $(CCFLAGS) -shared -fPIC $(LDFLAGS) -o $@ $(OFILE)
 
 CFILE: $(CSOURCES)
-	$(CC) -Wall -fPIC -c $(LDFLAGS) $(CSOURCES)
+	$(CC) $(CCFLAGS) -Wall -fPIC -c $(LDFLAGS) $(CSOURCES)
 
 SFILE : $(SSOURCES)
-	$(CC) -Wall -fPIC -c $(LDFLAGS) $(SSOURCES)
+	$(CC) $(CCFLAGS) -Wall -fPIC -c $(LDFLAGS) $(SSOURCES)
 
 #%.o: %.c
 #	$(CC) -Wall -fPIC -c $(LDFLAGS) -o $@ $^

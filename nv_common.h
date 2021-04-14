@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <sys/mman.h>
 #include <sys/queue.h>
 #include <sys/types.h>

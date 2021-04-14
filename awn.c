@@ -864,10 +864,15 @@ __attribute__((constructor))void init(void) {
 //Add by xzjin
 RETT_MMAP ts_mmap(INTF_MMAP) {
 	void *ret;
+	int err;
 //	int idx;
 
 	DEBUG("Call posix mmap.\n");
 	ret = mmap(CALL_MMAP);
+	err = errno;
+	if(UNLIKELY((long)ret==-1)){
+		ERROR("mmap ERROR, %s, errno:%d\n", strerror(err), err);
+	}
 	DEBUG("_hub_mmap returned:%p fileName:%s, fd:%d\n",ret, fd2path[file], file);
 
 	START_TIMING(fileMap_t, fileMap_time);
@@ -1638,32 +1643,41 @@ RETT_OPEN ts_open(INTF_OPEN)
 	char *abpath = NULL;
     struct stat st;
 	int result, err;
+	mode_t mode;
 	long mmapRet;
+    va_list ap;
 
-	result = open(path, oflag);
+    va_start(ap, oflag);
+    if (oflag & O_CREAT)
+        mode = va_arg(ap, unsigned int);
+    va_end(ap);
+	result = open(path, oflag, mode);
 	err = errno;
 	if(UNLIKELY(result == -1)){
-		MSG("file open error, %s, errno:%d.", strerror(err), err);
+		ERROR("file open error, %s, errno:%d.", strerror(err), err);
 		return result;
 	}
+	//xzjin If creat file, do not mmap
+    if (oflag & O_CREAT) return result;
 
 	abpath = realpath(path,NULL);
 	if(abpath){
 		fd2path[result%100] = abpath;
 //		MSG("Open %s ,Return = %d\n", fd2path[result], result);
 	}else {
-		MSG("Open %s , get realpath failed.\n", path, result);
+		ERROR("Open %s , get realpath failed.\n", path, result);
 	}
 	if(fstat(result, &st)){
 	    err = errno;
-	    DEBUG("fstat error, %s, errno:%d.", strerror(err), err);
-	    return err;
+	    ERROR("fstat error, %s, errno:%d.\n", strerror(err), err);
+		exit(-1);
 	}
 	mmapRet = (long)ts_mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, result, 0);
 	err = errno;
 	if(mmapRet == -1){
-	    DEBUG("ts_mmap error, %s, errno:%d.", strerror(err), err);
-	    return err;
+	    ERROR("ts_mmap error, %s, errno:%d.\n", strerror(err), err);
+		exit(-1);
 	}
+	MSG("file: %s, fd:%d\n",path, result);
 	return result;
 }
