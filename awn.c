@@ -1485,6 +1485,48 @@ ts_memcpy_returnPoint:
 	return ret;
 }
 
+//xzjin read content to buf use ts_memcpy and set offset to correct pos
+ssize_t ts_read(int fd, void *buf, size_t nbytes){
+
+	struct fileMapTreeNode **targetNodep;
+	struct fileMapTreeNode *node;
+	struct fileMapTreeNode *treeNode;
+	void* copyBegin;
+	size_t copyLen;
+	off_t seekRet;
+	int err;
+
+	treeNode = allocateFileMapTreeNode();
+	treeNode->fileName = fd2path[fd%100];
+	targetNodep = tfind(treeNode, &fileMapNameTreeRoot, fileMapNameTreeInsDelCompare);
+	withdrawFileMapTreeNode(treeNode);
+	if(UNLIKELY(!targetNodep)){
+		MSG("find mmap ERROR, file not mapped.\n");
+		exit(-1);
+	}
+	node = targetNodep[0];
+	//xzjin 直接用lseek是不是太耗时了
+	seekRet = lseek(fd, 0, SEEK_CUR);
+	if(seekRet == -1){
+		err = errno;
+		MSG("lseek ERROR, %s, errno %d.\n", strerror(err), err);
+		exit(-1);
+	}
+	copyBegin = (void *)(node->start+(seekRet - node->offset));
+	copyLen = (size_t)node->tail-(size_t)copyBegin;
+	copyLen = MIN(copyLen, nbytes);
+	ts_memcpy(buf, copyBegin, copyLen);
+
+	seekRet = lseek(fd, copyLen, SEEK_CUR);
+	err = errno;
+	if(seekRet == -1){
+		MSG("seek to %d.\n", seekRet+copyLen);
+		MSG("lseek ERROR, %s, errno %d.\n", strerror(err), err);
+		exit(-1);
+	}
+	return copyLen;
+}
+
 void* ts_realloc(void *ptr, size_t size, void* tail){
 	void *ret;
 	unsigned long long start = (unsigned long long)addr2PageNum(ptr);
@@ -1599,7 +1641,12 @@ RETT_OPEN ts_open(INTF_OPEN)
 	long mmapRet;
 
 	result = open(path, oflag);
-	
+	err = errno;
+	if(UNLIKELY(result == -1)){
+		MSG("file open error, %s, errno:%d.", strerror(err), err);
+		return result;
+	}
+
 	abpath = realpath(path,NULL);
 	if(abpath){
 		fd2path[result%100] = abpath;
@@ -1607,18 +1654,16 @@ RETT_OPEN ts_open(INTF_OPEN)
 	}else {
 		MSG("Open %s , get realpath failed.\n", path, result);
 	}
-	if(result>0){
-		if(fstat(result, &st)){
-		    err = errno;
-		    DEBUG("fstat error, %s, errno:%d.", strerror(err), err);
-		    return err;
-		}
-		mmapRet = (long)ts_mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, result, 0);
-		err = errno;
-		if(mmapRet == -1){
-		    DEBUG("ts_mmap error, %s, errno:%d.", strerror(err), err);
-		    return err;
-		}
+	if(fstat(result, &st)){
+	    err = errno;
+	    DEBUG("fstat error, %s, errno:%d.", strerror(err), err);
+	    return err;
+	}
+	mmapRet = (long)ts_mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, result, 0);
+	err = errno;
+	if(mmapRet == -1){
+	    DEBUG("ts_mmap error, %s, errno:%d.", strerror(err), err);
+	    return err;
 	}
 	return result;
 }

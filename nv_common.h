@@ -53,22 +53,9 @@
 
 // places quotation marks around arg (eg, MK_STR(stuff) becomes "stuff")
 #define MK_STR(arg) #arg
-#define MK_STR2(x) MK_STR(x)
-#define MK_STR3(x) MK_STR2(x)
 
 #define MACRO_WRAP(a) a
 #define MACRO_CAT(a, b) MACRO_WRAP(a##b)
-
-
-//#define MONETA_DEVICE_PATH "/dev/bbda" 
-#define MONETA_CHAR_DEVICE_PATH "/dev/monetaCtrla"
-#define SDSSD_CHAR_DEVICE_PATH "/dev/monetaCtrla"
-#define MONETA_BLOCK_DEVICE_PATH "/dev/monetaa"
-#define SDSSD_BLOCK_DEVICE_PATH "/dev/monetaa"
-
-#define ST_MONETA_DEVICE_ID 252
-#define ST_SDSSD_DEVICE_ID 252
-#define ST_SDSSD_BANKSHOT_DEVICE_ID 251
 
 #ifndef __cplusplus
 typedef int bool;
@@ -292,18 +279,22 @@ struct sigaction defaction;
 #define CALL_MUNMAP addr, len
 #define CALL_WRITE  file, buf, length
 #define CALL_OPEN   path, oflag
+#define CALL_READ   file, buf, length
 
 #define RETT_MMAP   void*
 #define RETT_MEMCPY void*
 #define RETT_MUNMAP int
 #define RETT_WRITE  ssize_t
 #define RETT_OPEN   int
+#define RETT_READ   ssize_t
 
 #define INTF_MEMCPY void *dest, const void *src, size_t n
 #define INTF_MMAP   void *addr, size_t len, int prot, int flags, int file, off_t off
 #define INTF_MUNMAP void *addr, size_t len
 #define INTF_WRITE  int file, const void* buf, size_t length
 #define INTF_OPEN const char *path, int oflag, ...
+#define INTF_READ   int file, void* buf, size_t length
 
 #define PFFS_WRITE  "%i, %p, %i"
 #define PFFS_OPEN   "%s, %i"
+#define PFFS_READ   "%i, %p, %i"

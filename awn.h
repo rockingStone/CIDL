@@ -46,6 +46,8 @@ extern int ts_munmap (void *__addr, size_t __len);
    appropriate third/fourth parameter.  */
 extern int ts_open (const char *__path, int __oflag, ...);
  
+extern ssize_t ts_read (int __fd, void *__buf, size_t __nbytes);
+
 #ifdef __cplusplus
 }
 #endif
