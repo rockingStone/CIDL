@@ -48,6 +48,11 @@ extern int ts_open (const char *__path, int __oflag, ...);
  
 extern ssize_t ts_read (int __fd, void *__buf, size_t __nbytes);
 
+/* Re-allocate the previously allocated block
+   in PTR, making the new block SIZE bytes long.  */
+extern void *ts_realloc (void *ptr, size_t size, void* tail);
+//extern void *realloc (void *__ptr, size_t __size);
+
 #ifdef __cplusplus
 }
 #endif

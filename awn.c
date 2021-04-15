@@ -75,29 +75,63 @@ void listFileMapTree(){
 	twalk(fileMapTreeRoot,listFileMapNodeAction);
 }
 
-static void listRecMapAction(const void *nodep, const VISIT which, const int depth){
+static showRecMapNode(struct recTreeNode **nodep){
     struct recTreeNode *fmNode;
+    struct tailhead* head = fmNode->listHead;
+
+	fmNode = *(struct recTreeNode **) nodep;
+	MSG("pageNum: %lu, list head:%lu, memRecIdx:%2d, struct address: %lu.\n",
+		fmNode->pageNum, head, fmNode->memRecIdx, fmNode);
+}
+
+static void listRecMapAction(const void *nodep, const VISIT which, const int depth){
 
     switch (which) {
     case preorder:
         break;
     case postorder:
-        fmNode = *(struct recTreeNode **) nodep;
-		MSG("pageNum: %lu, list head:%lu, memRecIdx:%2d, struct address: %lu.\n",
-			fmNode->pageNum, fmNode->listHead, fmNode->memRecIdx, fmNode);
+		showRecMapNode( (struct recTreeNode **)nodep);
         break;
     case endorder:
         break;
     case leaf:
-        fmNode = *(struct recTreeNode **) nodep;
-		MSG("pageNum: %lu, list head:%lu, memRecIdx:%2d, struct address: %lu.\n",
-			fmNode->pageNum, fmNode->listHead, fmNode->memRecIdx, fmNode);
+		showRecMapNode( (struct recTreeNode **)nodep);
+        break;
+    }
+}
+
+static showRecMapNodeDetail(struct recTreeNode **nodep){
+    struct recTreeNode *fmNode;
+    struct tailhead* head = fmNode->listHead;
+
+	fmNode = *(struct recTreeNode **) nodep;
+	MSG("pageNum: %lu, list head:%lu, memRecIdx:%2d, struct address: %lu.\n",
+		fmNode->pageNum, head, fmNode->memRecIdx, fmNode);
+	listRecTreeNode(fmNode->pageNum);
+}
+
+static void listRecMapActionDetail(const void *nodep, const VISIT which, const int depth){
+
+    switch (which) {
+    case preorder:
+        break;
+    case postorder:
+		showRecMapNode( (struct recTreeNode **)nodep);
+        break;
+    case endorder:
+        break;
+    case leaf:
+		showRecMapNode( (struct recTreeNode **)nodep);
         break;
     }
 }
 
 void listRecTree(){
 	twalk(recTreeRoot,  listRecMapAction);
+}
+
+void listRecTreeDetail(){
+	twalk(recTreeRoot,  listRecMapActionDetail);
 }
 
 int recCompare(const void *pa, const void *pb) {
@@ -254,6 +288,7 @@ void withdrawRecBlockEntry(struct recBlockEntry *ptr){
 
 inline struct memRec *allocateMemRecArr() __attribute__((always_inline));
 inline struct memRec *allocateMemRecArr(){
+	DEBUG("alloc memRecArr\n");
 	assert(RECARRPOOLIDX>0);
 	RECARRPOOLIDX--;
 	return RECARRPOOLPTR[RECARRPOOLIDX];
@@ -295,6 +330,7 @@ inline void writeRec(unsigned long fileOffset, void* src, void* dest, void* page
 	int idx = *(lastRec.lastIdx);
 	struct memRec* pt = lastRec.lastMemRec;
 	unsigned long pageOffset = (unsigned long)dest-((unsigned long)pageNum<<PAGENUMSHIFT);
+	//DEBUG("writeRec.\n");
 	//xzjin 注意开始的情况，如果lastRec是第一次用，还没有设置怎么办
 	if(idx<MEMRECPERENTRY){		//索引小于边界
 		pt[idx].fileName= fileName;
@@ -416,6 +452,8 @@ struct recTreeNode** findAndAddRecTreeNode(struct recTreeNode *recp){
 inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName) __attribute__((always_inline));
 inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName){
 	void* pageNum = addr2PageNum(dest);
+
+	//DEBUG("insterRec.\n");
 	//xzjin 这里暂时没有问题，对多输出的情况可以也做一个缓存
 	//xzjin 这里是同一页内容就追加，对重复写的内容怎么办？
 	//xzjin 这里主要的作用是检查树里面有没有对应这个页的节点，如果没有要新建节点
@@ -428,7 +466,8 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 		pt = tfind(&node, &recTreeRoot, recCompare);
 		if(UNLIKELY(pt)){	//xzjin 在树里找到了
 			//MSG("Found in tree\n");
-			//xzjin update lastRec,它是writeRec需要的参数之一，所以lastRec的更新必须在writeRec之前
+			//xzjin update lastRec, it is one of parameters that writeRec needs, 
+			//must update lastRec before callwriteRec
 			lastRec.lastPageNum = pageNum;
 			lastRec.lastMemRec = pt[0]->recModEntry->recArr;
 			//xzjin 注意这里是指向数字的指针
@@ -458,7 +497,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 					*(lastRec.lastIdx) = 0;
 				}
 			}
-
+			//DEBUG("insterRec if\n");
 			writeRec(fileOffset, src, dest, pageNum, fileName);
 //		    struct tailhead *head = pt[0]->listHead;
 
@@ -473,6 +512,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 			if(UNLIKELY(*lastRec.lastIdx<0 ||*lastRec.lastIdx>MEMRECPERENTRY)){
 				MSG("lastRec.lastIdx ERROR\n");
 			}
+			DEBUG("insterRec else\n");
 			writeRec(fileOffset, src, dest, pageNum, fileName);
 		}
 	}
@@ -1255,7 +1295,8 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 					destSearchNode.pageNum = (void*)destStart;
 					destRes = findAndAddRecTreeNode(&destSearchNode);
 				}
-				//xzjin update lastRec,它是writeRec需要的参数之一，所以lastRec的更新必须在writeRec之前
+				//xzjin update lastRec, it's one of paramters that writeRec needs，
+				//so update lastRec before call writeRec
 				lastRec.lastPageNum = (void*)destStart;
 				lastRec.lastMemRec = destRes[0]->recModEntry->recArr;
 				//xzjin 注意这里是指向数字的指针
@@ -1294,6 +1335,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 				}
 #endif	//TS_MEMCPY_CMPWRITE
 				//insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName);
+				DEBUG("ts_memcpy_traced UP idx:%d, uplimit:%d\n", idx, uplimit);
 				insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
 //				MSG("copy src: %lu, copy dest: %lu\n", copySrc, copyDest);
 #ifdef TS_MEMCPY_CMPWRITE
@@ -1321,6 +1363,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 			blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
 			//xzjin TODO 这里是不是可以和上面合并,函数太长了
 			while(blockEntry){
+				DEBUG("blockEntry:%p\n", blockEntry);
 				if(blockEntry == srcLastEntry){
 					uplimit = srcRes[0]->memRecIdx;
 				}
@@ -1328,7 +1371,6 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 //					uplimit = srcRes[0]->memRecIdx;
 //				}
 				rec = blockEntry->recArr;
-				////////////////////////////////////////////////////
 				for(idx = 0; idx < uplimit; idx++){
 					struct memRec *curMemRec = rec+idx;
 					void* copySrc = getAddr((void*)start, curMemRec->pageOffset);
@@ -1342,19 +1384,21 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 							dest, copySrc, src);
 						destRes = findAndAddRecTreeNode(&destSearchNode);
 					}
-					//xzjin update lastRec,它是writeRec需要的参数之一，所以lastRec的更新必须在writeRec之前
+					//xzjin update lastRec,it's one of the paremeters that writeRec needs，
+					// so update lastRec before call writeRec
 					lastRec.lastPageNum = (void*)destStart;
 					lastRec.lastMemRec = destRes[0]->recModEntry->recArr;
 					//xzjin 注意这里是指向数字的指针
 					lastRec.lastIdx = &(destRes[0]->memRecIdx);
 //					writeRec(curMemRec->fileOffset, copySrc, copyDest,
 //						 (void*)destStart, curMemRec->fileName);
+					DEBUG("ts_memcpy_traced DOWN idx:%d, uplimit:%d\n", idx, uplimit);
 					insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
 				}
 				//xzjin TODO 这里是不是也是不用删除，直接等写覆盖更好
-				/*
-				delBlockEntry = blockEntry;
+				//delBlockEntry = blockEntry;
 				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
+				/*
 				withdrawMemRecArr(delBlockEntry->recArr);
 				TAILQ_REMOVE(srcRes[0]->listHead, delBlockEntry, entries);
 				withdrawRecBlockEntry(delBlockEntry);
@@ -1452,6 +1496,7 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 //		src, dest,fmNode->start, fmNode->tail, fmNode->offset, fmNode->fileName);
 	//xzjin 记录log信息
 	START_TIMING(insert_rec_t,  insert_rec_time);
+	DEBUG("ts_memcpy\n");
 	insertRec(fmNode->offset+(src-fmNode->start), src, dest, fmNode->fileName);
 	END_TIMING(insert_rec_t,  insert_rec_time);
 	
@@ -1598,6 +1643,7 @@ void* ts_realloc(void *ptr, size_t size, void* tail){
 					overlaped = 1;
 					//Add record
 					dest = (void*)((unsigned long)memAddr-(unsigned long)ptr+ret);
+					DEBUG("in ts_realloc.\n");
 					insertRec(rec[i].fileOffset, NULL, dest, rec[i].fileName);
 				}
 				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
@@ -1674,8 +1720,7 @@ __attribute__((destructor))void fini(void) {
 }
 
 // xzjin _hub_managed_fileops是nvp
-RETT_OPEN ts_open(INTF_OPEN)
-{
+RETT_OPEN ts_open(INTF_OPEN){
 	char *abpath = NULL;
     struct stat st;
 	int result, err;

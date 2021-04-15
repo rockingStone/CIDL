@@ -5,7 +5,7 @@
 // Turns on debugging messages
 #undef SHOW_DEBUG
 #ifndef SHOW_DEBUG
-	#define SHOW_DEBUG 0
+	#define SHOW_DEBUG 1
 #endif
 
 #undef SHOW_MSG
