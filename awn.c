@@ -321,6 +321,7 @@ inline void writeRec(unsigned long fileOffset, void* src, void* dest, void* page
 		rbe = allocateRecBlockEntry();
 		rbe->recArr = recArr;
 		//xzjin 插入链表插在最前面，这样比较的时候是从最新拷贝的记录开始比较的
+		//xzjin 也就是说越大的内存地址在越前面
 		TAILQ_INSERT_HEAD(rec[0]->listHead, rbe, entries);
 		rec[0]->recModEntry = rbe;
 		
@@ -411,6 +412,7 @@ struct recTreeNode** findAndAddRecTreeNode(struct recTreeNode *recp){
 	return destRes;
 }
 
+//xzjin src is UNUSED and UNCHECKED
 inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName) __attribute__((always_inline));
 inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName){
 	void* pageNum = addr2PageNum(dest);
@@ -1061,7 +1063,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 //	unsigned long ret =  _hub_fileops->WRITE(CALL_WRITE);
 	unsigned long ret =  write(CALL_WRITE);
 	END_TIMING(ts_write_t, ts_write_time);
-	MSG("                  ts_write: buf:%lu, file:%d, len: %llu\n", 
+	MSG("ts_write: buf:%lu, file:%d, len: %llu\n", 
 		buf, file, length);
 #if USE_TS_FUNC 
 	START_TIMING(compare_mem_t, compare_mem_time);
@@ -1529,6 +1531,8 @@ ssize_t ts_read(int fd, void *buf, size_t nbytes){
 		MSG("lseek ERROR, %s, errno %d.\n", strerror(err), err);
 		exit(-1);
 	}
+	MSG("ts_read to %p ,len %d ,from %p, fd:%d, fileName:%s.\n",
+		buf, copyLen, copyBegin, fd, fd2path[fd%100]);
 	return copyLen;
 }
 
@@ -1538,23 +1542,6 @@ void* ts_realloc(void *ptr, size_t size, void* tail){
 	unsigned long long end = (unsigned long long)addr2PageNum(tail);
 	struct recTreeNode searchNode;
 
-//	if(LIKELY(libcRealloc)){
-//		ret = libcRealloc(ptr, size);
-//	}else{
-//		if(! _libc_so_p){
-//			_libc_so_p = dlopen(LIBC_SO_LOC, RTLD_LAZY|RTLD_LOCAL);
-//		}
-//		if(! _libc_so_p){
-//			ERROR("Failed to open libc.\n");
-//			assert(0);
-//		}
-//		libcRealloc= dlsym(_libc_so_p, "realloc");
-//		if(!libcRealloc){
-//			ERROR("Failed to find libc realloc.\n");
-//			assert(0);
-//		}
-//		ret = libcRealloc(ptr, size);
-//	}
 	ret = realloc(ptr, size);
 
 #if USE_TS_FUNC
@@ -1563,16 +1550,65 @@ void* ts_realloc(void *ptr, size_t size, void* tail){
 		searchNode.pageNum = (void*)start;
 		struct recTreeNode **res = tfind(&searchNode, &recTreeRoot, recCompare);
 		if(res){
-//			struct tailhead *headp = res[0]->listHead;
-//			struct recTreeNode *treeNode = malloc(sizeof(struct recTreeNode));
-			//TODO 这个函数好像没有写完
-//			struct recTreeNode *treeNode = allocateRecTreeNode();
-			//List is empty?
-//			if(TAILQ_EMPTY(treeNode->listHead)){
-//				MSG("List empty\n");
-//			}else{
-//				MSG("List NOT empty\n");
-//			}
+			struct tailhead* head = res[0]->listHead;
+			struct recBlockEntry *mostRecBlock = res[0]->recModEntry;
+			struct recBlockEntry *blockEntry = TAILQ_LAST(head, tailhead);
+			struct recBlockEntry *delBlockEntry;
+//			struct recBlockEntry *delBlockEntry;
+			struct memRec* rec;
+			int uplimit;
+
+			do{	//loop for every block/recArray
+				delBlockEntry = blockEntry;
+				int overlaped = 0;
+				if(blockEntry == mostRecBlock){
+					uplimit = res[0]->memRecIdx;
+				}else{
+					uplimit = MEMRECPERENTRY;
+				}
+				rec = blockEntry->recArr;
+/**	
+ * Realloc area				|________________|
+ * rec area
+ * case.1		|_______|
+ * case.2		|________________|
+ * case.3		|_________________________________________|
+ * case.4						|______|
+ * case.5						|_________________________|
+ * case.6											|_____|
+ */
+				//Precheck, case6, because of the ordered queue, later recorder
+				//must be larger, continue
+				if(getAddr((void*)start, rec[uplimit].pageOffset)>=tail){
+					continue;
+				}
+				for(int i=0; i< uplimit; i++){	//loop for every single record
+					void* dest;
+					void* memAddr = getAddr((void*)start, rec[i].pageOffset);
+					//case 1,2,3 ommit, for case 1,2,3 we do not kown the len,
+					//so do not now which case it belogs to, omit.
+					if(memAddr <= ptr){
+						continue;
+					}
+					//case6, because of the ordered queue, later recorder
+					//must be larger, continue
+					if(memAddr >= tail){
+						break;
+					}
+					overlaped = 1;
+					//Add record
+					dest = (void*)((unsigned long)memAddr-(unsigned long)ptr+ret);
+					insertRec(rec[i].fileOffset, NULL, dest, rec[i].fileName);
+				}
+				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
+				//xzjin after find relocate area, del all the rec in current array.
+				//it is a compromise bwtween complexity and effectiveness
+				if(overlaped){
+					withdrawMemRecArr(delBlockEntry->recArr);
+					TAILQ_REMOVE(head, delBlockEntry, entries);
+					withdrawRecBlockEntry(delBlockEntry);
+				}
+			}while(blockEntry);
 		}
 	}
 	END_TIMING(remap_mem_rec_t, remap_mem_rec_time);
