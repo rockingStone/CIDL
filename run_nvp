@@ -1,7 +1,0 @@
-#!/bin/bash
-
-sync
-export LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH
-export LD_PRELOAD="libnvp.so"
-export NVP_TREE_FILE="./nvp_nvp.tree"
-$@
