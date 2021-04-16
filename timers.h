@@ -11,38 +11,17 @@
 
 unsigned int num_open;
 unsigned int num_close;
-unsigned int num_async_close;
 unsigned int num_read;
 unsigned int num_write;
-unsigned int num_stat;
-unsigned int num_unlink;
-unsigned int num_appendfsync;
 unsigned int num_memcpy_read;
-unsigned int num_anon_read;
 unsigned int num_memcpy_write;
-unsigned int num_append_write;
-unsigned int num_posix_read;
-unsigned int num_posix_write;
-unsigned int num_fsync;
-unsigned int num_mfence;
-unsigned int num_write_nontemporal;
-unsigned int num_write_temporal;
-unsigned int num_clflushopt;
 unsigned int num_mmap;
-unsigned int num_drs;
-unsigned int num_drs_critical_path;
-unsigned long long appendfsync_size;
-unsigned long long non_temporal_write_size;
-unsigned long long temporal_write_size;
 unsigned long long read_size;
 unsigned long long write_size;
 unsigned long long memcpy_read_size;
-unsigned long long anon_read_size;
 unsigned long long memcpy_write_size;
-unsigned long long append_write_size;
-unsigned long long posix_read_size;
-unsigned long long posix_write_size;
 unsigned long long ts_write_size;
+unsigned long long ts_write_not_found_size;
 unsigned long long ts_write_same_size;
 unsigned long ts_metadataItem;
 //xzjin
@@ -52,9 +31,6 @@ long long nvpWriteSize;
 long long nvpWriteTime;
 unsigned long long total_syscalls;
 unsigned long long deleted_size;
-volatile size_t _nvp_wr_extended;
-volatile size_t _nvp_wr_total;
-atomic_uint_fast64_t num_drs_left;
 
 void nvp_print_io_stats(void);
 

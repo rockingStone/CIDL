@@ -77,9 +77,10 @@ void listFileMapTree(){
 
 static showRecMapNode(struct recTreeNode **nodep){
     struct recTreeNode *fmNode;
-    struct tailhead* head = fmNode->listHead;
-
+    struct tailhead* head;
 	fmNode = *(struct recTreeNode **) nodep;
+	head = fmNode->listHead;
+
 	MSG("pageNum: %lu, list head:%lu, memRecIdx:%2d, struct address: %lu.\n",
 		fmNode->pageNum, head, fmNode->memRecIdx, fmNode);
 }
@@ -90,19 +91,21 @@ static void listRecMapAction(const void *nodep, const VISIT which, const int dep
     case preorder:
         break;
     case postorder:
-		showRecMapNode( (struct recTreeNode **)nodep);
+		showRecMapNode((struct recTreeNode **)nodep);
         break;
     case endorder:
         break;
     case leaf:
-		showRecMapNode( (struct recTreeNode **)nodep);
+		showRecMapNode((struct recTreeNode **)nodep);
         break;
     }
 }
 
 static showRecMapNodeDetail(struct recTreeNode **nodep){
     struct recTreeNode *fmNode;
-    struct tailhead* head = fmNode->listHead;
+    struct tailhead* head;
+	fmNode = *(struct recTreeNode **) nodep;
+	head = fmNode->listHead;
 
 	fmNode = *(struct recTreeNode **) nodep;
 	MSG("pageNum: %lu, list head:%lu, memRecIdx:%2d, struct address: %lu.\n",
@@ -116,12 +119,12 @@ static void listRecMapActionDetail(const void *nodep, const VISIT which, const i
     case preorder:
         break;
     case postorder:
-		showRecMapNode( (struct recTreeNode **)nodep);
+		showRecMapNodeDetail((struct recTreeNode **)nodep);
         break;
     case endorder:
         break;
     case leaf:
-		showRecMapNode( (struct recTreeNode **)nodep);
+		showRecMapNodeDetail((struct recTreeNode **)nodep);
         break;
     }
 }
@@ -288,7 +291,6 @@ void withdrawRecBlockEntry(struct recBlockEntry *ptr){
 
 inline struct memRec *allocateMemRecArr() __attribute__((always_inline));
 inline struct memRec *allocateMemRecArr(){
-	DEBUG("alloc memRecArr\n");
 	assert(RECARRPOOLIDX>0);
 	RECARRPOOLIDX--;
 	return RECARRPOOLPTR[RECARRPOOLIDX];
@@ -325,12 +327,13 @@ inline short addr2PageOffset(void* addr){
 	return (short)((unsigned long long)(addr) & PAGEOFFMASK);
 }
 
-inline void writeRec(unsigned long fileOffset, void* src, void* dest, void* pageNum, char* fileName) __attribute__((always_inline));
-inline void writeRec(unsigned long fileOffset, void* src, void* dest, void* pageNum, char* fileName){
+inline void writeRec(unsigned long fileOffset, void* src, void* dest,
+	 void* pageNum, char* fileName) __attribute__((always_inline));
+inline void writeRec(unsigned long fileOffset, void* src, void* dest,
+	 void* pageNum, char* fileName){
 	int idx = *(lastRec.lastIdx);
 	struct memRec* pt = lastRec.lastMemRec;
 	unsigned long pageOffset = (unsigned long)dest-((unsigned long)pageNum<<PAGENUMSHIFT);
-	//DEBUG("writeRec.\n");
 	//xzjin 注意开始的情况，如果lastRec是第一次用，还没有设置怎么办
 	if(idx<MEMRECPERENTRY){		//索引小于边界
 		pt[idx].fileName= fileName;
@@ -380,7 +383,7 @@ struct recTreeNode* addTreeNode(void* pageNum){
 //	struct recTreeNode *treeNode = malloc(sizeof(struct recTreeNode));
 	struct recTreeNode *treeNode = allocateRecTreeNode();
 //	struct recTreeNode **insertResult;
-	DEBUG("Insert tree node, addr:%p, pageNum: %lu\n", treeNode, pageNum);
+	//DEBUG("Insert tree node, addr:%p, pageNum: %lu\n", treeNode, pageNum);
 	assert(treeNode!=NULL);
 
 //			xzjin 初始化链表结构，因为struct自己申请的内存会在程序结束被回收，用malloc代替
@@ -473,6 +476,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 			//xzjin 注意这里是指向数字的指针
 			lastRec.lastIdx = &(pt[0]->memRecIdx);
 			//Check whether new address is smaller than older
+			//If true, delete node content
 			{
 				struct memRec* lastMenRec = lastRec.lastMemRec;
 				int idx = *lastRec.lastIdx;
@@ -482,10 +486,11 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 				//TODO idx=0发生在
 				//	1. memcpy treced 刚删除了所有内容
 				//	2. memcpy treced 的dest的树节点之前是空的，现在刚插入内容
-				if(idx>0 && lastMenRec[idx-1].pageOffset>addr2PageOffset(dest)){
-					DEBUG("\nDeleting memory record list, pageNum:%lu.\n", pageNum);
+				//NOTE: bigger or equal, equal is important in some cases
+				if(idx>0 && lastMenRec[idx-1].pageOffset>=addr2PageOffset(dest)){
+//					DEBUG("\nDeleting memory record list, pageNum:%lu.\n", pageNum);
 					TAILQ_FOREACH(ent, head, entries){
-						DEBUG("delete list head:%p, element:%p\n", head, ent);
+//						DEBUG("delete list head:%p, element:%p\n", head, ent);
 						if(TAILQ_NEXT(ent, entries)){
 							withdrawMemRecArr(ent->recArr);
 							TAILQ_REMOVE(head, TAILQ_FIRST(head), entries);
@@ -511,8 +516,8 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 
 			if(UNLIKELY(*lastRec.lastIdx<0 ||*lastRec.lastIdx>MEMRECPERENTRY)){
 				MSG("lastRec.lastIdx ERROR\n");
+				exit(-1);
 			}
-			DEBUG("insterRec else\n");
 			writeRec(fileOffset, src, dest, pageNum, fileName);
 		}
 	}
@@ -712,14 +717,12 @@ void delMap(RBNodePtr *root, RBNodePtr addr){
 __attribute__((constructor))void init(void) {
 	execv_done = 0;
 	int tmp;
-	MSG("START\n");
-	DEBUG("Initializing the libnvp hub.  If you're reading this, the library is being loaded!\n");
-	DEBUG("Call tree will be parsed from %s\n", getenv(ENV_TREE_FILE));
+	MSG("Initializing the libawn.so.\n");
 
-	DEBUG("Initializing posix module\n");
 	//xzjin Put dlopen before call to memcpy and mmap call.
 	ts_write_size = 0;
  	ts_write_same_size = 0;
+ 	ts_write_not_found_size = 0;
 	ts_metadataItem = 0;
 	nvpWriteSize = 0;
 	mmapSrcCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
@@ -909,7 +912,6 @@ RETT_MMAP ts_mmap(INTF_MMAP) {
 	int err;
 //	int idx;
 
-	DEBUG("Call posix mmap.\n");
 	ret = mmap(CALL_MMAP);
 	err = errno;
 	if(UNLIKELY((long)ret==-1)){
@@ -1072,7 +1074,6 @@ inline unsigned long cmpWrite(unsigned long bufCmpStart, struct memRec *mrp, voi
 		ts_write_same_size += addLen;
 //		MSG("Cmp write: same len:%lu, buf:%lu, file buf:%lu, diffPos:%lu, cmpRet:%d, write len: %lu, file pos:%llu, fd:%d, fileName:%s\n\n",
 //			addLen, bufCmpStart, fileCmpStart, *diffPos, cmpRet, writeLen, fpos, fd, fmTarNode->fileName);
-//		syscall(335, file, mrp[i].fd, 67305985, addLen);	// 67305985是0x04030201的10进制
 	}else{
 		MSG("ts_write fMapCache not hit\n");
 	}
@@ -1083,22 +1084,21 @@ inline unsigned long cmpWrite(unsigned long bufCmpStart, struct memRec *mrp, voi
 
 ssize_t ts_write(int file, void *buf, size_t length){
 	void *t = buf;
-	ts_write_size += length;
 	unsigned long tail = (unsigned long)buf+length;
 	unsigned long long start = (unsigned long long)addr2PageNum(t);
-//	unsigned long long startPageNum = start;
 	unsigned long long end = (unsigned long long)addr2PageNum((void*)((unsigned long long)buf+length));
-//	unsigned long long cmpDiffPageNum;
 	struct recTreeNode searchNode;
-	//struct recBlockEntry *rbp;
 	struct memRec *mrp;
-	int idx; 
 	void* diffPos = 0;
 	void* bufCmpStart;
 	unsigned long sameLen;
 	int sameContentTimes = 0;
+	int toTailLen;
+	int idx; 
+
 	//TODO xzjin 这个是不是要在用户空间维护一下，太耗时了
 	//off_t fpos = lseek(file, 0, SEEK_CUR);
+	ts_write_size += length;
 	START_TIMING(ts_write_t, ts_write_time);
 //	unsigned long ret =  _hub_fileops->WRITE(CALL_WRITE);
 	unsigned long ret =  write(CALL_WRITE);
@@ -1111,8 +1111,10 @@ ssize_t ts_write(int file, void *buf, size_t length){
 	for(int i=0; start<=end; start++,i++){
 //		int writeLenCurPage = 4096;
 		int sameLenCurPage = 0;
+		int notFoundLen;
+		toTailLen = length-((unsigned long)getAddr((void*)start,0)-(unsigned long)buf);
 //		float samePercent;
-		DEBUG("compare, Page num:%lu.\n", start);
+//		DEBUG("compare, Page num:%lu.\n", start);
 		if((unsigned long)getAddr((void*)start, 0)<(unsigned long)diffPos) continue;
 //		if(startPageNum == start){
 //			writeLenCurPage = 4096-addr2PageOffset(buf);
@@ -1153,7 +1155,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 					sameLenCurPage += sameLen;
 				}
 				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
-			}//SLIST_FOREACH(blockEntry, headp, entries)
+			}
 
 //delTail:
 //			samePercent = ((double)sameLenCurPage/writeLenCurPage)*100;
@@ -1183,7 +1185,9 @@ ssize_t ts_write(int file, void *buf, size_t length){
 			}
 			*/
 		}else{
-			DEBUG("buf: %lu not found.\n", buf);
+			notFoundLen = MIN(PAGESIZE, toTailLen);
+			MSG("buf: %lu not found, size:%d.\n", start, notFoundLen);
+			ts_write_not_found_size += notFoundLen;
 		}
 	}
 //	DEBUG("ts_write buf:%p, tail:%p, length:%lu, fileName:%s, ret length:%lu, same content time:%d\n\n\n",
@@ -1207,12 +1211,12 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 	ret = memcpy(CALL_MEMCPY);
 
 #if USE_TS_FUNC
-	DEBUG("ts_memcpy_traced: From: %lu, from tail: %lu, to： %lu, to tail: %lu, length: %lu.\n",
-		src, src+n, dest, dest+n, n);
+//	DEBUG("ts_memcpy_traced: From: %lu, from tail: %lu, to： %lu, to tail: %lu, length: %lu.\n",
+//		src, src+n, dest, dest+n, n);
 	START_TIMING(mem_from_mem_trace_t, mem_from_mem_trace_time);
 	//xzjin TODO,对不是从页开始的内容做memRec的拼接
 	for(int i=0; start<=end; start++,destStart++,i++){
-		DEBUG("start:%lu.\n", start);
+//		DEBUG("start:%lu.\n", start);
 		searchNode.pageNum = (void*)start;
 		destSearchNode.pageNum = (void*)destStart;
 		struct recTreeNode **srcRes = tfind(&searchNode, &recTreeRoot, recCompare);
@@ -1290,7 +1294,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
  				copyDest = dest+(copySrc-src);
 				//xzjin 确保拷贝到了正确的页结构里面
 				if(UNLIKELY((unsigned long long)addr2PageNum(copyDest) != destStart)){
-					DEBUG("searchNode:%lu, pageNum:%lu.\n", &destSearchNode, destSearchNode.pageNum);
+//					DEBUG("searchNode:%lu, pageNum:%lu.\n", &destSearchNode, destSearchNode.pageNum);
 					destStart = (unsigned long long)addr2PageNum(copyDest);
 					destSearchNode.pageNum = (void*)destStart;
 					destRes = findAndAddRecTreeNode(&destSearchNode);
@@ -1335,7 +1339,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 				}
 #endif	//TS_MEMCPY_CMPWRITE
 				//insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName);
-				DEBUG("ts_memcpy_traced UP idx:%d, uplimit:%d\n", idx, uplimit);
+//				DEBUG("ts_memcpy_traced UP idx:%d, uplimit:%d\n", idx, uplimit);
 				insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
 //				MSG("copy src: %lu, copy dest: %lu\n", copySrc, copyDest);
 #ifdef TS_MEMCPY_CMPWRITE
@@ -1363,7 +1367,6 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 			blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
 			//xzjin TODO 这里是不是可以和上面合并,函数太长了
 			while(blockEntry){
-				DEBUG("blockEntry:%p\n", blockEntry);
 				if(blockEntry == srcLastEntry){
 					uplimit = srcRes[0]->memRecIdx;
 				}
@@ -1392,7 +1395,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 					lastRec.lastIdx = &(destRes[0]->memRecIdx);
 //					writeRec(curMemRec->fileOffset, copySrc, copyDest,
 //						 (void*)destStart, curMemRec->fileName);
-					DEBUG("ts_memcpy_traced DOWN idx:%d, uplimit:%d\n", idx, uplimit);
+//					DEBUG("ts_memcpy_traced DOWN idx:%d, uplimit:%d\n", idx, uplimit);
 					insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
 				}
 				//xzjin TODO 这里是不是也是不用删除，直接等写覆盖更好
@@ -1496,7 +1499,6 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 //		src, dest,fmNode->start, fmNode->tail, fmNode->offset, fmNode->fileName);
 	//xzjin 记录log信息
 	START_TIMING(insert_rec_t,  insert_rec_time);
-	DEBUG("ts_memcpy\n");
 	insertRec(fmNode->offset+(src-fmNode->start), src, dest, fmNode->fileName);
 	END_TIMING(insert_rec_t,  insert_rec_time);
 	
