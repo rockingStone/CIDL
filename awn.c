@@ -43,6 +43,7 @@ struct Fileops_p* _hub_fileops_lookup[MAX_FILEOPS];
 //int _hub_add_and_resolve_fileops_tree_from_file(char* filename);
 //int hub_check_resolve_fileops(char* tree);
 void init(void);
+void listRecTreeNode(void *pageNum);
 //inline void *intel_memcpy(void * __restrict__ b, const void * __restrict__ a, size_t n);
 instrumentation_type compare_mem_time, remap_mem_rec_time, ts_write_time;
 instrumentation_type mem_from_file_trace_time, mem_from_mem_trace_time;
@@ -75,7 +76,7 @@ void listFileMapTree(){
 	twalk(fileMapTreeRoot,listFileMapNodeAction);
 }
 
-static showRecMapNode(struct recTreeNode **nodep){
+static void showRecMapNode(struct recTreeNode **nodep){
     struct recTreeNode *fmNode;
     struct tailhead* head;
 	fmNode = *(struct recTreeNode **) nodep;
@@ -101,7 +102,7 @@ static void listRecMapAction(const void *nodep, const VISIT which, const int dep
     }
 }
 
-static showRecMapNodeDetail(struct recTreeNode **nodep){
+static void showRecMapNodeDetail(struct recTreeNode **nodep){
     struct recTreeNode *fmNode;
     struct tailhead* head;
 	fmNode = *(struct recTreeNode **) nodep;
@@ -147,6 +148,39 @@ int recCompare(const void *pa, const void *pb) {
     return 0;
 }
 
+//xzjin 遍历打印红黑树节点里的记录
+void listRecTreeNode(void *pageNum){
+	struct recTreeNode node,**pt;
+	struct recBlockEntry *ent, *mostRecentModifiedEnry;
+	node.pageNum = pageNum;
+	pt = tfind(&node, &recTreeRoot, recCompare);
+	if(!pt){
+		MSG("page:%lu not in tree.\n", pageNum);
+		return;
+	}
+    struct tailhead* listHead = pt[0]->listHead;
+	mostRecentModifiedEnry = pt[0]->recModEntry;
+
+	if(TAILQ_EMPTY(listHead)){
+		MSG("page:%lu list NULL.\n", pageNum);
+		return;
+	}
+
+	MSG("Page:%lu:\n", pageNum);
+	TAILQ_FOREACH(ent, listHead, entries){
+		struct memRec* recArr = ent->recArr;
+		int tail = MEMRECPERENTRY;
+		if(ent == mostRecentModifiedEnry)
+			tail = pt[0]->memRecIdx;
+
+		MSG("\nnew Array, %d length, element:%p\n", tail, ent);
+		for(int i=0; i<tail; i++,recArr++){
+			DEBUG("page off:%4d, fileOffset:%ld, addr:%lu, fileName:%s.\n",
+				recArr->pageOffset, recArr->fileOffset, recArr, recArr->fileName);
+		}
+	}
+}
+
 int fileMapTreeInsDelCompare(const void *pa, const void *pb) {
     const struct fileMapTreeNode* a = pa;
     const struct fileMapTreeNode* b = pb;
@@ -186,39 +220,6 @@ int fileMapTreeSearchCompare(const void *pa, const void *pb) {
             (unsigned long)(a->tail) < (unsigned long)(b->start))
         return -1;
     return 0;
-}
-
-//xzjin 遍历打印红黑树节点里的记录
-void listRecTreeNode(void *pageNum){
-	struct recTreeNode node,**pt;
-	struct recBlockEntry *ent, *mostRecentModifiedEnry;
-	node.pageNum = pageNum;
-	pt = tfind(&node, &recTreeRoot, recCompare);
-	if(!pt){
-		MSG("page:%lu not in tree.\n", pageNum);
-		return;
-	}
-    struct tailhead* listHead = pt[0]->listHead;
-	mostRecentModifiedEnry = pt[0]->recModEntry;
-
-	if(TAILQ_EMPTY(listHead)){
-		MSG("page:%lu list NULL.\n", pageNum);
-		return;
-	}
-
-	MSG("Page:%lu:\n", pageNum);
-	TAILQ_FOREACH(ent, listHead, entries){
-		struct memRec* recArr = ent->recArr;
-		int tail = MEMRECPERENTRY;
-		if(ent == mostRecentModifiedEnry)
-			tail = pt[0]->memRecIdx;
-
-		MSG("\nnew Array, %d length, element:%p\n", tail, ent);
-		for(int i=0; i<tail; i++,recArr++){
-			DEBUG("page off:%4d, fileOffset:%ld, addr:%lu, fileName:%s.\n",
-				recArr->pageOffset, recArr->fileOffset, recArr, recArr->fileName);
-		}
-	}
 }
 
 extern int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void* firstDiffPos);	
@@ -917,13 +918,13 @@ RETT_MMAP ts_mmap(INTF_MMAP) {
 	if(UNLIKELY((long)ret==-1)){
 		ERROR("mmap ERROR, %s, errno:%d\n", strerror(err), err);
 	}
-	DEBUG("_hub_mmap returned:%p fileName:%s, fd:%d\n",ret, fd2path[file], file);
+	DEBUG("_hub_mmap returned:%p fileName:%s, fd:%d\n",ret, fd2path[file%100], file);
 
 	START_TIMING(fileMap_t, fileMap_time);
 	//xzjin Here we need to skip pmem dir file
 	if(!(prot & MAP_ANONYMOUS) && file>-1 ){
 		//xzjin Here we skip mktmp file
-		if(UNLIKELY(!strncmp("./pmem/DR-",fd2path[file],10))) goto out;
+		if(UNLIKELY(!strncmp("./pmem/DR-",fd2path[file%100],10))) goto out;
 		//xzjin Recored page protection here.
 //		int pro = prot & (PROT_READ | PROT_WRITE | PROT_EXEC );
 		//struct fileMapTreeNode *treeNode = malloc(sizeof(struct fileMapTreeNode));
@@ -1070,10 +1071,10 @@ inline unsigned long cmpWrite(unsigned long bufCmpStart, struct memRec *mrp, voi
 			addLen = cmpLen;
 			*diffPos = (void*)tail;
 		}
-	 	ts_metadataItem++;
+		ts_metadataItem++;
+		MSG("Cmp write: same len:%lu, buf:%p, file buf:%p, diffPos:%lu, cmpRet:%d, fd:%d, fileName:%s\n\n",
+			addLen, bufCmpStart, fileCmpStart, *diffPos, cmpRet, fd, fmTarNode->fileName);
 		ts_write_same_size += addLen;
-//		MSG("Cmp write: same len:%lu, buf:%lu, file buf:%lu, diffPos:%lu, cmpRet:%d, write len: %lu, file pos:%llu, fd:%d, fileName:%s\n\n",
-//			addLen, bufCmpStart, fileCmpStart, *diffPos, cmpRet, writeLen, fpos, fd, fmTarNode->fileName);
 	}else{
 		MSG("ts_write fMapCache not hit\n");
 	}
@@ -1093,6 +1094,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 	void* bufCmpStart;
 	unsigned long sameLen;
 	int sameContentTimes = 0;
+	int curWriteSameLen = 0;
 	int toTailLen;
 	int idx; 
 
@@ -1103,8 +1105,8 @@ ssize_t ts_write(int file, void *buf, size_t length){
 //	unsigned long ret =  _hub_fileops->WRITE(CALL_WRITE);
 	unsigned long ret =  write(CALL_WRITE);
 	END_TIMING(ts_write_t, ts_write_time);
-	MSG("ts_write: buf:%lu, file:%d, len: %llu\n", 
-		buf, file, length);
+	MSG("ts_write: buf:%p, file:%d, len: %llu, fileName:%s\n", 
+		buf, file, length, fd2path[file%100]);
 #if USE_TS_FUNC 
 	START_TIMING(compare_mem_t, compare_mem_time);
 	//xzjin 因为是比较连续的地址，所以不用在开始重新初始化diffPos变量
@@ -1127,10 +1129,9 @@ ssize_t ts_write(int file, void *buf, size_t length){
 //		END_TIMING(tfind_t, tfind_time);
 		if(res){
 //			struct tailhead *headp = res[0]->listHead;
+			listRecTreeNode((void*)start);
 			struct recBlockEntry *blockEntry = TAILQ_LAST(res[0]->listHead, tailhead);
 			//xzjin 注意这里有个foreach，这个有效吗？正确吗?
-			//xzjin 这里是不是应该从后往前比？
-			//TAILQ_FOREACH(blockEntry, headp, entries)
 			while(blockEntry){
 				int i=0;
 				mrp = blockEntry->recArr;
@@ -1153,6 +1154,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 					sameLen = cmpWrite((unsigned long)bufCmpStart, mrp, buf, tail, &diffPos, file);
 					sameContentTimes += sameLen?1:0;
 					sameLenCurPage += sameLen;
+					curWriteSameLen +=sameLen;
 				}
 				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
 			}
@@ -1190,8 +1192,8 @@ ssize_t ts_write(int file, void *buf, size_t length){
 			ts_write_not_found_size += notFoundLen;
 		}
 	}
-//	DEBUG("ts_write buf:%p, tail:%p, length:%lu, fileName:%s, ret length:%lu, same content time:%d\n\n\n",
-//		 buf, tail, length, fd2path[file%10],ret, sameContentTimes);
+	MSG("ts_write buf:%p, tail:%p, length:%lu, same time:%d, same len:%d, same occupy:%d%%\n\n\n",
+		 buf, tail, length, sameContentTimes, curWriteSameLen, (int)(curWriteSameLen*100/length));
 	END_TIMING(compare_mem_t, compare_mem_time);
 #endif //USE_TS_FUNC 
 	return ret;
@@ -1600,14 +1602,15 @@ void* ts_realloc(void *ptr, size_t size, void* tail){
 			struct tailhead* head = res[0]->listHead;
 			struct recBlockEntry *mostRecBlock = res[0]->recModEntry;
 			struct recBlockEntry *blockEntry = TAILQ_LAST(head, tailhead);
-			struct recBlockEntry *delBlockEntry;
+			struct recBlockEntry *delBlockEntry __attribute__((unused));
 //			struct recBlockEntry *delBlockEntry;
 			struct memRec* rec;
 			int uplimit;
 
 			do{	//loop for every block/recArray
 				delBlockEntry = blockEntry;
-				int overlaped = 0;
+				int overlaped __attribute__((unused));
+				overlaped = 0;
 				if(blockEntry == mostRecBlock){
 					uplimit = res[0]->memRecIdx;
 				}else{
@@ -1651,11 +1654,13 @@ void* ts_realloc(void *ptr, size_t size, void* tail){
 				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
 				//xzjin after find relocate area, del all the rec in current array.
 				//it is a compromise bwtween complexity and effectiveness
+#if DEL_REALLOC_ADDR
 				if(overlaped){
 					withdrawMemRecArr(delBlockEntry->recArr);
 					TAILQ_REMOVE(head, delBlockEntry, entries);
 					withdrawRecBlockEntry(delBlockEntry);
 				}
+#endif	//DEL_REALLOC_ADDR
 			}while(blockEntry);
 		}
 	}

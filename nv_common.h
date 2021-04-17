@@ -41,6 +41,7 @@
 //#include "boost/preprocessor/cat.hpp"
 
 #define BUF_SIZE 40
+#define DEL_REALLOC_ADDR 1
 #undef USE_STAIL
 
 #define MIN(X,Y) (((X)<(Y))?(X):(Y))
