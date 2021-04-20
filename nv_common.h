@@ -14,6 +14,7 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <sched.h>
 #include <search.h>
 #include <signal.h>
@@ -41,7 +42,8 @@
 //#include "boost/preprocessor/cat.hpp"
 
 #define BUF_SIZE 40
-#define DEL_REALLOC_ADDR 1
+#define PATCH 1
+#define DEL_REALLOC_ADDR 0
 #undef USE_STAIL
 
 #define MIN(X,Y) (((X)<(Y))?(X):(Y))

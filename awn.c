@@ -24,18 +24,7 @@
 #define LIBC_SO_LOC "/lib/x86_64-linux-gnu/libc.so.6"
 
 ssize_t ts_write(int file, void *buf, size_t length);
-// for a given file descriptor (index), stores the fileops to use on that fd
-// all vlaues initialized to the posix ops
-struct Fileops_p** _hub_fd_lookup;
-struct Fileops_p*  _hub_managed_fileops;
-RETT_MEMCPY (*libcMemcpy) (INTF_MEMCPY);
-void (*libcFree) (void* ptr);
-RETT_MMAP (*libcMmap) (INTF_MMAP);
-void* (*libcRealloc)(void *ptr, size_t size);
 
-void* _libc_so_p;
-
-int _hub_fileops_count = 0;
 /**xzjin 大概是一个全局的操作库，每个元素包含了一个模块的操作
  */
 struct Fileops_p* _hub_fileops_lookup[MAX_FILEOPS];
@@ -146,39 +135,6 @@ int recCompare(const void *pa, const void *pb) {
     if ((unsigned long)a->pageNum > (unsigned long)b->pageNum)
         return 1;
     return 0;
-}
-
-//xzjin 遍历打印红黑树节点里的记录
-void listRecTreeNode(void *pageNum){
-	struct recTreeNode node,**pt;
-	struct recBlockEntry *ent, *mostRecentModifiedEnry;
-	node.pageNum = pageNum;
-	pt = tfind(&node, &recTreeRoot, recCompare);
-	if(!pt){
-		MSG("page:%lu not in tree.\n", pageNum);
-		return;
-	}
-    struct tailhead* listHead = pt[0]->listHead;
-	mostRecentModifiedEnry = pt[0]->recModEntry;
-
-	if(TAILQ_EMPTY(listHead)){
-		MSG("page:%lu list NULL.\n", pageNum);
-		return;
-	}
-
-	MSG("Page:%lu:\n", pageNum);
-	TAILQ_FOREACH(ent, listHead, entries){
-		struct memRec* recArr = ent->recArr;
-		int tail = MEMRECPERENTRY;
-		if(ent == mostRecentModifiedEnry)
-			tail = pt[0]->memRecIdx;
-
-		MSG("\nnew Array, %d length, element:%p\n", tail, ent);
-		for(int i=0; i<tail; i++,recArr++){
-			DEBUG("page off:%4d, fileOffset:%ld, addr:%lu, fileName:%s.\n",
-				recArr->pageOffset, recArr->fileOffset, recArr, recArr->fileName);
-		}
-	}
 }
 
 int fileMapTreeInsDelCompare(const void *pa, const void *pb) {
@@ -326,6 +282,41 @@ inline void *addr2PageTail(void* addr){
 inline short addr2PageOffset(void* addr) __attribute__((always_inline));
 inline short addr2PageOffset(void* addr){
 	return (short)((unsigned long long)(addr) & PAGEOFFMASK);
+}
+
+//xzjin 遍历打印红黑树节点里的记录
+void listRecTreeNode(void *pageNum){
+	struct recTreeNode node,**pt;
+	struct recBlockEntry *ent, *mostRecentModifiedEnry;
+	node.pageNum = pageNum;
+	pt = tfind(&node, &recTreeRoot, recCompare);
+	if(!pt){
+		MSG("page:%lu not in tree.\n", pageNum);
+		return;
+	}
+    struct tailhead* listHead = pt[0]->listHead;
+	mostRecentModifiedEnry = pt[0]->recModEntry;
+
+	if(TAILQ_EMPTY(listHead)){
+		MSG("page:%lu list NULL.\n", pageNum);
+		return;
+	}
+
+	MSG("Page:%lu:\n", pageNum);
+	TAILQ_FOREACH(ent, listHead, entries){
+		struct memRec* recArr = ent->recArr;
+		int tail = MEMRECPERENTRY;
+		if(ent == mostRecentModifiedEnry)
+			tail = pt[0]->memRecIdx;
+
+		MSG("\nnew Array, %d length, element:%p\n", tail, ent);
+		for(int i=0; i<tail; i++,recArr++){
+			void* bufAddr = getAddr(pageNum, recArr->pageOffset);
+			DEBUG("page off:%4d, fileOffset:%ld, addr:%p, fileName:%s, bufAddr:%p.\n",
+				recArr->pageOffset, recArr->fileOffset, recArr, 
+				recArr->fileName, bufAddr);
+		}
+	}
 }
 
 inline void writeRec(unsigned long fileOffset, void* src, void* dest,
@@ -489,7 +480,8 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 				//	2. memcpy treced 的dest的树节点之前是空的，现在刚插入内容
 				//NOTE: bigger or equal, equal is important in some cases
 				if(idx>0 && lastMenRec[idx-1].pageOffset>=addr2PageOffset(dest)){
-//					DEBUG("\nDeleting memory record list, pageNum:%lu.\n", pageNum);
+					DEBUG("\nDeleting memory record list, pageNum:%lu.\n", pageNum);
+					listRecTreeNode(pageNum);
 					TAILQ_FOREACH(ent, head, entries){
 //						DEBUG("delete list head:%p, element:%p\n", head, ent);
 						if(TAILQ_NEXT(ent, entries)){
@@ -733,10 +725,6 @@ __attribute__((constructor))void init(void) {
 //	lastSrcInMap = NULL;
 //	lastSrcInMapKey = 0;
 //	lastDestInMapKey = 0;
-	libcMemcpy = NULL;
-	libcFree = NULL;
-	libcRealloc = NULL;
-	libcMmap = NULL;
 	proKey = nonProKey = -1;
 	lastTs_memcpyFmNode = NULL;
 	leastRecFCache.idx=-1;
@@ -1103,10 +1091,11 @@ ssize_t ts_write(int file, void *buf, size_t length){
 	ts_write_size += length;
 	START_TIMING(ts_write_t, ts_write_time);
 //	unsigned long ret =  _hub_fileops->WRITE(CALL_WRITE);
-	unsigned long ret =  write(CALL_WRITE);
+	unsigned long ret = write(CALL_WRITE);
 	END_TIMING(ts_write_t, ts_write_time);
 	MSG("ts_write: buf:%p, file:%d, len: %llu, fileName:%s\n", 
 		buf, file, length, fd2path[file%100]);
+	listRecTreeDetail();
 #if USE_TS_FUNC 
 	START_TIMING(compare_mem_t, compare_mem_time);
 	//xzjin 因为是比较连续的地址，所以不用在开始重新初始化diffPos变量
@@ -1147,7 +1136,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 				}
 				
 				for(; i<idx; mrp++,i++){
-					//DEBUG("i=%d, mrp:%lu.\n", i, mrp);
+					DEBUG("i=%d, mrp:%lu.\n", i, mrp);
 					bufCmpStart = getAddr((void*)start, mrp->pageOffset);
 					if((unsigned long)bufCmpStart < (unsigned long) diffPos) continue;
 					if((unsigned long)bufCmpStart > (unsigned long) tail) break;
@@ -1189,6 +1178,133 @@ ssize_t ts_write(int file, void *buf, size_t length){
 		}else{
 			notFoundLen = MIN(PAGESIZE, toTailLen);
 			MSG("buf: %lu not found, size:%d.\n", start, notFoundLen);
+			ts_write_not_found_size += notFoundLen;
+		}
+	}
+	MSG("ts_write buf:%p, tail:%p, length:%lu, same time:%d, same len:%d, same occupy:%d%%\n\n\n",
+		 buf, tail, length, sameContentTimes, curWriteSameLen, (int)(curWriteSameLen*100/length));
+	END_TIMING(compare_mem_t, compare_mem_time);
+#endif //USE_TS_FUNC 
+	return ret;
+}
+
+size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
+	void *t = (void*)buf;
+	unsigned long tail;
+	unsigned long long start, end;
+	struct recTreeNode searchNode;
+	size_t length;
+	struct memRec *mrp;
+	void* diffPos = 0;
+	void* bufCmpStart;
+	unsigned long sameLen;
+	int sameContentTimes = 0;
+	int curWriteSameLen = 0;
+	int toTailLen;
+	int idx; 
+	int file;
+
+	length = size*n;
+	tail = (unsigned long)buf+length;
+	start = (unsigned long long)addr2PageNum(t);
+	end = (unsigned long long)addr2PageNum((void*)((unsigned long long)buf+length));
+	file = fileno(s);
+	//TODO xzjin 这个是不是要在用户空间维护一下，太耗时了
+	//off_t fpos = lseek(file, 0, SEEK_CUR);
+	ts_write_size += length;
+	START_TIMING(ts_write_t, ts_write_time);
+//	unsigned long ret =  _hub_fileops->WRITE(CALL_WRITE);
+	unsigned long ret = fwrite(buf, size, n, s);
+	END_TIMING(ts_write_t, ts_write_time);
+	MSG("ts_fwrite: buf:%p, file:%d, len: %llu, fileName:%s\n", 
+		buf, file, length, fd2path[file%100]);
+	listRecTreeDetail();
+#if USE_TS_FUNC 
+	START_TIMING(compare_mem_t, compare_mem_time);
+	//xzjin 因为是比较连续的地址，所以不用在开始重新初始化diffPos变量
+	for(int i=0; start<=end; start++,i++){
+//		int writeLenCurPage = 4096;
+		int sameLenCurPage = 0;
+		int notFoundLen;
+		toTailLen = length-((unsigned long)getAddr((void*)start,0)-(unsigned long)buf);
+//		float samePercent;
+//		DEBUG("compare, Page num:%lu.\n", start);
+		if((unsigned long)getAddr((void*)start, 0)<(unsigned long)diffPos) continue;
+//		if(startPageNum == start){
+//			writeLenCurPage = 4096-addr2PageOffset(buf);
+//		}else if(end == start){
+//			writeLenCurPage = addr2PageOffset((void*)tail);
+//		}
+		searchNode.pageNum = (void*)start;
+//		START_TIMING(tfind_t, tfind_time);
+		struct recTreeNode **res = tfind(&searchNode, &recTreeRoot, recCompare);
+//		END_TIMING(tfind_t, tfind_time);
+		if(res){
+//			struct tailhead *headp = res[0]->listHead;
+			listRecTreeNode((void*)start);
+			struct recBlockEntry *blockEntry = TAILQ_LAST(res[0]->listHead, tailhead);
+			//xzjin 注意这里有个foreach，这个有效吗？正确吗?
+			while(blockEntry){
+				int i=0;
+				mrp = blockEntry->recArr;
+				if(res[0]->recModEntry == blockEntry ){
+					idx = res[0]->memRecIdx;
+				}else{
+					idx = MEMRECPERENTRY;
+				}					
+				//xzjin 过滤掉比buf小的地址
+				//xzjin 这里是不是不太对，对于patch这种一次读进来然后分开写的都过滤了
+#if PATCH
+#else
+				while (((unsigned long)getAddr((void*)start, mrp->pageOffset) < (unsigned long) buf) &&
+					i<idx ) {
+					mrp++; i++;
+				}
+#endif //NOT_PATCH
+				
+				for(; i<idx; mrp++,i++){
+					DEBUG("i=%d, mrp:%lu.\n", i, mrp);
+					bufCmpStart = getAddr((void*)start, mrp->pageOffset);
+					if((unsigned long)bufCmpStart < (unsigned long) diffPos) continue;
+					if((unsigned long)bufCmpStart > (unsigned long) tail) break;
+					sameLen = cmpWrite((unsigned long)bufCmpStart, mrp, (void*)buf, tail, &diffPos, file);
+					sameContentTimes += sameLen?1:0;
+					sameLenCurPage += sameLen;
+					curWriteSameLen +=sameLen;
+				}
+				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
+			}
+
+//delTail:
+//			samePercent = ((double)sameLenCurPage/writeLenCurPage)*100;
+//			printf("same percentage this page: %.2f%%, pageLen:%d, samelen:%d, writePageNum:%lu, curPageNum:%lu.\n",
+//				samePercent, writeLenCurPage, sameLenCurPage,
+//				addr2PageNum(buf), start);
+			//xzjin 写完一个页就删除对应的映射结构
+			//xzjin TODO这里是不是可以等到写对比不同的时候再删除，不是写完就删除
+			//对一个地址多次写入的情况会有好处
+			/*
+			while (!TAILQ_EMPTY(headp)) {           // List Deletion.
+				rbp = TAILQ_FIRST(headp);
+				withdrawMemRecArr(rbp->recArr);
+				TAILQ_REMOVE(headp, TAILQ_FIRST(headp), entries);
+				withdrawRecBlockEntry(rbp);
+			}
+			withdrawTailHead(headp);
+			delNodep = tfind(&searchNode, &recTreeRoot, recCompare);
+			if(delNodep && *delNodep){
+				DEBUG("Delete tree node:%lu, withdraw addr: %lu, %lu, delNodep: %lu\n", 
+					delNodep[0]->pageNum, *delNodep, delNodep[0], delNodep);
+				//xzjin tdelete之后会修改delNodep指向的内容，所以要在tdelete之前保存
+				struct recTreeNode *freep = *delNodep;
+				tdelete(&searchNode, &recTreeRoot, recCompare);
+				//free(freep);
+				withdrawRecTreeNode(freep);
+			}
+			*/
+		}else{
+			notFoundLen = MIN(PAGESIZE, toTailLen);
+			MSG("buf page: %X not found, not found size:%d.\n", start, notFoundLen);
 			ts_write_not_found_size += notFoundLen;
 		}
 	}
@@ -1560,6 +1676,7 @@ ssize_t ts_read(int fd, void *buf, size_t nbytes){
 		MSG("find mmap ERROR, file not mapped.\n");
 		exit(-1);
 	}
+	MSG("read from file:%s\n", fd2path[fd%100]);
 	node = targetNodep[0];
 	//xzjin 直接用lseek是不是太耗时了
 	seekRet = lseek(fd, 0, SEEK_CUR);
@@ -1726,7 +1843,6 @@ __attribute__((destructor))void fini(void) {
 	PRINT_TIME();
 }
 
-// xzjin _hub_managed_fileops是nvp
 RETT_OPEN ts_open(INTF_OPEN){
 	char *abpath = NULL;
     struct stat st;
@@ -1767,5 +1883,94 @@ RETT_OPEN ts_open(INTF_OPEN){
 		exit(-1);
 	}
 	MSG("file: %s, fd:%d\n",path, result);
+	return result;
+}
+
+int ts_openat (char* dirName, int dirfd, const char *path, int oflag, ...){
+	char* abpath = NULL;
+	char fullpath[PATH_MAX] = "\0";
+    struct stat st;
+	int result, err;
+	mode_t mode;
+	long mmapRet;
+    va_list ap;
+
+    va_start(ap, oflag);
+    if (oflag & O_CREAT)
+        mode = va_arg(ap, unsigned int);
+    va_end(ap);
+	result = openat(dirfd, path, oflag, mode);
+	err = errno;
+	if(UNLIKELY(result == -1)){
+		ERROR("file open error, %s, errno:%d.", strerror(err), err);
+		return result;
+	}
+	//xzjin If creat file, do not mmap
+    if (oflag & O_CREAT) return result;
+
+//	strcat(fullpath, dirName);
+//	strcat(fullpath, "/");
+//	strcat(fullpath, path);
+//	abpath = realpath(fullpath, NULL);
+	abpath = (char*)path;
+	err = errno;
+	if(abpath){
+		fd2path[result%100] = abpath;
+//		MSG("Open %s ,Return = %d\n", fd2path[result], result);
+	}else {
+		ERROR("Open %s , get realpath failed, path:%s, error, %s, errno:%d.\n",
+			 path, result, fullpath, strerror(err), err);
+	}
+	if(fstat(result, &st)){
+	    err = errno;
+	    ERROR("fstat error, %s, errno:%d.\n", strerror(err), err);
+		exit(-1);
+	}
+	mmapRet = (long)ts_mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, result, 0);
+	err = errno;
+	if(mmapRet == -1){
+	    ERROR("ts_mmap error, %s, errno:%d.\n", strerror(err), err);
+		exit(-1);
+	}
+	MSG("file: %s, fd:%d\n",path, result);
+	return result;
+}
+
+FILE *ts_fopen (const char *filename, const char *modes){
+	char *abpath = NULL;
+    struct stat st;
+	FILE* result;
+	int err, fd;
+	long mmapRet;
+
+	result = fopen(filename, modes);
+	err = errno;
+	if(UNLIKELY(!result)){
+		ERROR("file open error, %s, errno:%d.", strerror(err), err);
+		return result;
+	}
+
+	abpath = realpath(filename, NULL);
+	if(abpath){
+		fd = fileno(result);
+//		MSG("Open %s ,Return = %d\n", fd2path[result], result);
+	}else {
+		ERROR("Open %s , get realpath failed.\n", filename, result);
+	}
+	if(fstat(fd, &st)){
+	    err = errno;
+	    ERROR("fstat error, %s, errno:%d.\n", strerror(err), err);
+		exit(-1);
+	}
+	if(st.st_size<=0) return result;
+
+	fd2path[fd%100] = abpath;
+	mmapRet = (long)ts_mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
+	err = errno;
+	if(mmapRet == -1){
+	    ERROR("ts_mmap error, %s, errno:%d.\n", strerror(err), err);
+		exit(-1);
+	}
+	MSG("file: %s, fd:%d\n", filename, result);
 	return result;
 }

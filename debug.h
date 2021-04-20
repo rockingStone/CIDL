@@ -80,7 +80,7 @@ void xil_printf(FILE* f, const charptr c, ...);
 	#define MSG(format, ...)
 #endif
 //#define MSG(format, ...) do{PRINTFUNC(NVP_PRINT_FD, "MSG: "); PRINTFUNC (NVP_PRINT_FD, format, ##__VA_ARGS__); fflush(NVP_PRINT_FD); }while(0)
-#define ERROR(format, ...) do{PRINTFUNC(NVP_PRINT_FD, "\033[01;31mNVP_ERROR\e[m (F:%s L:%d): " format, __func__ , __LINE__ , ##__VA_ARGS__); PRINTFUNC(NVP_PRINT_FD, "ROHAN HERE\n"); _nv_error_count++; if(SPIN_ON_ERROR){ _nvp_debug_handoff(); } }while(0)
+#define ERROR(format, ...) do{PRINTFUNC(NVP_PRINT_FD, "\033[01;31mNVP_ERROR\e[m (F:%s L:%d): " format, __func__ , __LINE__ , ##__VA_ARGS__);  _nv_error_count++; if(SPIN_ON_ERROR){ _nvp_debug_handoff(); } }while(0)
 
 FILE *debug_fd;
 //#define DEBUG_FD debug_fd

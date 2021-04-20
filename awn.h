@@ -1,6 +1,7 @@
 #ifndef _AWN_H
 #define _AWN_H
 
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/mman.h>
 /* Include guard goes here */
@@ -53,6 +54,21 @@ extern ssize_t ts_read (int __fd, void *__buf, size_t __nbytes);
 extern void *ts_realloc (void *ptr, size_t size, void* tail);
 //extern void *realloc (void *__ptr, size_t __size);
 
+/* Open a file and create a new stream for it.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern FILE *ts_fopen (const char *filename,
+		    const char *modes);
+
+extern int ts_openat (char* dirName, int dirfd, const char *path, int oflag, ...);
+
+/* Write chunks of generic data to STREAM.
+
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern size_t ts_fwrite (const void *ptr, size_t size,
+		      size_t n, FILE *s);
 #ifdef __cplusplus
 }
 #endif
