@@ -1,12 +1,3 @@
-// This serves as a common framework for any libraries serving runtime-determined file ops.
-// Does aliasing for ALIAS_*, redirecting them to whatever internal functions are desired.
-
-/*
-#define fopen fopen_orig
-#include <stdio.h>
-#undef fopen
-*/
-
 #include "awn.h"
 #include "nv_common.h"
 #include <sys/mman.h>
@@ -14,26 +5,39 @@
 #define USE_TS_FUNC 1
 #define USE_FMAP_CACHE 0
 #define REC_INSERT_TEST 0
-#define ENV_HUB_FOP "NVP_HUB_FOP"
-#define ENV_TREE_FILE "NVP_TREE_FILE"
-#define INS_HEAD
 #define CMPWRITE
 #undef TS_MEMCPY_CMPWRITE
-
-//#define LIBC_SO_LOC "/lib64/libc-2.5.so"
-#define LIBC_SO_LOC "/lib/x86_64-linux-gnu/libc.so.6"
-
-ssize_t ts_write(int file, void *buf, size_t length);
 
 /**xzjin 大概是一个全局的操作库，每个元素包含了一个模块的操作
  */
 struct Fileops_p* _hub_fileops_lookup[MAX_FILEOPS];
 
-//int _hub_add_and_resolve_fileops_tree_from_file(char* filename);
-//int hub_check_resolve_fileops(char* tree);
+//Debug help func
 void init(void);
 void listRecTreeNode(void *pageNum);
-//inline void *intel_memcpy(void * __restrict__ b, const void * __restrict__ a, size_t n);
+void listFileMapTree();
+void listRecTree();
+void listRecTreeDetail();
+
+//exported function
+int ts_open(const char *path, int oflag, ...);
+int ts_openat(char* dirName, int dirfd, const char *path, int oflag, ...);
+FILE *ts_fopen(const char *filename, const char *modes);
+int ts_close (int fd);
+ssize_t ts_write(int file, void *buf, size_t length);
+size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s);
+void* ts_memcpy_traced(void *dest, void *src, size_t n);
+void* ts_memcpy(void *dest, void *src, size_t n);
+ssize_t ts_read(int fd, void *buf, size_t nbytes);
+void* ts_realloc(void *ptr, size_t size, void* tail);
+
+//Address process func
+inline void *getAddr(void* pageNum, int offset) __attribute__((always_inline));
+inline void *addr2PageNum(void* addr) __attribute__((always_inline));
+inline void *addr2PageBegin(void* addr) __attribute__((always_inline));
+inline void *addr2PageTail(void* addr) __attribute__((always_inline));
+inline short addr2PageOffset(void* addr) __attribute__((always_inline));
+
 instrumentation_type compare_mem_time, remap_mem_rec_time, ts_write_time;
 instrumentation_type mem_from_file_trace_time, mem_from_mem_trace_time;
 instrumentation_type memcmp_asm_time, tfind_time, cmp_write_time;
@@ -61,7 +65,7 @@ static void listFileMapNodeAction(const void *nodep, const VISIT which, const in
     }
 }
 
-void listFileMapTree(){
+void listFileMapTree() {
 	twalk(fileMapTreeRoot,listFileMapNodeAction);
 }
 
@@ -259,27 +263,22 @@ void withdrawMemRecArr(struct memRec *ptr){
 	RECARRPOOLIDX++;
 }
 
-inline void *getAddr(void* pageNum, int offset) __attribute__((always_inline));
 inline void *getAddr(void* pageNum, int offset){
 	return (void *)(((unsigned long long)pageNum<<PAGENUMSHIFT)+offset);
 }
 
-inline void *addr2PageNum(void* addr) __attribute__((always_inline));
 inline void *addr2PageNum(void* addr){
 	return (void *)((unsigned long long)addr>>PAGENUMSHIFT);
 }
 
-inline void *addr2PageBegin(void* addr) __attribute__((always_inline));
 inline void *addr2PageBegin(void* addr){
 	return (void *)((unsigned long long)addr & PAGENUMMASK);
 }
 
-inline void *addr2PageTail(void* addr) __attribute__((always_inline));
 inline void *addr2PageTail(void* addr){
 	return (void *)((unsigned long long)(addr+PAGESIZE) & PAGENUMMASK);
 }
 
-inline short addr2PageOffset(void* addr) __attribute__((always_inline));
 inline short addr2PageOffset(void* addr){
 	return (short)((unsigned long long)(addr) & PAGEOFFMASK);
 }
@@ -720,6 +719,7 @@ __attribute__((constructor))void init(void) {
 	nvpWriteSize = 0;
 	mmapSrcCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	mmapDestCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
+	FD2PATH = calloc(FILEMAPTREENODEPOOLSIZE, sizeof(char*));
 
 //	lastDestInMap = NULL;
 //	lastSrcInMap = NULL;
@@ -912,7 +912,7 @@ RETT_MMAP ts_mmap(INTF_MMAP) {
 	//xzjin Here we need to skip pmem dir file
 	if(!(prot & MAP_ANONYMOUS) && file>-1 ){
 		//xzjin Here we skip mktmp file
-		if(UNLIKELY(!strncmp("./pmem/DR-",fd2path[file%100],10))) goto out;
+		if(UNLIKELY(!strncmp("./pmem/DR-",GETPATH(file),10))) goto out;
 		//xzjin Recored page protection here.
 //		int pro = prot & (PROT_READ | PROT_WRITE | PROT_EXEC );
 		//struct fileMapTreeNode *treeNode = malloc(sizeof(struct fileMapTreeNode));
@@ -923,12 +923,13 @@ RETT_MMAP ts_mmap(INTF_MMAP) {
 		//open(through able to close file after operation 
 		//complete), fd2path is still holding the origion file name, 
 		// except another file descriptor has same mod value.
-		treeNode->fileName = fd2path[file%100];
+		//treeNode->fileName = fd2path[file%100];
+		treeNode->fileName = GETPATH(file);
 		treeNode->usedTime = 0;
 		treeNode->offset = off;
 		tsearch(treeNode, &fileMapTreeRoot, fileMapTreeInsDelCompare);
 		tsearch(treeNode, &fileMapNameTreeRoot, fileMapNameTreeInsDelCompare);
-		DEBUG("_hub_mmap fileName:%s, start:%p, tail:%p, offset:%llu\n",
+		MSG("_hub_mmap fileName:%s, start:%p, tail:%p, offset:%llu\n",
 			treeNode->fileName, treeNode->start, treeNode->tail,
 			treeNode->offset);
 		//listFileMapTree();
@@ -1048,6 +1049,11 @@ inline unsigned long cmpWrite(unsigned long bufCmpStart, struct memRec *mrp, voi
 	if(LIKELY(fmTarNode->offset <= mrp->fileOffset)){
 		//xzjin 文件映射的开始+内存追踪的文件偏移-文件映射的偏移
 		fileCmpStart = (unsigned long)(fmTarNode->start+mrp->fileOffset-fmTarNode->offset);
+#if PATCH
+		//xzjin 对于patch命令，fileCmpStart把对比位置设置到实际写的位置，而不是记录位置
+		fileCmpStart += (unsigned long)buf-bufCmpStart;
+		bufCmpStart = (unsigned long)buf;
+#endif //PATCH
 		cmpLen = tail-bufCmpStart;
 		START_TIMING(memcmp_asm_t, memcmp_asm_time);
 		//xzjin TODO 可以改成无论比较结果，都设置diffPos，减少比较后面的if语句
@@ -1060,14 +1066,14 @@ inline unsigned long cmpWrite(unsigned long bufCmpStart, struct memRec *mrp, voi
 			*diffPos = (void*)tail;
 		}
 		ts_metadataItem++;
-		MSG("Cmp write: same len:%lu, buf:%p, file buf:%p, diffPos:%lu, cmpRet:%d, fd:%d, fileName:%s\n\n",
-			addLen, bufCmpStart, fileCmpStart, *diffPos, cmpRet, fd, fmTarNode->fileName);
+//		MSG("Cmp write: same len:%lu, buf:%p, file buf:%p, diffPos:%lu, cmpRet:%d, fd:%d, fileName:%s\n\n",
+//			addLen, bufCmpStart, fileCmpStart, *diffPos, cmpRet, fd, fmTarNode->fileName);
 		ts_write_same_size += addLen;
 	}else{
 		MSG("ts_write fMapCache not hit\n");
 	}
 //	END_TIMING(cmp_write_t, cmp_write_time);
-#endif
+#endif //CMPWRITE
 	return addLen;
 }
 
@@ -1094,8 +1100,8 @@ ssize_t ts_write(int file, void *buf, size_t length){
 	unsigned long ret = write(CALL_WRITE);
 	END_TIMING(ts_write_t, ts_write_time);
 	MSG("ts_write: buf:%p, file:%d, len: %llu, fileName:%s\n", 
-		buf, file, length, fd2path[file%100]);
-	listRecTreeDetail();
+		buf, file, length, GETPATH(file));
+//	listRecTreeDetail();
 #if USE_TS_FUNC 
 	START_TIMING(compare_mem_t, compare_mem_time);
 	//xzjin 因为是比较连续的地址，所以不用在开始重新初始化diffPos变量
@@ -1117,8 +1123,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 		struct recTreeNode **res = tfind(&searchNode, &recTreeRoot, recCompare);
 //		END_TIMING(tfind_t, tfind_time);
 		if(res){
-//			struct tailhead *headp = res[0]->listHead;
-			listRecTreeNode((void*)start);
+//			listRecTreeNode((void*)start);
 			struct recBlockEntry *blockEntry = TAILQ_LAST(res[0]->listHead, tailhead);
 			//xzjin 注意这里有个foreach，这个有效吗？正确吗?
 			while(blockEntry){
@@ -1213,35 +1218,27 @@ size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
 	//off_t fpos = lseek(file, 0, SEEK_CUR);
 	ts_write_size += length;
 	START_TIMING(ts_write_t, ts_write_time);
-//	unsigned long ret =  _hub_fileops->WRITE(CALL_WRITE);
 	unsigned long ret = fwrite(buf, size, n, s);
 	END_TIMING(ts_write_t, ts_write_time);
-	MSG("ts_fwrite: buf:%p, file:%d, len: %llu, fileName:%s\n", 
-		buf, file, length, fd2path[file%100]);
-	listRecTreeDetail();
+//	MSG("ts_fwrite: buf:%p, file:%d, len: %llu, fileName:%s\n", 
+//		buf, file, length, fd2path[file%100]);
+	//listRecTreeDetail();
 #if USE_TS_FUNC 
 	START_TIMING(compare_mem_t, compare_mem_time);
+#if PATCH
 	//xzjin 因为是比较连续的地址，所以不用在开始重新初始化diffPos变量
 	for(int i=0; start<=end; start++,i++){
-//		int writeLenCurPage = 4096;
 		int sameLenCurPage = 0;
 		int notFoundLen;
 		toTailLen = length-((unsigned long)getAddr((void*)start,0)-(unsigned long)buf);
-//		float samePercent;
 //		DEBUG("compare, Page num:%lu.\n", start);
 		if((unsigned long)getAddr((void*)start, 0)<(unsigned long)diffPos) continue;
-//		if(startPageNum == start){
-//			writeLenCurPage = 4096-addr2PageOffset(buf);
-//		}else if(end == start){
-//			writeLenCurPage = addr2PageOffset((void*)tail);
-//		}
 		searchNode.pageNum = (void*)start;
 //		START_TIMING(tfind_t, tfind_time);
 		struct recTreeNode **res = tfind(&searchNode, &recTreeRoot, recCompare);
 //		END_TIMING(tfind_t, tfind_time);
 		if(res){
-//			struct tailhead *headp = res[0]->listHead;
-			listRecTreeNode((void*)start);
+//			listRecTreeNode((void*)start);
 			struct recBlockEntry *blockEntry = TAILQ_LAST(res[0]->listHead, tailhead);
 			//xzjin 注意这里有个foreach，这个有效吗？正确吗?
 			while(blockEntry){
@@ -1254,13 +1251,10 @@ size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
 				}					
 				//xzjin 过滤掉比buf小的地址
 				//xzjin 这里是不是不太对，对于patch这种一次读进来然后分开写的都过滤了
-#if PATCH
-#else
-				while (((unsigned long)getAddr((void*)start, mrp->pageOffset) < (unsigned long) buf) &&
-					i<idx ) {
-					mrp++; i++;
-				}
-#endif //NOT_PATCH
+//				while (((unsigned long)getAddr((void*)start, mrp->pageOffset) < (unsigned long) buf) &&
+//					i<idx ) {
+//					mrp++; i++;
+//				}
 				
 				for(; i<idx; mrp++,i++){
 					DEBUG("i=%d, mrp:%lu.\n", i, mrp);
@@ -1308,8 +1302,94 @@ size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
 			ts_write_not_found_size += notFoundLen;
 		}
 	}
-	MSG("ts_write buf:%p, tail:%p, length:%lu, same time:%d, same len:%d, same occupy:%d%%\n\n\n",
-		 buf, tail, length, sameContentTimes, curWriteSameLen, (int)(curWriteSameLen*100/length));
+#else
+	//xzjin 因为是比较连续的地址，所以不用在开始重新初始化diffPos变量
+	for(int i=0; start<=end; start++,i++){
+//		int writeLenCurPage = 4096;
+		int sameLenCurPage = 0;
+		int notFoundLen;
+		toTailLen = length-((unsigned long)getAddr((void*)start,0)-(unsigned long)buf);
+//		float samePercent;
+//		DEBUG("compare, Page num:%lu.\n", start);
+		if((unsigned long)getAddr((void*)start, 0)<(unsigned long)diffPos) continue;
+//		if(startPageNum == start){
+//			writeLenCurPage = 4096-addr2PageOffset(buf);
+//		}else if(end == start){
+//			writeLenCurPage = addr2PageOffset((void*)tail);
+//		}
+		searchNode.pageNum = (void*)start;
+//		START_TIMING(tfind_t, tfind_time);
+		struct recTreeNode **res = tfind(&searchNode, &recTreeRoot, recCompare);
+//		END_TIMING(tfind_t, tfind_time);
+		if(res){
+//			struct tailhead *headp = res[0]->listHead;
+			listRecTreeNode((void*)start);
+			struct recBlockEntry *blockEntry = TAILQ_LAST(res[0]->listHead, tailhead);
+			//xzjin 注意这里有个foreach，这个有效吗？正确吗?
+			while(blockEntry){
+				int i=0;
+				mrp = blockEntry->recArr;
+				if(res[0]->recModEntry == blockEntry ){
+					idx = res[0]->memRecIdx;
+				}else{
+					idx = MEMRECPERENTRY;
+				}					
+				//xzjin 过滤掉比buf小的地址
+				//xzjin 这里是不是不太对，对于patch这种一次读进来然后分开写的都过滤了
+				while (((unsigned long)getAddr((void*)start, mrp->pageOffset) < (unsigned long) buf) &&
+					i<idx ) {
+					mrp++; i++;
+				}
+				
+				for(; i<idx; mrp++,i++){
+					DEBUG("i=%d, mrp:%lu.\n", i, mrp);
+					bufCmpStart = getAddr((void*)start, mrp->pageOffset);
+					if((unsigned long)bufCmpStart < (unsigned long) diffPos) continue;
+					if((unsigned long)bufCmpStart > (unsigned long) tail) break;
+					sameLen = cmpWrite((unsigned long)bufCmpStart, mrp, (void*)buf, tail, &diffPos, file);
+					sameContentTimes += sameLen?1:0;
+					sameLenCurPage += sameLen;
+					curWriteSameLen +=sameLen;
+				}
+				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
+			}
+
+//delTail:
+//			samePercent = ((double)sameLenCurPage/writeLenCurPage)*100;
+//			printf("same percentage this page: %.2f%%, pageLen:%d, samelen:%d, writePageNum:%lu, curPageNum:%lu.\n",
+//				samePercent, writeLenCurPage, sameLenCurPage,
+//				addr2PageNum(buf), start);
+			//xzjin 写完一个页就删除对应的映射结构
+			//xzjin TODO这里是不是可以等到写对比不同的时候再删除，不是写完就删除
+			//对一个地址多次写入的情况会有好处
+			/*
+			while (!TAILQ_EMPTY(headp)) {           // List Deletion.
+				rbp = TAILQ_FIRST(headp);
+				withdrawMemRecArr(rbp->recArr);
+				TAILQ_REMOVE(headp, TAILQ_FIRST(headp), entries);
+				withdrawRecBlockEntry(rbp);
+			}
+			withdrawTailHead(headp);
+			delNodep = tfind(&searchNode, &recTreeRoot, recCompare);
+			if(delNodep && *delNodep){
+				DEBUG("Delete tree node:%lu, withdraw addr: %lu, %lu, delNodep: %lu\n", 
+					delNodep[0]->pageNum, *delNodep, delNodep[0], delNodep);
+				//xzjin tdelete之后会修改delNodep指向的内容，所以要在tdelete之前保存
+				struct recTreeNode *freep = *delNodep;
+				tdelete(&searchNode, &recTreeRoot, recCompare);
+				//free(freep);
+				withdrawRecTreeNode(freep);
+			}
+			*/
+		}else{
+			notFoundLen = MIN(PAGESIZE, toTailLen);
+			MSG("buf page: %X not found, not found size:%d.\n", start, notFoundLen);
+			ts_write_not_found_size += notFoundLen;
+		}
+	}
+#endif //NOT_PATCH
+//	MSG("ts_write buf:%p, tail:%p, length:%lu, same time:%d, same len:%d, same occupy:%d%%\n\n\n",
+//		 buf, tail, length, sameContentTimes, curWriteSameLen, (int)(curWriteSameLen*100/length));
 	END_TIMING(compare_mem_t, compare_mem_time);
 #endif //USE_TS_FUNC 
 	return ret;
@@ -1549,6 +1629,10 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 	struct recTreeNode node,**pt;
 #endif
 	void *ret;
+	void* destTail __attribute__ ((__unused__));
+	void* startPageNum __attribute__ ((__unused__));
+	void* endPageNum __attribute__ ((__unused__));
+	unsigned long fileOffset;
 	struct fileMapTreeNode fileMapTreeNode;
 	struct fileMapTreeNode **fileMapSearRes;
 	struct fileMapTreeNode *fmNode;
@@ -1603,21 +1687,29 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 	}
 #endif	// USE_FMAP_CACHE
 	END_TIMING(ts_memcpy_tfind_file_t, ts_memcpy_tfind_file_time);
-/*
-	void* start;	//文件映射的开始
-	void* tail;		//文件映射的结束
-	int usedTime;
-	int fd;
-	char* fileName;
-	unsigned long offset;	//文件映射部分相对于文件开头的偏移
-*/
-//insertRecPoint:
 	fmNode->usedTime++;
 //	MSG("copy src found, copyFrom:%lu, copyTo:%lu, map start:%lu, map tail:%lu, map offset:%ld, fileName: %s\n",
 //		src, dest,fmNode->start, fmNode->tail, fmNode->offset, fmNode->fileName);
 	//xzjin 记录log信息
+	fileOffset = fmNode->offset+(src-fmNode->start);
 	START_TIMING(insert_rec_t,  insert_rec_time);
-	insertRec(fmNode->offset+(src-fmNode->start), src, dest, fmNode->fileName);
+#if PATCH
+	//xzjin 对于patch, 每页加一个记录
+	destTail = dest+n;
+	startPageNum = addr2PageNum(dest);
+	endPageNum = addr2PageNum(destTail);
+	do{
+		unsigned long diff;
+		insertRec(fileOffset, src, dest, fmNode->fileName);
+		startPageNum++;
+		diff = ((unsigned long)startPageNum<<PAGENUMSHIFT)-(unsigned long)dest;
+		fileOffset += diff;
+		src += diff;
+		dest += diff;
+	}while(startPageNum<=endPageNum);
+#else
+	insertRec(fileOffset, src, dest, fmNode->fileName);
+#endif //PATCH
 	END_TIMING(insert_rec_t,  insert_rec_time);
 	
 #if REC_INSERT_TEST 
@@ -1648,9 +1740,8 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 		ERROR("REC_INSERT test fail, tfind NULL!\n");
 		exit(-1);
 	}
-#endif
+#endif	//REC_INSERT_TEST 
 //		MSG("copy src:           %lu not fount in file list.\n", src);
-//		listFileMapTree();
 ts_memcpy_returnPoint:
 	END_TIMING(mem_from_file_trace_t, mem_from_file_trace_time);
 #endif	//USE_TS_FUNC
@@ -1669,14 +1760,15 @@ ssize_t ts_read(int fd, void *buf, size_t nbytes){
 	int err;
 
 	treeNode = allocateFileMapTreeNode();
-	treeNode->fileName = fd2path[fd%100];
+	//treeNode->fileName = fd2path[fd%100];
+	treeNode->fileName = GETPATH(fd);
 	targetNodep = tfind(treeNode, &fileMapNameTreeRoot, fileMapNameTreeInsDelCompare);
 	withdrawFileMapTreeNode(treeNode);
 	if(UNLIKELY(!targetNodep)){
 		MSG("find mmap ERROR, file not mapped.\n");
 		exit(-1);
 	}
-	MSG("read from file:%s\n", fd2path[fd%100]);
+//	MSG("read from file:%s\n", fd2path[fd%100]);
 	node = targetNodep[0];
 	//xzjin 直接用lseek是不是太耗时了
 	seekRet = lseek(fd, 0, SEEK_CUR);
@@ -1698,7 +1790,7 @@ ssize_t ts_read(int fd, void *buf, size_t nbytes){
 		exit(-1);
 	}
 	MSG("ts_read to %p ,len %d ,from %p, fd:%d, fileName:%s.\n",
-		buf, copyLen, copyBegin, fd, fd2path[fd%100]);
+		buf, copyLen, copyBegin, fd, GETPATH(fd));
 	return copyLen;
 }
 
@@ -1843,7 +1935,7 @@ __attribute__((destructor))void fini(void) {
 	PRINT_TIME();
 }
 
-RETT_OPEN ts_open(INTF_OPEN){
+int ts_open(const char *path, int oflag, ...){
 	char *abpath = NULL;
     struct stat st;
 	int result, err;
@@ -1866,7 +1958,7 @@ RETT_OPEN ts_open(INTF_OPEN){
 
 	abpath = realpath(path,NULL);
 	if(abpath){
-		fd2path[result%100] = abpath;
+		STOREPATH(result, abpath);
 //		MSG("Open %s ,Return = %d\n", fd2path[result], result);
 	}else {
 		ERROR("Open %s , get realpath failed.\n", path, result);
@@ -1915,7 +2007,7 @@ int ts_openat (char* dirName, int dirfd, const char *path, int oflag, ...){
 	abpath = (char*)path;
 	err = errno;
 	if(abpath){
-		fd2path[result%100] = abpath;
+		STOREPATH(result, abpath);
 //		MSG("Open %s ,Return = %d\n", fd2path[result], result);
 	}else {
 		ERROR("Open %s , get realpath failed, path:%s, error, %s, errno:%d.\n",
@@ -1964,7 +2056,8 @@ FILE *ts_fopen (const char *filename, const char *modes){
 	}
 	if(st.st_size<=0) return result;
 
-	fd2path[fd%100] = abpath;
+//	fd2path[fd%100] = abpath;
+	STOREPATH(fd, abpath);
 	mmapRet = (long)ts_mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
 	err = errno;
 	if(mmapRet == -1){
@@ -1972,5 +2065,51 @@ FILE *ts_fopen (const char *filename, const char *modes){
 		exit(-1);
 	}
 	MSG("file: %s, fd:%d\n", filename, result);
+	return result;
+}
+
+int ts_close (int fd){
+	char *abpath = NULL;
+    struct stat st;
+	struct fileMapTreeNode treeNode;
+	struct fileMapTreeNode** delNodep;
+	int result, err;
+	mode_t mode;
+	long mmapRet;
+
+	result = close(fd);
+	err = errno;
+	if(UNLIKELY(result == -1)){
+		ERROR("file close error, %s, errno:%d.", strerror(err), err);
+		return result;
+	}
+
+	//abpath = fd2path[fd%100];
+	abpath = GETPATH(fd);
+	if(!abpath){
+		ERROR("close %d , get realpath failed.\n",fd);
+		return result;
+	}else{
+		MSG("Close file:%s\n", abpath);
+	}
+
+	treeNode.fileName = abpath;
+	//TODO 这里需要的到被删除的节点，释放节点和包含文件名的字符串
+	delNodep = tfind(&treeNode, &fileMapTreeRoot, fileMapNameTreeInsDelCompare);
+	if(delNodep && delNodep[0]){
+		struct fileMapTreeNode *freep = *delNodep;
+		//xzjin 同样，tdelete会改变delNodep指向位置的内容
+		tdelete(&treeNode, &fileMapTreeRoot, fileMapNameTreeInsDelCompare);
+		//这里用的比较算法还是fileMapTree的插入/删除算法
+		tdelete(&treeNode, &fileMapNameTreeRoot, fileMapNameTreeInsDelCompare);
+		MSG("deleted node is: %p, fileName:%s, name addr:%p.\n",
+			 freep, freep->fileName, freep->fileName);
+		//free(freep->fileName);
+		//free(freep);
+		withdrawFileMapTreeNode(freep);
+	}else{
+		MSG("Nothing deleted.\n");
+	}
+
 	return result;
 }

@@ -53,7 +53,7 @@
 #define LIKELY(x)       __builtin_expect((long int)(x),1)
 #define UNLIKELY(x)     __builtin_expect((long int)(x),0)
 
-#define assert(x) if(UNLIKELY(!(x))) { printf("ASSERT FAILED ROHAN\n"); fflush(NULL); ERROR("NVP_ASSERT("#x") failed!\n"); exit(100); }
+#define assert(x) if(UNLIKELY(!(x))) { printf("ASSERT FAILED\n"); fflush(NULL); ERROR("ASSERT("#x") failed!\n"); exit(100); }
 
 // places quotation marks around arg (eg, MK_STR(stuff) becomes "stuff")
 #define MK_STR(arg) #arg
@@ -164,7 +164,8 @@ int RECTREENODEPOOLIDX;
 struct recTreeNode** RECTREENODEPOOLPTR;
 
 struct fileMapTreeNode* FILEMAPTREENODEPOOL;
-#define FILEMAPTREENODEPOOLSIZE 1024
+//#define FILEMAPTREENODEPOOLSIZE 1024
+#define FILEMAPTREENODEPOOLSIZE 2048
 int FILEMAPTREENODEPOOLIDX;
 struct fileMapTreeNode** FILEMAPTREENODEPOOLPTR;
 
@@ -231,7 +232,7 @@ struct{
 /**xzjin fd to path map, <fd>'s path is in fd%100;
  * which means when fd > 100, then may by an error.
 */
-char* fd2path[100];
+char** FD2PATH;
 //xzjin TODO 添加对多个锁的支持
 //xzjin this Key is always allow all operation
 int nonProKey;
@@ -275,6 +276,8 @@ struct sigaction defaction;
 		DEBUG(MODULENAME"("#OP2") resolved to %s\n", OP2->name); \
 	}
 
+#define STOREPATH(fd, path) do{ FD2PATH[fd%FILEMAPTREENODEPOOLSIZE] = path;} while(0)
+#define GETPATH(fd) FD2PATH[fd%FILEMAPTREENODEPOOLSIZE]
 #endif
 
 // breaking the build

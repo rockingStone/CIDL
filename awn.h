@@ -69,6 +69,9 @@ extern int ts_openat (char* dirName, int dirfd, const char *path, int oflag, ...
    marked with __THROW.  */
 extern size_t ts_fwrite (const void *ptr, size_t size,
 		      size_t n, FILE *s);
+
+/* Close the file descriptor FD. */
+extern int ts_close (int fd);
 #ifdef __cplusplus
 }
 #endif
