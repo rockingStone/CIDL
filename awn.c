@@ -1102,8 +1102,8 @@ ssize_t ts_write(int file, void *buf, size_t length){
 //	unsigned long ret =  _hub_fileops->WRITE(CALL_WRITE);
 	unsigned long ret = write(CALL_WRITE);
 	END_TIMING(ts_write_t, ts_write_time);
-	MSG("ts_write: buf:%p, file:%d, len: %llu, fileName:%s\n", 
-		buf, file, length, GETPATH(file));
+//	MSG("ts_write: buf:%p, file:%d, len: %llu, fileName:%s\n", 
+//		buf, file, length, GETPATH(file));
 //	listRecTreeDetail();
 #if USE_TS_FUNC 
 	START_TIMING(compare_mem_t, compare_mem_time);
@@ -1189,8 +1189,8 @@ ssize_t ts_write(int file, void *buf, size_t length){
 			ts_write_not_found_size += notFoundLen;
 		}
 	}
-	MSG("ts_write buf:%p, tail:%p, length:%lu, same time:%d, same len:%d, same occupy:%d%%\n\n\n",
-		 buf, tail, length, sameContentTimes, curWriteSameLen, (int)(curWriteSameLen*100/length));
+//	MSG("ts_write buf:%p, tail:%p, length:%lu, same time:%d, same len:%d, same occupy:%d%%\n\n\n",
+//		 buf, tail, length, sameContentTimes, curWriteSameLen, (int)(curWriteSameLen*100/length));
 	END_TIMING(compare_mem_t, compare_mem_time);
 #endif //USE_TS_FUNC 
 	return ret;
@@ -1943,7 +1943,7 @@ int ts_open(const char *path, int oflag, ...){
     struct stat st;
 	int result, err;
 	mode_t mode;
-	long mmapRet;
+	long mmapRet __attribute__((unused));
     va_list ap;
 
     va_start(ap, oflag);
@@ -1971,12 +1971,14 @@ int ts_open(const char *path, int oflag, ...){
 	    ERROR("fstat error, %s, errno:%d.\n", strerror(err), err);
 		exit(-1);
 	}
+#if PATCH
 	mmapRet = (long)ts_mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, result, 0);
 	err = errno;
 	if(mmapRet == -1){
 	    ERROR("ts_mmap error, %s, errno:%d.\n", strerror(err), err);
 		exit(-1);
 	}
+#endif //PATCH
 	MSG("file: %s, fd:%d\n",path, result);
 	return result;
 }
@@ -1987,7 +1989,7 @@ int ts_openat (char* dirName, int dirfd, const char *path, int oflag, ...){
     struct stat st;
 	int result, err;
 	mode_t mode;
-	long mmapRet;
+	long mmapRet __attribute__((unused));
     va_list ap;
 
     va_start(ap, oflag);
@@ -2021,12 +2023,14 @@ int ts_openat (char* dirName, int dirfd, const char *path, int oflag, ...){
 	    ERROR("fstat error, %s, errno:%d.\n", strerror(err), err);
 		exit(-1);
 	}
+#if PATCH
 	mmapRet = (long)ts_mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, result, 0);
 	err = errno;
 	if(mmapRet == -1){
 	    ERROR("ts_mmap error, %s, errno:%d.\n", strerror(err), err);
 		exit(-1);
 	}
+#endif //PATCH
 	MSG("file: %s, fd:%d\n",path, result);
 	return result;
 }
@@ -2036,7 +2040,7 @@ FILE *ts_fopen (const char *filename, const char *modes){
     struct stat st;
 	FILE* result;
 	int err, fd;
-	long mmapRet;
+	long mmapRet __attribute__((unused));
 
 	result = fopen(filename, modes);
 	err = errno;
@@ -2061,12 +2065,14 @@ FILE *ts_fopen (const char *filename, const char *modes){
 
 //	fd2path[fd%100] = abpath;
 	STOREPATH(fd, abpath);
+#if PATCH
 	mmapRet = (long)ts_mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
 	err = errno;
 	if(mmapRet == -1){
 	    ERROR("ts_mmap error, %s, errno:%d.\n", strerror(err), err);
 		exit(-1);
 	}
+#endif //PATCH
 	MSG("file: %s, fd:%d\n", filename, result);
 	return result;
 }
