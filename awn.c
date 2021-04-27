@@ -1,7 +1,9 @@
 #include "awn.h"
-#include "nv_common.h"
+#include "common.h"
 #include <sys/mman.h>
 
+#define PATCH 0
+#define DEL_REALLOC_ADDR 0
 #define USE_TS_FUNC 1
 #define USE_FMAP_CACHE 0
 #define REC_INSERT_TEST 0
@@ -310,7 +312,8 @@ void listRecTreeNode(void *pageNum){
 
 		MSG("\nnew Array, %d length, element:%p\n", tail, ent);
 		for(int i=0; i<tail; i++,recArr++){
-			void* bufAddr = getAddr(pageNum, recArr->pageOffset);
+			void* bufAddr __attribute__((unused));
+			bufAddr = getAddr(pageNum, recArr->pageOffset);
 			DEBUG("page off:%4d, fileOffset:%ld, addr:%p, fileName:%s, bufAddr:%p.\n",
 				recArr->pageOffset, recArr->fileOffset, recArr, 
 				recArr->fileName, bufAddr);
@@ -2069,14 +2072,15 @@ FILE *ts_fopen (const char *filename, const char *modes){
 }
 
 int ts_close (int fd){
-	char *abpath = NULL;
-    struct stat st;
+	char *abpath __attribute__((unused));
+    struct stat st __attribute__((unused));
 	struct fileMapTreeNode treeNode;
 	struct fileMapTreeNode** delNodep;
 	int result, err;
-	mode_t mode;
-	long mmapRet;
+	mode_t mode __attribute__((unused));
+	long mmapRet __attribute__((unused));
 
+	abpath = NULL;
 	result = close(fd);
 	err = errno;
 	if(UNLIKELY(result == -1)){

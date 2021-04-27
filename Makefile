@@ -3,7 +3,7 @@ CLEANEXTS  = o so
 
 # Specify the source files, the target files, 
 # and the install directory 
-CSOURCES = awn.c nvp_printf.c timers.c
+CSOURCES = awn.c debug_printf.c timers.c
 SSOURCES = memcmp-avx2-addr.S
 OFILE = $(subst .c,.o, $(CSOURCES))
 OFILE += $(subst .S,.o, $(SSOURCES))

@@ -43,26 +43,15 @@ void crush_outbuf(void)
 
 void flush_outbuf(void)
 {
-     static size_t (*glibc_fwrite) ( const void * ptr, size_t size, size_t count, FILE * stream ) = NULL;
-
-	if(glibc_fwrite==NULL) {
-		void* libc_so = dlopen("/lib/x86_64-linux-gnu/libc.so.6", RTLD_LAZY|RTLD_LOCAL);
-		if(!libc_so) { assert(0); }
-		void* glcw = dlsym(libc_so, "fwrite");
-		if(!glcw) { assert(0); }
-		glibc_fwrite = (size_t (*) ( const void * ptr, size_t size, size_t count, FILE * stream ))glcw;
-		assert(glibc_fwrite!=NULL);
-	}
 	int errno_holder = errno;
 	int ret;
 	int ret_count = 0;
 	do {
-		ret = glibc_fwrite( outbuf, pos, 1, _xil_printf_file);
+		ret = fwrite( outbuf, pos, 1, _xil_printf_file);
 		ret_count++;
 	} while((ret!=1) && (ret_count < 20));
 	
 	if(ret!=1) {
-	     //xil_printf(stderr, "\n\nERROR: nvp_printf.c: glibc_fwrite returned %i, expected 1: %s\n\n", ret, strerror(errno)); fflush(stderr);
 	     printString("ERROR: nvp_printf.c: glibc_fwrite returned something other than 1!\n");
 	     while(ret != 1) {}
 	     assert(0);
