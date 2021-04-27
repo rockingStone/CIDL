@@ -7,17 +7,11 @@
 #include <stdatomic.h>
 #include "debug.h"
 
-#define INSTRUMENT_CALLS 1
+#define INSTRUMENT_CALLS 0
 
-unsigned int num_open;
-unsigned int num_close;
-unsigned int num_read;
-unsigned int num_write;
 unsigned int num_memcpy_read;
 unsigned int num_memcpy_write;
 unsigned int num_mmap;
-unsigned long long read_size;
-unsigned long long write_size;
 unsigned long long memcpy_read_size;
 unsigned long long memcpy_write_size;
 unsigned long long ts_write_size;
@@ -32,7 +26,7 @@ long long nvpWriteTime;
 unsigned long long total_syscalls;
 unsigned long long deleted_size;
 
-void nvp_print_io_stats(void);
+void print_statistics(void);
 
 enum instrumentation_vars {
 	appends_t,

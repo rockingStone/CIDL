@@ -1,23 +1,16 @@
 #include "common.h"
 #include "timers.h"
 
-void nvp_print_io_stats(void){
+void print_statistics(void){
 	float tmp;
-	MSG("====================== NVP IO stats: ======================\n");
-	MSG("open %u, close %u\n", num_open, num_close);
-	MSG("mmap %u\n", num_mmap);
-	MSG("READ: count %u, size %llu, average %llu\n", num_read,
-		read_size, num_read ? read_size / num_read : 0);
-	MSG("WRITE: count %u, size %llu, average %llu\n", num_write,
-		write_size, num_write ? write_size / num_write : 0);
-	MSG("memcpy READ: count %u, size %llu, average %llu\n",
+	MSG("====================== IO statistics: ======================\n");
+	MSG(" mmap %u\n", num_mmap);
+	MSG(" memcpy READ: count %u, size %llu, average %llu\n",
 		num_memcpy_read, memcpy_read_size,
 		num_memcpy_read ? memcpy_read_size / num_memcpy_read : 0);
-	MSG("memcpy WRITE: count %u, size %llu, average %llu\n",
+	MSG(" memcpy WRITE: count %u, size %llu, average %llu\n",
 		num_memcpy_write, memcpy_write_size,
 		num_memcpy_write ? memcpy_write_size / num_memcpy_write : 0);
-	MSG("TOTAL SYSCALLS (open + close + read + write + fsync): count %llu\n",
-	       num_open + num_close);
 
 	MSG(" RECTREENODEPOOLIDX:%d\n", RECTREENODEPOOLIDX);
 	//MSG(" SLISTHEADPOOLIDX:%d\n", SLISTHEADPOOLIDX);

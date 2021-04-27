@@ -483,7 +483,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 				//NOTE: bigger or equal, equal is important in some cases
 				if(idx>0 && lastMenRec[idx-1].pageOffset>=addr2PageOffset(dest)){
 					DEBUG("\nDeleting memory record list, pageNum:%lu.\n", pageNum);
-					listRecTreeNode(pageNum);
+//					listRecTreeNode(pageNum);
 					TAILQ_FOREACH(ent, head, entries){
 //						DEBUG("delete list head:%p, element:%p\n", head, ent);
 						if(TAILQ_NEXT(ent, entries)){
@@ -914,8 +914,9 @@ RETT_MMAP ts_mmap(INTF_MMAP) {
 	START_TIMING(fileMap_t, fileMap_time);
 	//xzjin Here we need to skip pmem dir file
 	if(!(prot & MAP_ANONYMOUS) && file>-1 ){
+		char* path = GETPATH(file);
 		//xzjin Here we skip mktmp file
-		if(UNLIKELY(!strncmp("./pmem/DR-",GETPATH(file),10))) goto out;
+		if(UNLIKELY(!strncmp("./pmem/DR-", path, 10))) goto out;
 		//xzjin Recored page protection here.
 //		int pro = prot & (PROT_READ | PROT_WRITE | PROT_EXEC );
 		//struct fileMapTreeNode *treeNode = malloc(sizeof(struct fileMapTreeNode));
@@ -932,9 +933,9 @@ RETT_MMAP ts_mmap(INTF_MMAP) {
 		treeNode->offset = off;
 		tsearch(treeNode, &fileMapTreeRoot, fileMapTreeInsDelCompare);
 		tsearch(treeNode, &fileMapNameTreeRoot, fileMapNameTreeInsDelCompare);
-		MSG("_hub_mmap fileName:%s, start:%p, tail:%p, offset:%llu\n",
-			treeNode->fileName, treeNode->start, treeNode->tail,
-			treeNode->offset);
+//		MSG("_hub_mmap fileName:%s, start:%p, tail:%p, offset:%llu\n",
+//			treeNode->fileName, treeNode->start, treeNode->tail,
+//			treeNode->offset);
 		//listFileMapTree();
 		//xzjin TODO add to search tree
 		/*
@@ -980,7 +981,7 @@ RETT_MUNMAP ts_munmap(INTF_MUNMAP) {
 		tdelete(&treeNode, &fileMapTreeRoot, fileMapTreeInsDelCompare);
 		//这里用的比较算法还是fileMapTree的插入/删除算法
 		tdelete(&treeNode, &fileMapNameTreeRoot, fileMapTreeInsDelCompare);
-		MSG("deleted node is: %p, fileName:%s.\n", freep, freep->fileName);
+//		MSG("deleted node is: %p, fileName:%s.\n", freep, freep->fileName);
 		free(freep->fileName);
 		//free(freep);
 		withdrawFileMapTreeNode(freep);
@@ -1326,7 +1327,7 @@ size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
 //		END_TIMING(tfind_t, tfind_time);
 		if(res){
 //			struct tailhead *headp = res[0]->listHead;
-			listRecTreeNode((void*)start);
+//			listRecTreeNode((void*)start);
 			struct recBlockEntry *blockEntry = TAILQ_LAST(res[0]->listHead, tailhead);
 			//xzjin 注意这里有个foreach，这个有效吗？正确吗?
 			while(blockEntry){
@@ -1932,9 +1933,7 @@ void ts_free(void* ptr, void* tail){
 }
 
 __attribute__((destructor))void fini(void) {
-	MSG("exit handler\n");
-	MSG("Exit: print stats\n");
-	nvp_print_io_stats();
+	print_statistics();
 	PRINT_TIME();
 }
 
@@ -1956,8 +1955,10 @@ int ts_open(const char *path, int oflag, ...){
 		ERROR("file open error, %s, errno:%d.", strerror(err), err);
 		return result;
 	}
+#if PATCH
 	//xzjin If creat file, do not mmap
     if (oflag & O_CREAT) return result;
+#endif //PATCH
 
 	abpath = realpath(path,NULL);
 	if(abpath){
@@ -1979,7 +1980,7 @@ int ts_open(const char *path, int oflag, ...){
 		exit(-1);
 	}
 #endif //PATCH
-	MSG("file: %s, fd:%d\n",path, result);
+//	MSG("file: %s, fd:%d\n",path, result);
 	return result;
 }
 
@@ -2002,8 +2003,10 @@ int ts_openat (char* dirName, int dirfd, const char *path, int oflag, ...){
 		ERROR("file open error, %s, errno:%d.", strerror(err), err);
 		return result;
 	}
+#if PATCH
 	//xzjin If creat file, do not mmap
     if (oflag & O_CREAT) return result;
+#endif //PATCH
 
 //	strcat(fullpath, dirName);
 //	strcat(fullpath, "/");
