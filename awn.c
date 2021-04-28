@@ -54,14 +54,14 @@ static void listFileMapNodeAction(const void *nodep, const VISIT which, const in
         break;
     case postorder:
         fmNode = *(struct fileMapTreeNode **) nodep;
-		MSG("map start:%lu, map tail:%lu, map offset:%ld, fileName: %s, fileName addr:%lu, fmNodeaddr: %lu\n",
+		MSG("map start:%p, map tail:%p, map offset:%ld, fileName: %s, fileName addr:%p, fmNodeaddr: %p\n",
 			fmNode->start, fmNode->tail, fmNode->offset, fmNode->fileName, fmNode->fileName, fmNode);
         break;
     case endorder:
         break;
     case leaf:
         fmNode = *(struct fileMapTreeNode **) nodep;
-		MSG("map start:%lu, map tail:%lu, map offset:%ld, fileName: %s, fileName addr:%lu, fmNodeaddr: %lu\n",
+		MSG("map start:%p, map tail:%p, map offset:%ld, fileName: %s, fileName addr:%p, fmNodeaddr: %p\n",
 			fmNode->start, fmNode->tail, fmNode->offset, fmNode->fileName, fmNode->fileName, fmNode);
         break;
     }
@@ -77,7 +77,7 @@ static void showRecMapNode(struct recTreeNode **nodep){
 	fmNode = *(struct recTreeNode **) nodep;
 	head = fmNode->listHead;
 
-	MSG("pageNum: %lu, list head:%lu, memRecIdx:%2d, struct address: %lu.\n",
+	MSG("pageNum: %p, list head:%p, memRecIdx:%2d, struct address: %p.\n",
 		fmNode->pageNum, head, fmNode->memRecIdx, fmNode);
 }
 
@@ -104,7 +104,7 @@ static void showRecMapNodeDetail(struct recTreeNode **nodep){
 	head = fmNode->listHead;
 
 	fmNode = *(struct recTreeNode **) nodep;
-	MSG("pageNum: %lu, list head:%lu, memRecIdx:%2d, struct address: %lu.\n",
+	MSG("pageNum: %p, list head:%p, memRecIdx:%2d, struct address: %p.\n",
 		fmNode->pageNum, head, fmNode->memRecIdx, fmNode);
 	listRecTreeNode(fmNode->pageNum);
 }
@@ -292,18 +292,18 @@ void listRecTreeNode(void *pageNum){
 	node.pageNum = pageNum;
 	pt = tfind(&node, &recTreeRoot, recCompare);
 	if(!pt){
-		MSG("page:%lu not in tree.\n", pageNum);
+		MSG("page:%p not in tree.\n", pageNum);
 		return;
 	}
     struct tailhead* listHead = pt[0]->listHead;
 	mostRecentModifiedEnry = pt[0]->recModEntry;
 
 	if(TAILQ_EMPTY(listHead)){
-		MSG("page:%lu list NULL.\n", pageNum);
+		MSG("page:%p list NULL.\n", pageNum);
 		return;
 	}
 
-	MSG("Page:%lu:\n", pageNum);
+	MSG("Page:%p:\n", pageNum);
 	TAILQ_FOREACH(ent, listHead, entries){
 		struct memRec* recArr = ent->recArr;
 		int tail = MEMRECPERENTRY;
@@ -482,7 +482,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 				//	2. memcpy treced 的dest的树节点之前是空的，现在刚插入内容
 				//NOTE: bigger or equal, equal is important in some cases
 				if(idx>0 && lastMenRec[idx-1].pageOffset>=addr2PageOffset(dest)){
-					DEBUG("\nDeleting memory record list, pageNum:%lu.\n", pageNum);
+					DEBUG("\nDeleting memory record list, pageNum:%p.\n", pageNum);
 //					listRecTreeNode(pageNum);
 					TAILQ_FOREACH(ent, head, entries){
 //						DEBUG("delete list head:%p, element:%p\n", head, ent);
@@ -871,7 +871,7 @@ __attribute__((constructor))void init(void) {
 
 	PAGEOFFMASK = (1<<PAGENUMSHIFT)-1;
 	PAGENUMMASK = ~PAGEOFFMASK;
-	DEBUG("PAGENUMMASK is %X\n",PAGENUMMASK);
+	DEBUG("PAGENUMMASK is %llX\n",PAGENUMMASK);
 
 	proMapper = NULL;
 	/** xzjin 这里用pvalloc会有问题，不清楚原因, need to be set before 
@@ -909,7 +909,7 @@ RETT_MMAP ts_mmap(INTF_MMAP) {
 	if(UNLIKELY((long)ret==-1)){
 		ERROR("mmap ERROR, %s, errno:%d\n", strerror(err), err);
 	}
-	DEBUG("_hub_mmap returned:%p fileName:%s, fd:%d\n",ret, fd2path[file%100], file);
+	DEBUG("_hub_mmap returned:%p fileName:%s, fd:%d\n",ret, GETPATH(file), file);
 
 	START_TIMING(fileMap_t, fileMap_time);
 	//xzjin Here we need to skip pmem dir file
@@ -1145,7 +1145,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 				}
 				
 				for(; i<idx; mrp++,i++){
-					DEBUG("i=%d, mrp:%lu.\n", i, mrp);
+					DEBUG("i=%d, mrp:%p.\n", i, mrp);
 					bufCmpStart = getAddr((void*)start, mrp->pageOffset);
 					if((unsigned long)bufCmpStart < (unsigned long) diffPos) continue;
 					if((unsigned long)bufCmpStart > (unsigned long) tail) break;
@@ -1186,7 +1186,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 			*/
 		}else{
 			notFoundLen = MIN(PAGESIZE, toTailLen);
-			MSG("buf: %lu not found, size:%d.\n", start, notFoundLen);
+			MSG("buf: %p not found, size:%d.\n", (void*)start, notFoundLen);
 			ts_write_not_found_size += notFoundLen;
 		}
 	}
@@ -1346,7 +1346,7 @@ size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
 				}
 				
 				for(; i<idx; mrp++,i++){
-					DEBUG("i=%d, mrp:%lu.\n", i, mrp);
+					DEBUG("i=%d, mrp:%p.\n", i, mrp);
 					bufCmpStart = getAddr((void*)start, mrp->pageOffset);
 					if((unsigned long)bufCmpStart < (unsigned long) diffPos) continue;
 					if((unsigned long)bufCmpStart > (unsigned long) tail) break;
@@ -1387,7 +1387,7 @@ size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
 			*/
 		}else{
 			notFoundLen = MIN(PAGESIZE, toTailLen);
-			MSG("buf page: %X not found, not found size:%d.\n", start, notFoundLen);
+			MSG("buf page: %llX not found, not found size:%d.\n", start, notFoundLen);
 			ts_write_not_found_size += notFoundLen;
 		}
 	}
@@ -1584,7 +1584,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 					if(UNLIKELY((unsigned long long)addr2PageNum(copyDest) != destStart)){
 						destStart = (unsigned long long)addr2PageNum(copyDest);
 						destSearchNode.pageNum = (void*)destStart;
-						MSG("searchNode:%lu, pageNum:%lu, copyDest: %lu, dest: %lu, copySrc:%lu, src:%lu.\n", 
+						MSG("searchNode:%p, pageNum:%p, copyDest: %p, dest: %p, copySrc:%p, src:%p.\n", 
 							&destSearchNode, destSearchNode.pageNum, copyDest, 
 							dest, copySrc, src);
 						destRes = findAndAddRecTreeNode(&destSearchNode);
@@ -1789,11 +1789,11 @@ ssize_t ts_read(int fd, void *buf, size_t nbytes){
 	seekRet = lseek(fd, copyLen, SEEK_CUR);
 	err = errno;
 	if(seekRet == -1){
-		MSG("seek to %d.\n", seekRet+copyLen);
+		MSG("seek to %ld.\n", seekRet+copyLen);
 		MSG("lseek ERROR, %s, errno %d.\n", strerror(err), err);
 		exit(-1);
 	}
-	MSG("ts_read to %p ,len %d ,from %p, fd:%d, fileName:%s.\n",
+	MSG("ts_read to %p ,len %ld ,from %p, fd:%d, fileName:%s.\n",
 		buf, copyLen, copyBegin, fd, GETPATH(fd));
 	return copyLen;
 }
@@ -1965,7 +1965,7 @@ int ts_open(const char *path, int oflag, ...){
 		STOREPATH(result, abpath);
 //		MSG("Open %s ,Return = %d\n", fd2path[result], result);
 	}else {
-		ERROR("Open %s , get realpath failed.\n", path, result);
+		ERROR("Open %s, get realpath failed, return:%d.\n", path, result);
 	}
 	if(fstat(result, &st)){
 	    err = errno;
@@ -2019,7 +2019,7 @@ int ts_openat (char* dirName, int dirfd, const char *path, int oflag, ...){
 //		MSG("Open %s ,Return = %d\n", fd2path[result], result);
 	}else {
 		ERROR("Open %s , get realpath failed, path:%s, error, %s, errno:%d.\n",
-			 path, result, fullpath, strerror(err), err);
+			 path, fullpath, strerror(err), err);
 	}
 	if(fstat(result, &st)){
 	    err = errno;
@@ -2057,7 +2057,7 @@ FILE *ts_fopen (const char *filename, const char *modes){
 		fd = fileno(result);
 //		MSG("Open %s ,Return = %d\n", fd2path[result], result);
 	}else {
-		ERROR("Open %s , get realpath failed.\n", filename, result);
+		ERROR("Open %s , get realpath failed.\n", filename);
 	}
 	if(fstat(fd, &st)){
 	    err = errno;
@@ -2076,7 +2076,7 @@ FILE *ts_fopen (const char *filename, const char *modes){
 		exit(-1);
 	}
 #endif //PATCH
-	MSG("file: %s, fd:%d\n", filename, result);
+	MSG("file: %s\n", filename);
 	return result;
 }
 
