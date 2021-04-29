@@ -1,6 +1,5 @@
-
-#ifndef __DEBUG_INCLUDED
-#define __DEBUG_INCLUDED
+#ifndef __AWN_DEBUG__
+#define __AWN_DEBUG__
 
 // Turns on debugging messages
 #undef SHOW_DEBUG
@@ -29,11 +28,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-// use stderr, until we dup it
 #define PRINT_FD stderr
 
 typedef char* charptr;
-void xil_printf(FILE* f, const charptr c, ...);
 
 #define _nvp_debug_handoff(x) \
 { \
@@ -43,18 +40,15 @@ void xil_printf(FILE* f, const charptr c, ...);
 	while(asdf) {}; \
 }
 
-
-//void outbyte(char c);
-
-//#define ERROR_NAMES (EPERM) (ENOENT) (ESRCH) (EINTR) (EIO) (ENXIO) (E2BIG) (ENOEXEC) (EBADF) (ECHILD) (EAGAIN) (ENOMEM) (EACCES) (EFAULT) (ENOTBLK) (EBUSY) (EEXIST) (EXDEV) (ENODEV) (ENOTDIR) (EISDIR) (EINVAL) (ENFILE) (EMFILE) (ENOTTY) (ETXTBSY) (EFBIG) (ENOSPC) (ESPIPE) (EROFS) (EMLINK) (EPIPE) (EDOM) (ERANGE) (EDEADLK)
-#define ERROR_NAMES_LIST (EPERM, (ENOENT, (ESRCH, (EINTR, (EIO, (ENXIO, (E2BIG, (ENOEXEC, (EBADF, (ECHILD, (EAGAIN, (ENOMEM, (EACCES, (EFAULT, (ENOTBLK, (EBUSY, (EEXIST, (EXDEV, (ENODEV, (ENOTDIR, (EISDIR, (EINVAL, (ENFILE, (EMFILE, (ENOTTY, (ETXTBSY, (EFBIG, (ENOSPC, (ESPIPE, (EROFS, (EMLINK, (EPIPE, (EDOM, (ERANGE, (EDEADLK, BOOST_PP_NIL)))))))))))))))))))))))))))))))))))
+/** xzjin 16进制打印内存数据,每行16 byte
+ * @mem 内存开始地址
+ * @lineNr 打印的行数
+*/
+void printMem(void* mem, int lineNr);
 
 #define ERROR_IF_PRINT(r, data, elem) if(data == elem) { DEBUG("errno == %s (%i): %s\n", MK_STR(elem), elem, strerror(elem)); }
 
-// also used in fileops_wrap
 #define PRINTFUNC fprintf 
-//#define PRINTFUNC xil_printf 
-
 
 #if SHOW_MSG
 	#define MSG(format, ...) do{PRINTFUNC(PRINT_FD, "\033[01;32mMSG(\e[m\033[01;36mF:%s L:%d\e[m\033[01;33m):\e[m" , __func__ , __LINE__); PRINTFUNC(PRINT_FD,  format, ##__VA_ARGS__); fflush(PRINT_FD); }while(0)
@@ -85,22 +79,4 @@ int _nv_error_count;
 	#define DEBUG_P(format, ...) do{}while(0)
 #endif
 
-#define FAIL \
-"FFFFFFFFFFFFFFFFFFFFFF      AAA               IIIIIIIIII LLLLLLLLLLL             \n"\
-"F::::::::::::::::::::F     A:::A              I::::::::I L:::::::::L             \n"\
-"F::::::::::::::::::::F    A:::::A             I::::::::I L:::::::::L             \n"\
-"FF::::::FFFFFFFFF::::F   A:::::::A            II::::::II LL:::::::LL             \n"\
-"  F:::::F       FFFFFF  A:::::::::A             I::::I     L:::::L               \n"\
-"  F:::::F              A:::::A:::::A            I::::I     L:::::L               \n"\
-"  F::::::FFFFFFFFFF   A:::::A A:::::A           I::::I     L:::::L               \n"\
-"  F:::::::::::::::F  A:::::A   A:::::A          I::::I     L:::::L               \n"\
-"  F:::::::::::::::F A:::::A     A:::::A         I::::I     L:::::L               \n"\
-"  F::::::FFFFFFFFFFA:::::AAAAAAAAA:::::A        I::::I     L:::::L               \n"\
-"  F:::::F         A:::::::::::::::::::::A       I::::I     L:::::L               \n"\
-"  F:::::F        A:::::AAAAAAAAAAAAA:::::A      I::::I     L:::::L         LLLLLL\n"\
-"FF:::::::FF     A:::::A             A:::::A   II::::::II LL:::::::LLLLLLLLL:::::L\n"\
-"F::::::::FF    A:::::A               A:::::A  I::::::::I L::::::::::::::::::::::L\n"\
-"F::::::::FF   A:::::A                 A:::::A I::::::::I L::::::::::::::::::::::L\n"\
-"FFFFFFFFFFF  AAAAAAA                   AAAAAAAIIIIIIIIII LLLLLLLLLLLLLLLLLLLLLLLL\n"
-
-#endif
+#endif //__AWN_DEBUG__

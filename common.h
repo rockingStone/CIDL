@@ -1,8 +1,5 @@
-
-// Header file shared by nvmfileops.c, fileops_compareharness.c
-
-#ifndef __NV_COMMON_H_
-#define __NV_COMMON_H_
+#ifndef __AWN_COMMON__
+#define __AWN_COMMON__
 
 #ifndef __cplusplus
 //typedef long long off64_t;
@@ -247,10 +244,6 @@ RBNodePtr findmap2f(void* addr, RBNodePtr* pageMapTree, int* protected, int* pro
 extern void *intel_memcpy(void* __restrict__ b, const void* __restrict__ a, size_t n);
 void delMap(RBNodePtr* root, RBNodePtr addr);
 void segvhandler(int signum, siginfo_t* info, void* context);
-extern void* addr2PageNum(void* addr);
-extern void* addr2PageTail(void* addr);
-extern void* addr2PageBegin(void* addr);
-extern short addr2PageOffset(void* addr);
 struct sigaction action;
 struct sigaction defaction;
 // maximum number of file operations to support simultaneously
@@ -276,7 +269,6 @@ struct sigaction defaction;
 
 #define STOREPATH(fd, path) do{ FD2PATH[fd%FILEMAPTREENODEPOOLSIZE] = path;} while(0)
 #define GETPATH(fd) FD2PATH[fd%FILEMAPTREENODEPOOLSIZE]
-#endif
 
 // breaking the build
 #define CALL_MMAP   addr, len, prot, flags, file, off
@@ -303,3 +295,5 @@ struct sigaction defaction;
 #define PFFS_WRITE  "%i, %p, %i"
 #define PFFS_OPEN   "%s, %i"
 #define PFFS_READ   "%i, %p, %i"
+
+#endif //__AWN_COMMON__

@@ -1,5 +1,5 @@
-#ifndef _LEDGER_TIMERS_H_
-#define _LEDGER_TIMERS_H_
+#ifndef __AWN_TIMER__
+#define __AWN_TIMER__
 
 #include <sys/time.h>
 #include <string.h>
@@ -131,4 +131,4 @@ typedef struct timespec instrumentation_type;
 	
 #endif
 
-#endif
+#endif //__AWN_TIMER__
