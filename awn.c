@@ -321,56 +321,6 @@ void listRecTreeNode(void *pageNum){
 	}
 }
 
-inline void writeRec(unsigned long fileOffset, void* src, void* dest,
-	 void* pageNum, char* fileName) __attribute__((always_inline));
-inline void writeRec(unsigned long fileOffset, void* src, void* dest,
-	 void* pageNum, char* fileName){
-	int idx = *(lastRec.lastIdx);
-	struct memRec* pt = lastRec.lastMemRec;
-	unsigned long pageOffset = (unsigned long)dest-((unsigned long)pageNum<<PAGENUMSHIFT);
-	//xzjin 注意开始的情况，如果lastRec是第一次用，还没有设置怎么办
-	if(idx<MEMRECPERENTRY){		//索引小于边界
-		pt[idx].fileName= fileName;
-		pt[idx].fileOffset = fileOffset;
-		//因为在ts_memcpy_traced有时候会把pageOffset>page size的地址放到这里，所以这么做
-		pt[idx].pageOffset = pageOffset;
-		//xzjin update lastRec
-//			lastRec.lastPageNum = ***;
-//			lastRec.lastMemRec = ***;
-		*(lastRec.lastIdx) = idx+1;
-	}else{	//索引大于边界，追加list
-//		DEBUG("Append list node\n");
-		struct recTreeNode tmpRecTreeNode,**rec;
-		//xzjin 这个是实际包含memRec
-		struct memRec *recArr;
-		//xzjin 这个是链表的结构，里面只包含一个指向memRec的指针
-		struct recBlockEntry *rbe;
-		tmpRecTreeNode.pageNum = pageNum;
-		rec = tfind(&tmpRecTreeNode, &recTreeRoot,recCompare);
-		assert(rec!=NULL);
-//		recArr = malloc(sizeof(struct memRec)*MEMRECPERENTRY);
-//		rbe = malloc(sizeof(struct recBlockEntry));
-		recArr = allocateMemRecArr();
-		rbe = allocateRecBlockEntry();
-		rbe->recArr = recArr;
-		//xzjin 插入链表插在最前面，这样比较的时候是从最新拷贝的记录开始比较的
-		//xzjin 也就是说越大的内存地址在越前面
-		TAILQ_INSERT_HEAD(rec[0]->listHead, rbe, entries);
-		rec[0]->recModEntry = rbe;
-		
-		//xzjin update Rec
-		recArr[0].fileName= fileName;
-		recArr[0].fileOffset = fileOffset;
-		//因为在ts_memcpy_traced有时候会把pageOffset>page size的地址放到这里，所以这么做
-		recArr[0].pageOffset = pageOffset;
-
-		//xzjin update lastRec
-		lastRec.lastMemRec = recArr;
-		*(lastRec.lastIdx) = 1;
-	}
-	//MSG("PageNum: %lu, idx:%d\n", lastRec.lastPageNum, *(lastRec.lastIdx));
-}
-
 struct recTreeNode* addTreeNode(void* pageNum){
 
 	//xzjin 因为tdelete会在函数内部释放空间，所以在这里暂时用单独的malloc 
@@ -424,6 +374,7 @@ struct recTreeNode* addTreeNode(void* pageNum){
 	treeNode->recModEntry = ent;	//used when insert to tail
 	treeNode->memRecIdx = 0;
 	tsearch(treeNode, &recTreeRoot, recCompare);
+//	DEBUG_FILE("add tree node:%p, pageNum:%p\n", treeNode, pageNum);
 //	if(insertResult){
 //		DEBUG("Inserted, address:%p, instered pageNum:%lu, origin pageNum:%lu.\n",
 //			insertResult[0], insertResult[0]->pageNum, treeNode->pageNum);
@@ -445,6 +396,54 @@ struct recTreeNode** findAndAddRecTreeNode(struct recTreeNode *recp){
 	return destRes;
 }
 
+inline void writeRec(unsigned long fileOffset, void* src, void* dest,
+	 void* pageNum, char* fileName) __attribute__((always_inline));
+inline void writeRec(unsigned long fileOffset, void* src, void* dest,
+	 void* pageNum, char* fileName){
+	int idx = *(lastRec.lastIdx);
+	struct memRec* pt = lastRec.lastMemRec;
+	unsigned long pageOffset = (unsigned long)dest-((unsigned long)pageNum<<PAGENUMSHIFT);
+	//xzjin 注意开始的情况，如果lastRec是第一次用，还没有设置怎么办
+	if(idx<MEMRECPERENTRY){		//索引小于边界
+		pt[idx].fileName= fileName;
+		pt[idx].fileOffset = fileOffset;
+		//因为在ts_memcpy_traced有时候会把pageOffset>page size的地址放到这里，所以这么做
+		pt[idx].pageOffset = pageOffset;
+		//xzjin update lastRec
+//			lastRec.lastPageNum = ***;
+//			lastRec.lastMemRec = ***;
+		*(lastRec.lastIdx) = idx+1;
+	}else{	//索引大于边界，追加list
+//		DEBUG("Append list node\n");
+		struct recTreeNode tmpRecTreeNode,**rec;
+		//xzjin 这个是实际包含memRec
+		struct memRec *recArr;
+		//xzjin 这个是链表的结构，里面只包含一个指向memRec的指针
+		struct recBlockEntry *rbe;
+		tmpRecTreeNode.pageNum = pageNum;
+		rec = tfind(&tmpRecTreeNode, &recTreeRoot,recCompare);
+		assert(rec!=NULL);
+		recArr = allocateMemRecArr();
+		rbe = allocateRecBlockEntry();
+		rbe->recArr = recArr;
+		//xzjin 插入链表插在最前面，这样比较的时候是从最新拷贝的记录开始比较的
+		//xzjin 也就是说越大的内存地址在越前面
+		TAILQ_INSERT_HEAD(rec[0]->listHead, rbe, entries);
+		rec[0]->recModEntry = rbe;
+		
+		//xzjin update Rec
+		recArr[0].fileName= fileName;
+		recArr[0].fileOffset = fileOffset;
+		//因为在ts_memcpy_traced有时候会把pageOffset>page size的地址放到这里，所以这么做
+		recArr[0].pageOffset = pageOffset;
+
+		//xzjin update lastRec
+		lastRec.lastMemRec = recArr;
+		*(lastRec.lastIdx) = 1;
+	}
+//	MSG("PageNum: %p, idx:%d\n", lastRec.lastPageNum, *(lastRec.lastIdx));
+}
+
 //xzjin src is UNUSED and UNCHECKED
 inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName) __attribute__((always_inline));
 inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName){
@@ -458,24 +457,25 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 //		writeRec(fileOffset, src, dest, pageNum, fileName);
 //	}else
 	{		//xzjin 和上次更新的不在同一个页
-		struct recTreeNode node,**pt;
+		struct recTreeNode node, *nodePtr, **pt;
 		node.pageNum = pageNum;
 		pt = tfind(&node, &recTreeRoot, recCompare);
 		if(UNLIKELY(pt)){	//xzjin 在树里找到了
 			//MSG("Found in tree\n");
+			nodePtr = pt[0];
 			//xzjin update lastRec, it is one of parameters that writeRec needs, 
 			//must update lastRec before callwriteRec
 			lastRec.lastPageNum = pageNum;
-			lastRec.lastMemRec = pt[0]->recModEntry->recArr;
+			lastRec.lastMemRec = nodePtr->recModEntry->recArr;
 			//xzjin 注意这里是指向数字的指针
-			lastRec.lastIdx = &(pt[0]->memRecIdx);
+			lastRec.lastIdx = &(nodePtr->memRecIdx);
 			//Check whether new address is smaller than older
 			//If true, delete node content
 			{
 				struct memRec* lastMenRec = lastRec.lastMemRec;
 				int idx = *lastRec.lastIdx;
 				struct recBlockEntry *ent;
-			    struct tailhead *head = pt[0]->listHead;
+			    struct tailhead *head = nodePtr->listHead;
 				assert(idx>=0);
 				//TODO idx=0发生在
 				//	1. memcpy treced 刚删除了所有内容
@@ -492,8 +492,8 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 							withdrawRecBlockEntry(ent);
 						}
 					}
-					pt[0]->recModEntry =  TAILQ_FIRST(head);
-					lastRec.lastMemRec = pt[0]->recModEntry->recArr;
+					nodePtr->recModEntry =  TAILQ_FIRST(head);
+					lastRec.lastMemRec = nodePtr->recModEntry->recArr;
 					*(lastRec.lastIdx) = 0;
 				}
 			}
@@ -504,6 +504,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 		}else{	//xzjin 在树里没找到
 			//MSG("Not found in tree\n");
 			struct recTreeNode *treeNode = addTreeNode(pageNum);
+			nodePtr = treeNode;
 			//xzjin update lastRec
 			lastRec.lastPageNum = pageNum;
 			lastRec.lastMemRec = treeNode->recModEntry->recArr;
@@ -515,6 +516,8 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 			}
 			writeRec(fileOffset, src, dest, pageNum, fileName);
 		}
+//		MSG("Node pageNum:%p, memRecIdx:%d, nodePtr:%p.\n",
+//			 nodePtr->pageNum, nodePtr->memRecIdx, nodePtr);
 	}
 	if(UNLIKELY(*lastRec.lastIdx<0 ||*lastRec.lastIdx>MEMRECPERENTRY)){
 		MSG("lastRec.lastIdx ERROR\n");
@@ -711,7 +714,7 @@ void delMap(RBNodePtr *root, RBNodePtr addr){
 // Creates the set of standard posix functions as a module.
 __attribute__((constructor))void init(void) {
 	execv_done = 0;
-	int tmp;
+	int tmp, err;
 	MSG("Initializing the libawn.so.\n");
 
 	//xzjin Put dlopen before call to memcpy and mmap call.
@@ -723,6 +726,12 @@ __attribute__((constructor))void init(void) {
 	mmapSrcCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	mmapDestCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	FD2PATH = calloc(FILEMAPTREENODEPOOLSIZE, sizeof(char*));
+
+	debug_fd = fopen("log", "w");
+	err = errno;
+	if(debug_fd==NULL){
+		MSG("open log file error, %s.\n", strerror(err));
+	}
 
 //	lastDestInMap = NULL;
 //	lastSrcInMap = NULL;
@@ -750,12 +759,19 @@ __attribute__((constructor))void init(void) {
 
 	//xzjin Allocate pool for node
 	{
-		RECTREENODEPOOL = malloc(sizeof(struct recTreeNode)*RECTREENODEPOOLSIZE);
+		unsigned long long allocSize;
+		unsigned long long totalAllocSize = 0;
+		
+		allocSize = sizeof(struct recTreeNode)*RECTREENODEPOOLSIZE;
+		totalAllocSize += allocSize;
+		RECTREENODEPOOL = malloc(allocSize);
 		if(!RECTREENODEPOOL){
 			ERROR("Could not allocate space for RECTREENODEPOOL.\n");
 			assert(0);
 		}
-		RECTREENODEPOOLPTR = malloc(sizeof(struct recTreeNode*)*RECTREENODEPOOLSIZE);
+		allocSize = sizeof(struct recTreeNode*)*RECTREENODEPOOLSIZE;
+		totalAllocSize += allocSize;
+		RECTREENODEPOOLPTR = malloc(allocSize);
 		if(!RECTREENODEPOOLPTR){
 			ERROR("Could not allocate space for RECTREENODEPOOLPTR.\n");
 			assert(0);
@@ -765,12 +781,16 @@ __attribute__((constructor))void init(void) {
 		}
 		RECTREENODEPOOLIDX = RECTREENODEPOOLSIZE;
 
-		FILEMAPTREENODEPOOL = malloc(sizeof(struct fileMapTreeNode)*FILEMAPTREENODEPOOLSIZE);
+		allocSize = sizeof(struct fileMapTreeNode)*FILEMAPTREENODEPOOLSIZE;
+		totalAllocSize += allocSize;
+		FILEMAPTREENODEPOOL = malloc(allocSize);
 		if(!FILEMAPTREENODEPOOL){
 			ERROR("Could not allocate space for FILEMAPTREENODEPOOL.\n");
 			assert(0);
 		}
-		FILEMAPTREENODEPOOLPTR = malloc(sizeof(struct fileMapTreeNode*)*RECTREENODEPOOLSIZE);
+		allocSize = sizeof(struct fileMapTreeNode*)*RECTREENODEPOOLSIZE;
+		totalAllocSize += allocSize;
+		FILEMAPTREENODEPOOLPTR = malloc(allocSize);
 		if(!FILEMAPTREENODEPOOLPTR){
 			ERROR("Could not allocate space for FILEMAPTREENODEPOOLPTR.\n");
 			assert(0);
@@ -795,12 +815,16 @@ __attribute__((constructor))void init(void) {
 //		}
 //		SLISTHEADPOOLIDX = SLISTHEADPOOLSIZE;
 
-		TAILHEADPOOL = malloc(sizeof(struct tailhead)*TAILHEADPOOLSIZE);
+		allocSize = sizeof(struct tailhead)*TAILHEADPOOLSIZE;
+		totalAllocSize += allocSize;
+		TAILHEADPOOL = malloc(allocSize);
 		if(!TAILHEADPOOL){
 			ERROR("Could not allocate space for TAILHEADPOOL.\n");
 			assert(0);
 		}
-		TAILHEADPOOLPTR = malloc(sizeof(struct tailhead*)*TAILHEADPOOLSIZE);
+		allocSize = sizeof(struct tailhead*)*TAILHEADPOOLSIZE;
+		totalAllocSize += allocSize;
+		TAILHEADPOOLPTR = malloc(allocSize);
 		if(!TAILHEADPOOLPTR){
 			ERROR("Could not allocate space for TAILHEADPOOLPTR.\n");
 			assert(0);
@@ -810,12 +834,16 @@ __attribute__((constructor))void init(void) {
 		}
 		TAILHEADPOOLIDX = TAILHEADPOOLSIZE;
 
-		RECBLOCKENTRYPOOL = malloc(sizeof(struct recBlockEntry)*RECBLOCKENTRYPOOLSIZE);
+		allocSize = sizeof(struct recBlockEntry)*RECBLOCKENTRYPOOLSIZE;
+		totalAllocSize += allocSize;
+		RECBLOCKENTRYPOOL = malloc(allocSize);
 		if(!RECBLOCKENTRYPOOL){
 			ERROR("Could not allocate space for RECBLOCKENTRYPOOL.\n");
 			assert(0);
 		}
-		RECBLOCKENTRYPOOLPTR = malloc(sizeof(struct recBlockEntry*)*RECBLOCKENTRYPOOLSIZE);
+		allocSize = sizeof(struct recBlockEntry*)*RECBLOCKENTRYPOOLSIZE;
+		totalAllocSize += allocSize;
+		RECBLOCKENTRYPOOLPTR = malloc(allocSize);
 		if(!RECBLOCKENTRYPOOLPTR){
 			ERROR("Could not allocate space for RECBLOCKENTRYPOOLPTR.\n");
 			assert(0);
@@ -826,12 +854,16 @@ __attribute__((constructor))void init(void) {
 		RECBLOCKENTRYPOOLIDX = RECBLOCKENTRYPOOLSIZE;
 
 		//xzjin 注意这里RECARRPOOL的类型是memRec的指针，不是memRec[MEMRECPERENTRY],申请的时候应该是+-MEMRECPERENTRY
-		RECARRPOOL = malloc(sizeof(struct memRec)*MEMRECPERENTRY*RECARRPOOLSIZE);
+		allocSize = sizeof(struct memRec)*MEMRECPERENTRY*RECARRPOOLSIZE;
+		totalAllocSize += allocSize;
+		RECARRPOOL = malloc(allocSize);
 		if(!RECARRPOOL){
 			ERROR("Could not allocate space for RECARRPOOL.\n");
 			assert(0);
 		}
-		RECARRPOOLPTR = malloc(sizeof(struct memRec*)*RECARRPOOLSIZE);
+		allocSize = sizeof(struct memRec*)*RECARRPOOLSIZE;
+		totalAllocSize += allocSize;
+		RECARRPOOLPTR = malloc(allocSize);
 		if(!RECARRPOOLPTR){
 			ERROR("Could not allocate space for RECARRPOOLPTR.\n");
 			assert(0);
@@ -841,6 +873,7 @@ __attribute__((constructor))void init(void) {
 			RECARRPOOLTAIL = (unsigned long long)RECARRPOOLPTR[i];
 		}
 		RECARRPOOLIDX = RECARRPOOLSIZE;
+		MSG("Allocate %llu bytes memory.\n", totalAllocSize);
 	}
 
 #if USE_PKEY
@@ -1100,7 +1133,6 @@ ssize_t ts_write(int file, void *buf, size_t length){
 	//off_t fpos = lseek(file, 0, SEEK_CUR);
 	ts_write_size += length;
 	START_TIMING(ts_write_t, ts_write_time);
-//	unsigned long ret =  _hub_fileops->WRITE(CALL_WRITE);
 	unsigned long ret = write(CALL_WRITE);
 	END_TIMING(ts_write_t, ts_write_time);
 //	MSG("ts_write: buf:%p, file:%d, len: %llu, fileName:%s\n", 
@@ -1186,7 +1218,8 @@ ssize_t ts_write(int file, void *buf, size_t length){
 			*/
 		}else{
 			notFoundLen = MIN(PAGESIZE, toTailLen);
-			MSG("buf: %p not found, size:%d.\n", (void*)start, notFoundLen);
+			//TODO 这里打印出来没有找到的内容，是不是可以分析一下模式
+//			MSG("buf: %p not found, size:%d.\n", (void*)start, notFoundLen);
 			ts_write_not_found_size += notFoundLen;
 		}
 	}
@@ -1406,8 +1439,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 	unsigned long long srcPageNum = start;
 	unsigned long long destStart = (unsigned long long)addr2PageNum(dest);
 	unsigned long long end = (unsigned long long)addr2PageNum((void*)((unsigned long long)src+n));
-	struct recTreeNode searchNode, destSearchNode;
-
+	struct recTreeNode searchNode;
 	void *ret;
 
 	ret = memcpy(CALL_MEMCPY);
@@ -1420,9 +1452,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 	for(int i=0; start<=end; start++,destStart++,i++){
 //		DEBUG("start:%lu.\n", start);
 		searchNode.pageNum = (void*)start;
-		destSearchNode.pageNum = (void*)destStart;
 		struct recTreeNode **srcRes = tfind(&searchNode, &recTreeRoot, recCompare);
-		struct recTreeNode **destRes = findAndAddRecTreeNode(&destSearchNode);
 		//src address is in tree and dest address is not
 		if(srcRes){
 			struct recBlockEntry *srcLastEntry = srcRes[0]->recModEntry;
@@ -1485,28 +1515,10 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 //			MSG("blockEntry:%lu.\n", blockEntry);
 			//Copy record item to dest
 			for(; idx < uplimit; idx++){
-//				void *fileCmpStart;
-//				size_t cmpLen = 999;
 				struct memRec *curMemRec = rec+idx;
-//				struct fileMapTreeNode **fmSearNodep;
-//				struct fileMapTreeNode *fmTarNode = NULL;
 				void* copySrc = getAddr((void*)start, curMemRec->pageOffset);
 				void* copyDest;
-//				struct memRec *modifyTarget; 
  				copyDest = dest+(copySrc-src);
-				//xzjin 确保拷贝到了正确的页结构里面
-				if(UNLIKELY((unsigned long long)addr2PageNum(copyDest) != destStart)){
-//					DEBUG("searchNode:%lu, pageNum:%lu.\n", &destSearchNode, destSearchNode.pageNum);
-					destStart = (unsigned long long)addr2PageNum(copyDest);
-					destSearchNode.pageNum = (void*)destStart;
-					destRes = findAndAddRecTreeNode(&destSearchNode);
-				}
-				//xzjin update lastRec, it's one of paramters that writeRec needs，
-				//so update lastRec before call writeRec
-				lastRec.lastPageNum = (void*)destStart;
-				lastRec.lastMemRec = destRes[0]->recModEntry->recArr;
-				//xzjin 注意这里是指向数字的指针
-				lastRec.lastIdx = &(destRes[0]->memRecIdx);
 
 				//Test Compare whether content are the same
 #ifdef  TS_MEMCPY_CMPWRITE
@@ -1580,23 +1592,6 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 					struct memRec *curMemRec = rec+idx;
 					void* copySrc = getAddr((void*)start, curMemRec->pageOffset);
 					void* copyDest = dest+(copySrc-src);
-					//xzjin 确保拷贝到了正确的页结构里面
-					if(UNLIKELY((unsigned long long)addr2PageNum(copyDest) != destStart)){
-						destStart = (unsigned long long)addr2PageNum(copyDest);
-						destSearchNode.pageNum = (void*)destStart;
-						MSG("searchNode:%p, pageNum:%p, copyDest: %p, dest: %p, copySrc:%p, src:%p.\n", 
-							&destSearchNode, destSearchNode.pageNum, copyDest, 
-							dest, copySrc, src);
-						destRes = findAndAddRecTreeNode(&destSearchNode);
-					}
-					//xzjin update lastRec,it's one of the paremeters that writeRec needs，
-					// so update lastRec before call writeRec
-					lastRec.lastPageNum = (void*)destStart;
-					lastRec.lastMemRec = destRes[0]->recModEntry->recArr;
-					//xzjin 注意这里是指向数字的指针
-					lastRec.lastIdx = &(destRes[0]->memRecIdx);
-//					writeRec(curMemRec->fileOffset, copySrc, copyDest,
-//						 (void*)destStart, curMemRec->fileName);
 //					DEBUG("ts_memcpy_traced DOWN idx:%d, uplimit:%d\n", idx, uplimit);
 					insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
 				}
