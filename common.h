@@ -31,12 +31,8 @@
 #include <unistd.h>
 #include <linux/types.h>
 
-//#include "rbtree.h"
 #include "debug.h"
 #include "timers.h"
-
-#include "boost/preprocessor/seq/for_each.hpp"
-//#include "boost/preprocessor/cat.hpp"
 
 #define BUF_SIZE 40
 #undef USE_STAIL
@@ -48,19 +44,12 @@
 #define LIKELY(x)       __builtin_expect((long int)(x),1)
 #define UNLIKELY(x)     __builtin_expect((long int)(x),0)
 
-#define assert(x) if(UNLIKELY(!(x))) { printf("ASSERT FAILED\n"); fflush(NULL); ERROR("ASSERT("#x") failed!\n"); exit(100); }
-
-// places quotation marks around arg (eg, MK_STR(stuff) becomes "stuff")
-#define MK_STR(arg) #arg
-
-#define MACRO_WRAP(a) a
-#define MACRO_CAT(a, b) MACRO_WRAP(a##b)
-
 #ifndef __cplusplus
 typedef int bool;
 #define false 0
 #define true 1
 #endif
+
 #define REALPKEYPROTECT 0
 
 atomic_uint_least64_t Instrustats[INSTRUMENT_NUM];
@@ -81,77 +70,11 @@ struct searchCache{
 	int proKey;
 };
 
-struct fMap{
-	void* start;	//文件映射的开始
-	void* tail;		//文件映射的结束
-	int usedTime;
-	int fd;
-	char* fileName;
-	unsigned long offset;	//文件映射部分相对于文件开头的偏移
-};
-
-//xzjin 对于跨页的记录，就记录在开始地址对应的记录里，反正最后会遍历对比
-struct memRec{
-	unsigned long fileOffset;
-	char* fileName;
-	short pageOffset;		//记录在页内的偏移，memRec是对应一个页的一条记录，页号是记录在树节点的
-//	short fd;
-};
-
-//xzjin single list element
-#ifndef  USE_STAIL
-	struct recBlockEntry{
-		struct memRec* recArr;		//这里是一块连续struct memRec地址的开始
-		TAILQ_ENTRY(recBlockEntry) entries;     /* Singly-linked List. */
-	};
-#else
-	struct recBlockEntry{
-		struct memRec* recArr;		//这里是一块连续struct memRec地址的开始
-		SLIST_ENTRY(recBlockEntry) entries;     /* Singly-linked List. */
-	};
-#endif	// USE_STAIL
-
-//xzjin single list head
-struct slisthead{
-    struct  recBlockEntry *slh_first;	/* first element */	
-};
-
-//xzjin tail queue list
-struct tailhead {
-	struct recBlockEntry *tqh_first;		/* first element */
-	struct recBlockEntry * *tqh_last;	/* addr of last next element */
-};
 
 #define MEMRECPERENTRY 38		// (4096/((13+100)/2))/2
 void* recTreeRoot;
 void* fileMapTreeRoot;
 void* fileMapNameTreeRoot;
-
-#ifndef  USE_STAIL
-struct recTreeNode{
-	void* pageNum;
-    struct tailhead* listHead;
-	struct recBlockEntry *recModEntry;	//used when insert to tail, most recent modified entry.
-	short memRecIdx;		//It seems write first and then increase idx
-};
-#else
-struct recTreeNode{
-	void* pageNum;
-    struct slisthead* listHead;
-	struct recBlockEntry *recModEntry;	//used when insert to tail, most recent modified entry.
-	short memRecIdx;		//It seems write first and then increase idx
-};
-#endif	//USE_STAIL
-
-struct fileMapTreeNode{
-	void* start;	//文件映射的开始
-	void* tail;		//文件映射的结束
-	int usedTime;
-	char* fileName;
-	unsigned long offset;	//文件映射部分相对于文件开头的偏移
-//	unsigned int ref;	//对这个文件的引用数
-//	bool userUnmapped;	//用户是否已经对这个文件unmmap了
-};
 
 struct recTreeNode* RECTREENODEPOOL;
 #define RECTREENODEPOOLSIZE 2500
@@ -160,6 +83,13 @@ struct recTreeNode** RECTREENODEPOOLPTR;
 
 struct fileMapTreeNode* FILEMAPTREENODEPOOL;
 //#define FILEMAPTREENODEPOOLSIZE 1024
+
+/**xzjin fd to path map, <fd>'s path is in 
+ * fd%FILEMAPTREENODEPOOLSIZE; which means when
+ * fd > FILEMAPTREENODEPOOLSIZE, then may by an
+ * error.
+*/
+char** FD2PATH;
 #define FILEMAPTREENODEPOOLSIZE 2048
 int FILEMAPTREENODEPOOLIDX;
 struct fileMapTreeNode** FILEMAPTREENODEPOOLPTR;
@@ -199,8 +129,6 @@ struct searchCache* mmapSrcCache;
 struct searchCache* mmapDestCache;
 //struct protRec* protRecPool;
 //#define protRECPOOLSIZE 204
-#define FMAPCACHESIZE 10
-struct fMap fMapCache[FMAPCACHESIZE];
 
 //RBNodePtr RBPool;
 //#define RBPOOLSIZE 40960
@@ -223,11 +151,6 @@ struct{
 	int idx;
 } leastRecFCache;
 
-
-/**xzjin fd to path map, <fd>'s path is in fd%100;
- * which means when fd > 100, then may by an error.
-*/
-char** FD2PATH;
 //xzjin TODO 添加对多个锁的支持
 //xzjin this Key is always allow all operation
 int nonProKey;
@@ -235,37 +158,10 @@ int execv_done,proKey;
 int PAGESIZE,PAGENUMSHIFT;
 long long PAGEOFFMASK;
 long long PAGENUMMASK;
-RBNodePtr pageNum2Tree;
-// TNULL is process shared
-extern RBNodePtr TNULL;
-extern void nvp_print_io_stats(void);
-void p2fAppend(void *, long long , long long , char*, short);
 RBNodePtr findmap2f(void* addr, RBNodePtr* pageMapTree, int* protected, int* proKey);
-extern void *intel_memcpy(void* __restrict__ b, const void* __restrict__ a, size_t n);
-void delMap(RBNodePtr* root, RBNodePtr addr);
 void segvhandler(int signum, siginfo_t* info, void* context);
 struct sigaction action;
 struct sigaction defaction;
-// maximum number of file operations to support simultaneously
-#define MAX_FILEOPS 32
-
-#define RESOLVE_TWO_FILEOPS(MODULENAME, OP1, OP2) \
-	DEBUG("Resolving module "MODULENAME": wants two fileops.\n"); \
-	struct Fileops_p** result = resolve_n_fileops(tree, MODULENAME, 2); \
-	OP1 = result[0]; \
-	OP2 = result[1]; \
-	if(OP1 == NULL) { \
-		ERROR("Failed to resolve "#OP1"\n"); \
-		assert(0); \
-	} else { \
-		DEBUG(MODULENAME"("#OP1") resolved to %s\n", OP1->name); \
-	} \
-	if(OP2 == NULL) { \
-		ERROR("Failed to resolve "#OP2"\n"); \
-		assert(0); \
-	} else { \
-		DEBUG(MODULENAME"("#OP2") resolved to %s\n", OP2->name); \
-	}
 
 #define STOREPATH(fd, path) do{ FD2PATH[fd%FILEMAPTREENODEPOOLSIZE] = path;} while(0)
 #define GETPATH(fd) FD2PATH[fd%FILEMAPTREENODEPOOLSIZE]

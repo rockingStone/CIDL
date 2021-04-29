@@ -2,6 +2,7 @@
 #define __AWN_MEM__
 
 #include "common.h"
+#include "tree.h"
 
 inline struct recTreeNode *allocateRecTreeNode() __attribute__((always_inline));
 //xzjin TODO 现在对于recTreeNode没有回收方式，同样tailHead也是
@@ -17,6 +18,7 @@ void withdrawMemRecArr(struct memRec *ptr);
 
 //xzjin 因为IDX开始存放的是缓存大小，所以先减后返回
 inline struct recTreeNode *allocateRecTreeNode(){
+	if(RECTREENODEPOOLIDX==0) recTreeNodeGrabageReclaim();
 	assert(RECTREENODEPOOLIDX>0);
 	RECTREENODEPOOLIDX--;
 	return RECTREENODEPOOLPTR[RECTREENODEPOOLIDX];

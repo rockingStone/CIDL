@@ -1,5 +1,6 @@
 #include "common.h"
 #include "mem.h"
+#include "tree.h"
 
 //xzjin TODO 现在对于recTreeNode没有回收方式，同样tailHead也是
 void withdrawRecTreeNode(struct recTreeNode * ptr){

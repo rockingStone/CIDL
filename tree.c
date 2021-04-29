@@ -83,11 +83,11 @@ void listRecMapActionDetail(const void *nodep, const VISIT which, const int dept
 }
 
 void listRecTree(){
-	twalk(recTreeRoot,  listRecMapAction);
+	twalk(recTreeRoot, listRecMapAction);
 }
 
 void listRecTreeDetail(){
-	twalk(recTreeRoot,  listRecMapActionDetail);
+	twalk(recTreeRoot, listRecMapActionDetail);
 }
 
 int recCompare(const void *pa, const void *pb) {
@@ -250,4 +250,51 @@ struct recTreeNode** findAndAddRecTreeNode(struct recTreeNode *recp){
 //			 destRes, recp->pageNum, destRes[0]->pageNum);
 	}
 	return destRes;
+}
+
+void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
+	struct recTreeNode delNode;
+	struct recTreeNode* node;
+	struct tailhead *head;
+	struct recBlockEntry *ent;
+
+	node = *nodep;
+	head = node->listHead;
+	ent = TAILQ_FIRST(head);
+	//if(TAILQ_EMPTY(head))
+	//xzjin list是空或者只有一个元素且这个列表是空的
+	if(node->memRecIdx==0 && !(TAILQ_NEXT(ent, entries))){
+		reclamedRecNode++;
+		delNode.pageNum = node->pageNum;
+		withdrawMemRecArr(ent->recArr);
+		TAILQ_REMOVE(head, TAILQ_FIRST(head), entries);
+		withdrawRecBlockEntry(ent);
+		withdrawTailHead(head);
+		memset(node, 0, sizeof(struct recTreeNode));
+		withdrawRecTreeNode(node);
+		tdelete(&delNode, &recTreeRoot, recCompare);
+	}
+}
+
+void reclaimRecTreeNode(const void *nodep, const VISIT which, const int depth){
+
+    switch (which) {
+    case preorder:
+        break;
+    case postorder:
+		reclaimSpecialRecTreeNode ((struct recTreeNode **)nodep);
+        break;
+    case endorder:
+        break;
+    case leaf:
+		reclaimSpecialRecTreeNode((struct recTreeNode **)nodep);
+        break;
+    }
+}
+
+
+void recTreeNodeGrabageReclaim(){
+	reclamedRecNode = 0;
+	twalk(recTreeRoot, listRecMapActionDetail);
+	MSG("Reclaimed recNode:%lu\n", reclamedRecNode);
 }

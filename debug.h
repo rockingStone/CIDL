@@ -46,6 +46,8 @@ typedef char* charptr;
 */
 void printMem(void* mem, int lineNr);
 
+#define assert(x) if(UNLIKELY(!(x))) { printf("ASSERT FAILED\n"); fflush(NULL); ERROR("ASSERT("#x") failed!\n"); exit(100); }
+
 #define ERROR_IF_PRINT(r, data, elem) if(data == elem) { DEBUG("errno == %s (%i): %s\n", MK_STR(elem), elem, strerror(elem)); }
 
 #define PRINTFUNC fprintf 

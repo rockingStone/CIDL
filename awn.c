@@ -13,10 +13,6 @@
 #define CMPWRITE
 #undef TS_MEMCPY_CMPWRITE
 
-/**xzjin 大概是一个全局的操作库，每个元素包含了一个模块的操作
- */
-struct Fileops_p* _hub_fileops_lookup[MAX_FILEOPS];
-
 //Debug help func
 void init(void);
 void listRecTreeNode(void *pageNum);
