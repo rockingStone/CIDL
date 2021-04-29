@@ -270,9 +270,11 @@ void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
 		TAILQ_REMOVE(head, TAILQ_FIRST(head), entries);
 		withdrawRecBlockEntry(ent);
 		withdrawTailHead(head);
-		memset(node, 0, sizeof(struct recTreeNode));
 		withdrawRecTreeNode(node);
 		tdelete(&delNode, &recTreeRoot, recCompare);
+		//xzjin 删除时候要用pageNum做判断，所以在删除之后再清空
+		memset(node, 0, sizeof(struct recTreeNode));
+//		MSG("delete recNode pageNum:%p\n", delNode.pageNum);
 	}
 }
 
@@ -295,6 +297,8 @@ void reclaimRecTreeNode(const void *nodep, const VISIT which, const int depth){
 
 void recTreeNodeGrabageReclaim(){
 	reclamedRecNode = 0;
-	twalk(recTreeRoot, listRecMapActionDetail);
+
+	twalk(recTreeRoot, reclaimRecTreeNode);
+	RECTREENODETHRESHOLD = RECTREENODEPOOLIDX* RECTREENODETHRESHOLDRATIO;
 	MSG("Reclaimed recNode:%lu\n", reclamedRecNode);
 }

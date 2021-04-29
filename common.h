@@ -79,10 +79,9 @@ void* fileMapNameTreeRoot;
 struct recTreeNode* RECTREENODEPOOL;
 #define RECTREENODEPOOLSIZE 2500
 int RECTREENODEPOOLIDX;
+int RECTREENODETHRESHOLD;
+#define RECTREENODETHRESHOLDRATIO (0.6)
 struct recTreeNode** RECTREENODEPOOLPTR;
-
-struct fileMapTreeNode* FILEMAPTREENODEPOOL;
-//#define FILEMAPTREENODEPOOLSIZE 1024
 
 /**xzjin fd to path map, <fd>'s path is in 
  * fd%FILEMAPTREENODEPOOLSIZE; which means when
@@ -90,6 +89,7 @@ struct fileMapTreeNode* FILEMAPTREENODEPOOL;
  * error.
 */
 char** FD2PATH;
+struct fileMapTreeNode* FILEMAPTREENODEPOOL;
 #define FILEMAPTREENODEPOOLSIZE 2048
 int FILEMAPTREENODEPOOLIDX;
 struct fileMapTreeNode** FILEMAPTREENODEPOOLPTR;
