@@ -367,7 +367,6 @@ __attribute__((constructor))void init(void) {
  	ts_write_same_size = 0;
  	ts_write_not_found_size = 0;
 	ts_metadataItem = 0;
-	nvpWriteSize = 0;
 	mmapSrcCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	mmapDestCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	FD2PATH = calloc(FILEMAPTREENODEPOOLSIZE, sizeof(char*));

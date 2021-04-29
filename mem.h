@@ -18,12 +18,6 @@ void withdrawMemRecArr(struct memRec *ptr);
 
 //xzjin 因为IDX开始存放的是缓存大小，所以先减后返回
 inline struct recTreeNode *allocateRecTreeNode(){
-	
-	if(UNLIKELY(RECTREENODETHRESHOLD > RECTREENODEPOOLIDX || RECTREENODEPOOLIDX==0)){
-		MSG("RECTREENODETHRESHOLD: %d, RECTREENODEPOOLIDX: %d\n",
-			RECTREENODETHRESHOLD, RECTREENODEPOOLIDX);
-		recTreeNodeGrabageReclaim();
-	}
 	assert(RECTREENODEPOOLIDX>0);
 	RECTREENODEPOOLIDX--;
 	return RECTREENODEPOOLPTR[RECTREENODEPOOLIDX];

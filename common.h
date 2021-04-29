@@ -32,7 +32,7 @@
 #include <linux/types.h>
 
 #include "debug.h"
-#include "timers.h"
+#include "statistics.h"
 
 #define BUF_SIZE 40
 #undef USE_STAIL

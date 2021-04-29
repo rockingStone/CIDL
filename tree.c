@@ -179,6 +179,11 @@ void listRecTreeNode(void *pageNum){
 
 struct recTreeNode* addTreeNode(void* pageNum){
 
+	if(UNLIKELY(RECTREENODETHRESHOLD > RECTREENODEPOOLIDX || RECTREENODEPOOLIDX==0)){
+		MSG("RECTREENODETHRESHOLD: %d, RECTREENODEPOOLIDX: %d\n",
+			RECTREENODETHRESHOLD, RECTREENODEPOOLIDX);
+		recTreeNodeGrabageReclaim();
+	}
 	//xzjin 因为tdelete会在函数内部释放空间，所以在这里暂时用单独的malloc 
 //	struct recTreeNode *treeNode = malloc(sizeof(struct recTreeNode));
 	struct recTreeNode *treeNode = allocateRecTreeNode();
