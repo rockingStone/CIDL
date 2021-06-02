@@ -58,6 +58,7 @@ inline void writeRec(unsigned long fileOffset, void* src, void* dest,
 //			lastRec.lastPageNum = ***;
 //			lastRec.lastMemRec = ***;
 		*(lastRec.lastIdx) = idx+1;
+//		checkEmptyRecTreeNode();
 	}else{	//索引大于边界，追加list
 //		DEBUG("Append list node\n");
 		struct recTreeNode tmpRecTreeNode,**rec;
@@ -85,6 +86,7 @@ inline void writeRec(unsigned long fileOffset, void* src, void* dest,
 		//xzjin update lastRec
 		lastRec.lastMemRec = recArr;
 		*(lastRec.lastIdx) = 1;
+//		checkEmptyRecTreeNode();
 	}
 //	MSG("PageNum: %p, idx:%d\n", lastRec.lastPageNum, *(lastRec.lastIdx));
 }
@@ -145,7 +147,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 			//DEBUG("insterRec if\n");
 			writeRec(fileOffset, src, dest, pageNum, fileName);
 //		    struct tailhead *head = pt[0]->listHead;
-
+//			checkEmptyRecTreeNode();
 		}else{	//xzjin 在树里没找到
 			//MSG("Not found in tree\n");
 			struct recTreeNode *treeNode = addTreeNode(pageNum);
@@ -160,10 +162,12 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 				exit(-1);
 			}
 			writeRec(fileOffset, src, dest, pageNum, fileName);
+//			checkEmptyRecTreeNode();
 		}
 //		MSG("Node pageNum:%p, memRecIdx:%d, nodePtr:%p.\n",
 //			 nodePtr->pageNum, nodePtr->memRecIdx, nodePtr);
 	}
+//	checkEmptyRecTreeNode();
 	if(UNLIKELY(*lastRec.lastIdx<0 ||*lastRec.lastIdx>MEMRECPERENTRY)){
 		MSG("lastRec.lastIdx ERROR\n");
 	}
@@ -841,11 +845,13 @@ ssize_t ts_write(int file, void *buf, size_t length){
 				withdrawRecTreeNode(freep);
 			}
 			*/
+//			checkEmptyRecTreeNode();
 		}else{
 			notFoundLen = MIN(PAGESIZE, toTailLen);
 			//TODO 这里打印出来没有找到的内容，是不是可以分析一下模式
 //			MSG("buf: %p not found, size:%d.\n", (void*)start, notFoundLen);
 			ts_write_not_found_size += notFoundLen;
+//			checkEmptyRecTreeNode();
 		}
 	}
 //	MSG("ts_write buf:%p, tail:%p, length:%lu, same time:%d, same len:%d, same occupy:%d%%\n\n\n",
@@ -1043,10 +1049,12 @@ size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
 				withdrawRecTreeNode(freep);
 			}
 			*/
+//			checkEmptyRecTreeNode();
 		}else{
 			notFoundLen = MIN(PAGESIZE, toTailLen);
 			MSG("buf page: %llX not found, not found size:%d.\n", start, notFoundLen);
 			ts_write_not_found_size += notFoundLen;
+//			checkEmptyRecTreeNode();
 		}
 	}
 #endif //NOT_PATCH
@@ -1086,28 +1094,32 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 			struct memRec* rec;
 			int idx = 0, uplimit = MEMRECPERENTRY;
 			//xzjin 这里应该是略过拷贝src同页面里比src小的记录
-			if(blockEntry == srcLastEntry){
-				uplimit = srcRes[0]->memRecIdx;
-			}
+			//xzjin 不应该在里面吗，为什么从里面移出来了
+			//if(blockEntry == srcLastEntry){
+			//	uplimit = srcRes[0]->memRecIdx;
+			//}
 			//int destOffset = addr2PageOffset(dest);
 			if(start == srcPageNum){
 				int destOffset = addr2PageOffset(src);
-				//xzjin 先找到recArr
+				//xzjin 先找到从哪个recArr开始拷贝
 				do{
-				//	if(srcRes[0]->recModEntry == srcLastEntry){
-				//		uplimit = srcRes[0]->memRecIdx;
-				//	}
+					if(srcRes[0]->recModEntry == srcLastEntry){
+						uplimit = srcRes[0]->memRecIdx;
+					}
 					rec = blockEntry->recArr;
 					if(rec[uplimit-1].pageOffset>= destOffset){
 						break;
 					}
 					blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
 				}while(blockEntry);
+
 				if(!blockEntry){
 //					MSG("No offset bigger than copy offset, continue.\n");
 					continue;
 				}
 
+				//xzjin 这里从被拷贝的地方截断了，相当于删除了,
+				//这就是有很多空地址的原因
 				//xzjin 再从recArr里面找具体的条目
 				for(idx=0; idx < uplimit; idx++){
 					if(rec[idx].pageOffset >= destOffset){
@@ -1237,6 +1249,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 //				MSG("List NOT empty\n");
 //			}
 		}
+//		checkEmptyRecTreeNode();
 	}
 	END_TIMING(mem_from_mem_trace_t, mem_from_mem_trace_time);
 #endif	//USE_TS_FUNC
@@ -1363,7 +1376,8 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 	}else{
 		ERROR("REC_INSERT test fail, tfind NULL!\n");
 		exit(-1);
-	}
+	}	
+//	checkEmptyRecTreeNode();
 #endif	//REC_INSERT_TEST 
 //		MSG("copy src:           %lu not fount in file list.\n", src);
 ts_memcpy_returnPoint:
@@ -1497,6 +1511,7 @@ void* ts_realloc(void *ptr, size_t size, void* tail){
 			}while(blockEntry);
 		}
 	}
+//	checkEmptyRecTreeNode();
 	END_TIMING(remap_mem_rec_t, remap_mem_rec_time);
 #endif 	//USE_TS_FUNC
 	return ret;
@@ -1700,6 +1715,7 @@ FILE *ts_fopen (const char *filename, const char *modes){
 	return result;
 }
 
+//TODO ts_close 里面是不是要加unmap的函数
 int ts_close (int fd){
 	char *abpath __attribute__((unused));
     struct stat st __attribute__((unused));

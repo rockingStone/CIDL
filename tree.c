@@ -2,6 +2,7 @@
 #include "common.h"
 #include "mem.h"
 #include "tree.h"
+#include "sys/queue.h"
 
 void listFileMapNodeAction(const void *nodep, const VISIT which, const int depth){
     struct fileMapTreeNode *fmNode;
@@ -57,13 +58,19 @@ void listRecMapAction(const void *nodep, const VISIT which, const int depth){
 void showRecMapNodeDetail(struct recTreeNode **nodep){
     struct recTreeNode *fmNode;
     struct tailhead* head;
+	int recIdx;
 	fmNode = *(struct recTreeNode **) nodep;
 	head = fmNode->listHead;
 
 	fmNode = *(struct recTreeNode **) nodep;
+	recIdx = fmNode->memRecIdx;
 	MSG("pageNum: %p, list head:%p, memRecIdx:%2d, struct address: %p.\n",
-		fmNode->pageNum, head, fmNode->memRecIdx, fmNode);
-	listRecTreeNode(fmNode->pageNum);
+		fmNode->pageNum, head, recIdx, fmNode);
+	if(recIdx==0 && TAILQ_FIRST(head)==TAILQ_LAST(head, tailhead)){
+		ERROR("Node empty.\n");
+	}else{
+		listRecTreeNode(fmNode->pageNum);
+	}
 }
 
 void listRecMapActionDetail(const void *nodep, const VISIT which, const int depth){
@@ -90,6 +97,40 @@ void listRecTreeDetail(){
 	twalk(recTreeRoot, listRecMapActionDetail);
 }
 
+void checkEmptyNode(struct recTreeNode **nodep){
+    struct recTreeNode *fmNode;
+    struct tailhead* head;
+	int recIdx;
+	fmNode = *(struct recTreeNode **) nodep;
+	head = fmNode->listHead;
+
+	recIdx = fmNode->memRecIdx;
+	if(recIdx==0 && TAILQ_FIRST(head)==TAILQ_LAST(head, tailhead)){
+		ERROR("Node %p empty.\n", fmNode->pageNum);
+		assert(0);
+	}
+}
+
+void checkEmptyNodeAction(const void *nodep, const VISIT which, const int depth){
+
+    switch (which) {
+    case preorder:
+        break;
+    case postorder:
+		checkEmptyNode((struct recTreeNode **)nodep);
+        break;
+    case endorder:
+        break;
+    case leaf:
+		checkEmptyNode((struct recTreeNode **)nodep);
+        break;
+    }
+}
+
+void checkEmptyRecTreeNode(){
+	twalk(recTreeRoot, checkEmptyNodeAction);
+}
+
 int recCompare(const void *pa, const void *pb) {
     const struct recTreeNode* a = pa;
     const struct recTreeNode* b = pb;
@@ -100,6 +141,8 @@ int recCompare(const void *pa, const void *pb) {
     return 0;
 }
 
+//xzjin 用映射的开始地址做索引,用在unmap时候,内存拷贝时候结合
+//fileMapTreeSearchCompare查找文件来源
 int fileMapTreeInsDelCompare(const void *pa, const void *pb) {
     const struct fileMapTreeNode* a = pa;
     const struct fileMapTreeNode* b = pb;
@@ -110,6 +153,8 @@ int fileMapTreeInsDelCompare(const void *pa, const void *pb) {
     return 0;
 }
 
+//xzjin 用文件名字做索引,用在cmpWrite的时候用record里的文件名查找源文件,
+//或者ts_read时候用fd先得到文件名，再通过文件名得到map地址
 int fileMapNameTreeInsDelCompare(const void *pa, const void *pb) {
     const struct fileMapTreeNode* a = pa;
     const struct fileMapTreeNode* b = pb;
@@ -170,7 +215,7 @@ void listRecTreeNode(void *pageNum){
 		for(int i=0; i<tail; i++,recArr++){
 			void* bufAddr __attribute__((unused));
 			bufAddr = getAddr(pageNum, recArr->pageOffset);
-			DEBUG("page off:%4d, fileOffset:%ld, addr:%p, fileName:%s, bufAddr:%p.\n",
+			MSG("page off:%4d, fileOffset:%ld, addr:%p, fileName:%s, bufAddr:%p.\n",
 				recArr->pageOffset, recArr->fileOffset, recArr, 
 				recArr->fileName, bufAddr);
 		}

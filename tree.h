@@ -81,6 +81,7 @@ void showRecMapNodeDetail(struct recTreeNode **nodep);
 void listRecMapActionDetail(const void *nodep, const VISIT which, const int depth);
 void listRecTree();
 void listRecTreeDetail();
+void checkEmptyRecTreeNode();
 int recCompare(const void *pa, const void *pb);
 int fileMapTreeInsDelCompare(const void *pa, const void *pb);
 int fileMapNameTreeInsDelCompare(const void *pa, const void *pb);
