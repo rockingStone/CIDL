@@ -15,7 +15,8 @@
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
-
+//xzjin compare whether the data is same and move the first different address
+//of first parameter to the pointer of forth pointer pointed address.
 //AT&T风格代码 op src, dest
 //寻址 section:disp(base, index, scale) -> disp + base + index * scale
 

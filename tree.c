@@ -141,8 +141,10 @@ int recCompare(const void *pa, const void *pb) {
     return 0;
 }
 
-//xzjin 用映射的开始地址做索引,用在unmap时候,内存拷贝时候结合
-//fileMapTreeSearchCompare查找文件来源
+/** xzjin 用映射的开始地址做索引,用在unmap时候, memory copy时候结合
+* fileMapTreeSearchCompare(next next function)查找内存是不是拷贝
+* 过来的
+*/
 int fileMapTreeInsDelCompare(const void *pa, const void *pb) {
     const struct fileMapTreeNode* a = pa;
     const struct fileMapTreeNode* b = pb;
@@ -153,8 +155,9 @@ int fileMapTreeInsDelCompare(const void *pa, const void *pb) {
     return 0;
 }
 
-//xzjin 用文件名字做索引,用在cmpWrite的时候用record里的文件名查找源文件,
-//或者ts_read时候用fd先得到文件名，再通过文件名得到map地址
+/** xzjin 用文件名字做索引,用在cmpWrite的时候用record里的文件名查找源文件,
+* 或者ts_read时候用fd先得到文件名，再通过文件名得到map地址
+*/
 int fileMapNameTreeInsDelCompare(const void *pa, const void *pb) {
     const struct fileMapTreeNode* a = pa;
     const struct fileMapTreeNode* b = pb;
