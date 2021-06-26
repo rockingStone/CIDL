@@ -1285,7 +1285,7 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 	fileMapTreeNode.tail = src + n;
 	fmNode = lastTs_memcpyFmNode;
 	//xzjin TODO 整个函数的大约75%开销来自这里
-	START_TIMING(ts_memcpy_tfind_file_t, ts_memcpy_tfind_file_time);
+	//START_TIMING(ts_memcpy_tfind_file_t, ts_memcpy_tfind_file_time);
 	//xzjin 当前buf不在上次查询的文件的映射里面
 //	if(!(LIKELY(lastTs_memcpyFmNode) && (lastTs_memcpyFmNode->start<=(unsigned long)src &&
 //		 (unsigned long)src<=lastTs_memcpyFmNode->tail)))
@@ -1323,13 +1323,13 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 		goto ts_memcpy_returnPoint;
 	}
 #endif	// USE_FMAP_CACHE
-	END_TIMING(ts_memcpy_tfind_file_t, ts_memcpy_tfind_file_time);
+	//END_TIMING(ts_memcpy_tfind_file_t, ts_memcpy_tfind_file_time);
 	fmNode->usedTime++;
 //	MSG("copy src found, copyFrom:%lu, copyTo:%lu, map start:%lu, map tail:%lu, map offset:%ld, fileName: %s\n",
 //		src, dest,fmNode->start, fmNode->tail, fmNode->offset, fmNode->fileName);
 	//xzjin 记录log信息
 	fileOffset = fmNode->offset+(src-fmNode->start);
-	START_TIMING(insert_rec_t,  insert_rec_time);
+	//START_TIMING(insert_rec_t,  insert_rec_time);
 #if PATCH
 	//xzjin 对于patch, 每页加一个记录
 	destTail = dest+n;
@@ -1347,7 +1347,7 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 #else
 	insertRec(fileOffset, src, dest, fmNode->fileName);
 #endif //PATCH
-	END_TIMING(insert_rec_t,  insert_rec_time);
+	//END_TIMING(insert_rec_t,  insert_rec_time);
 	
 #if REC_INSERT_TEST 
 	node.pageNum = addr2PageNum(dest);
