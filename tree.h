@@ -69,6 +69,7 @@ struct fileMapTreeNode{
 	int usedTime;
 	char* fileName;
 	unsigned long offset;	//文件映射部分相对于文件开头的偏移
+	int fd;
 //	unsigned int ref;	//对这个文件的引用数
 //	bool userUnmapped;	//用户是否已经对这个文件unmmap了
 };

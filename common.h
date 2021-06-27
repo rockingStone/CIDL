@@ -50,6 +50,11 @@ typedef int bool;
 #define true 1
 #endif
 
+#ifndef MAX_FILE_NUM
+#define  MAX_FILE_NUM 1024
+#endif
+
+struct fileMapTreeNode* openFileArray[MAX_FILE_NUM];
 #define REALPKEYPROTECT 0
 
 atomic_uint_least64_t Instrustats[INSTRUMENT_NUM];

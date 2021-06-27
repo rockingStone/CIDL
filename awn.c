@@ -28,7 +28,7 @@ int ts_close (int fd);
 ssize_t ts_write(int file, void *buf, size_t length);
 size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s);
 void* ts_memcpy_traced(void *dest, void *src, size_t n);
-void* ts_memcpy(void *dest, void *src, size_t n);
+void* ts_memcpy(void *dest, void *src, size_t n, ...);
 ssize_t ts_read(int fd, void *buf, size_t nbytes);
 void* ts_realloc(void *ptr, size_t size, void* tail);
 
@@ -375,6 +375,7 @@ __attribute__((constructor))void init(void) {
 	mmapDestCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	FD2PATH = calloc(FILEMAPTREENODEPOOLSIZE, sizeof(char*));
 
+	memset(openFileArray, 0, sizeof(openFileArray));
 	debug_fd = fopen("log", "w");
 	err = errno;
 	if(debug_fd==NULL){
@@ -613,6 +614,8 @@ RETT_MMAP ts_mmap(INTF_MMAP) {
 		treeNode->fileName = GETPATH(file);
 		treeNode->usedTime = 0;
 		treeNode->offset = off;
+		treeNode->fd = file;
+		openFileArray[file%MAX_FILE_NUM] = treeNode;
 		tsearch(treeNode, &fileMapTreeRoot, fileMapTreeInsDelCompare);
 		tsearch(treeNode, &fileMapNameTreeRoot, fileMapNameTreeInsDelCompare);
 //		MSG("_hub_mmap fileName:%s, start:%p, tail:%p, offset:%llu\n",
@@ -659,6 +662,7 @@ RETT_MUNMAP ts_munmap(INTF_MUNMAP) {
 	delNodep = tfind(&treeNode, &fileMapTreeRoot, fileMapTreeInsDelCompare);
 	if(delNodep && delNodep[0]){
 		struct fileMapTreeNode *freep = *delNodep;
+		openFileArray[(delNodep[0]->fd)%MAX_FILE_NUM] = NULL;
 		//xzjin 同样，tdelete会改变delNodep指向位置的内容
 		tdelete(&treeNode, &fileMapTreeRoot, fileMapTreeInsDelCompare);
 		//这里用的比较算法还是fileMapTree的插入/删除算法
@@ -1259,7 +1263,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 
 //xzjin 普通的memcpy但是会做地址跟踪,这个是针对从mmap区域的copy
 //ts_memcpy_traced是针对拷贝traced（从mmap或traced区域拷贝过一次的）的内容
-void* ts_memcpy(void *dest, void *src, size_t n){
+void* ts_memcpy(void *dest, void *src, size_t n, ...){
 //	DEBUG("Memcpy start,dest:%p, src:%p, len:%llu\n",
 //				 dest, src, n);
 #if REC_INSERT_TEST 
@@ -1283,7 +1287,6 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 
 	fileMapTreeNode.start = src;
 	fileMapTreeNode.tail = src + n;
-	fmNode = lastTs_memcpyFmNode;
 	//xzjin TODO 整个函数的大约75%开销来自这里
 	//START_TIMING(ts_memcpy_tfind_file_t, ts_memcpy_tfind_file_time);
 	//xzjin 当前buf不在上次查询的文件的映射里面
@@ -1292,6 +1295,7 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 	//xzjin TODO 这里添加一个最近使用文件的缓存
 #if USE_FMAP_CACHE
 	struct fileMapTreeNode* fmtp;
+	fmNode = lastTs_memcpyFmNode;
 	for(int i=0; i< FILEMAPCACHESIZE; i++){
 		fmtp = fileMapCache[i];
 		if(LIKELY(fmtp) && fmtp->start<=(unsigned long)src && (unsigned long)src<=fmtp->tail){
@@ -1320,6 +1324,128 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 		fmNode = fileMapSearRes[0];
 		//MSG("File Name:%s.\n", fmNode->fileName);
 	}else{
+		goto ts_memcpy_returnPoint;
+	}
+#endif	// USE_FMAP_CACHE
+	//END_TIMING(ts_memcpy_tfind_file_t, ts_memcpy_tfind_file_time);
+	fmNode->usedTime++;
+//	MSG("copy src found, copyFrom:%lu, copyTo:%lu, map start:%lu, map tail:%lu, map offset:%ld, fileName: %s\n",
+//		src, dest,fmNode->start, fmNode->tail, fmNode->offset, fmNode->fileName);
+	//xzjin 记录log信息
+	fileOffset = fmNode->offset+(src-fmNode->start);
+	//START_TIMING(insert_rec_t,  insert_rec_time);
+#if PATCH
+	//xzjin 对于patch, 每页加一个记录
+	destTail = dest+n;
+	startPageNum = addr2PageNum(dest);
+	endPageNum = addr2PageNum(destTail);
+	do{
+		unsigned long diff;
+		insertRec(fileOffset, src, dest, fmNode->fileName);
+		startPageNum++;
+		diff = ((unsigned long)startPageNum<<PAGENUMSHIFT)-(unsigned long)dest;
+		fileOffset += diff;
+		src += diff;
+		dest += diff;
+	}while(startPageNum<=endPageNum);
+#else
+	insertRec(fileOffset, src, dest, fmNode->fileName);
+#endif //PATCH
+	//END_TIMING(insert_rec_t,  insert_rec_time);
+	
+#if REC_INSERT_TEST 
+	node.pageNum = addr2PageNum(dest);
+	pt = tfind(&node, &recTreeRoot, recCompare);
+	if(pt && pt[0]->memRecIdx){	//xzjin 在树里找到了
+		void *diffPos;
+		void *fileCmpStart;
+		int cmpRet;
+		struct memRec *mrp = pt[0]->recModEntry->recArr;
+		mrp += pt[0]->memRe:Idx;
+		mrp-- ;
+
+		fileCmpStart = fmNode->start+mrp->fileOffset-fmNode->offset;
+		cmpRet = memcmp_avx2_asm(fileCmpStart, dest, n, &diffPos);
+		if(cmpRet){
+			MSG("Compare diff, fileCmpStart:%lu, diffPos:%lu, sameLen:%lu, copyFrom:%lu, copyTo:%lu\n",
+				fileCmpStart, diffPos, (diffPos-fileCmpStart), src, dest);
+			MSG("file in mem:\n");
+			printMem(fileCmpStart, 2);
+			MSG("dest mem:\n");
+			printMem(dest, 2);
+			exit(-1);
+		}else{
+			MSG("Compare correct, sameLen:%lu\n", n);
+		}
+	}else{
+		ERROR("REC_INSERT test fail, tfind NULL!\n");
+		exit(-1);
+	}	
+//	checkEmptyRecTreeNode();
+#endif	//REC_INSERT_TEST 
+//		MSG("copy src:           %lu not fount in file list.\n", src);
+ts_memcpy_returnPoint:
+	END_TIMING(mem_from_file_trace_t, mem_from_file_trace_time);
+#endif	//USE_TS_FUNC
+	return ret;
+}
+
+
+//xzjin 普通的memcpy但是会做地址跟踪,这个是针对从mmap区域的copy
+//ts_memcpy_traced是针对拷贝traced（从mmap或traced区域拷贝过一次的）的内容
+void* ts_memcpy_withFile(void *dest, void *src, size_t n,
+	 struct fileMapTreeNode *fmNode){
+//	DEBUG("Memcpy start,dest:%p, src:%p, len:%llu\n",
+//				 dest, src, n);
+#if REC_INSERT_TEST 
+	struct recTreeNode node,**pt;
+#endif
+	void *ret;
+	void* destTail __attribute__ ((__unused__));
+	void* startPageNum __attribute__ ((__unused__));
+	void* endPageNum __attribute__ ((__unused__));
+	unsigned long fileOffset;
+//	MSG("ts_memcpy\n");
+
+	ret = memcpy(CALL_MEMCPY);
+	//xzjin 如果copy的内容是跨文件的（好像不太可能）这里只记录前半段
+#if USE_TS_FUNC
+ 
+	START_TIMING(mem_from_file_trace_t, mem_from_file_trace_time);
+
+	//xzjin TODO 整个函数的大约75%开销来自这里
+	//START_TIMING(ts_memcpy_tfind_file_t, ts_memcpy_tfind_file_time);
+	//xzjin 当前buf不在上次查询的文件的映射里面
+//	if(!(LIKELY(lastTs_memcpyFmNode) && (lastTs_memcpyFmNode->start<=(unsigned long)src &&
+//		 (unsigned long)src<=lastTs_memcpyFmNode->tail)))
+	//xzjin TODO 这里添加一个最近使用文件的缓存
+#if USE_FMAP_CACHE
+	struct fileMapTreeNode* fmtp;
+	fmNode = lastTs_memcpyFmNode;
+	for(int i=0; i< FILEMAPCACHESIZE; i++){
+		fmtp = fileMapCache[i];
+		if(LIKELY(fmtp) && fmtp->start<=(unsigned long)src && (unsigned long)src<=fmtp->tail){
+			fmNode = fmtp;
+			goto insertRecPoint;
+		}
+		if(LIKELY(fmtp) && leastRecFCache.leastUsedTime >fmtp->usedTime){
+			leastRecFCache.leastUsedTime = fmtp->usedTime;
+			leastRecFCache.idx = i;
+		}
+	}
+	fileMapSearRes = tfind(&fileMapTreeNode, &fileMapTreeRoot, fileMapTreeSearchCompare);
+	if(fileMapSearRes){
+		fmNode = fileMapSearRes[0];
+		//xzjin insert into fileMapCache
+		fmNode->usedTime = 0;
+		fileMapCache[leastRecFCache.idx] = fmNode;
+		leastRecFCache.leastUsedTime = INT32_MAX;
+		//MSG("File Name:%s.\n", fmNode->fileName);
+	}else{
+		goto ts_memcpy_returnPoint;
+	}
+#else
+	if(!fmNode){
 		goto ts_memcpy_returnPoint;
 	}
 #endif	// USE_FMAP_CACHE
@@ -1418,7 +1544,8 @@ ssize_t ts_read(int fd, void *buf, size_t nbytes){
 	copyBegin = (void *)(node->start+(seekRet - node->offset));
 	copyLen = (size_t)node->tail-(size_t)copyBegin;
 	copyLen = MIN(copyLen, nbytes);
-	ts_memcpy(buf, copyBegin, copyLen);
+	//ts_memcpy(buf, copyBegin, copyLen);
+ 	ts_memcpy_withFile(buf, copyBegin, copyLen, openFileArray[fd%MAX_FILE_NUM]);
 
 	seekRet = lseek(fd, copyLen, SEEK_CUR);
 	err = errno;
@@ -1747,6 +1874,7 @@ int ts_close (int fd){
 	delNodep = tfind(&treeNode, &fileMapTreeRoot, fileMapNameTreeInsDelCompare);
 	if(delNodep && delNodep[0]){
 		struct fileMapTreeNode *freep = *delNodep;
+		openFileArray[(delNodep[0]->fd)%MAX_FILE_NUM] = NULL;
 		//xzjin 同样，tdelete会改变delNodep指向位置的内容
 		tdelete(&treeNode, &fileMapTreeRoot, fileMapNameTreeInsDelCompare);
 		//这里用的比较算法还是fileMapTree的插入/删除算法

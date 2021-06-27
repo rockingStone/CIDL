@@ -11,7 +11,7 @@ extern "C" {
 
 /* Copy N bytes of SRC to DEST.  */
 extern void *ts_memcpy (void * __dest, void * __src,
-		     size_t __n) ;
+		     size_t __n, ...) ;
 
 /* Free a block allocated by `malloc', `realloc' or `calloc'.  */
 extern void ts_free (void *__ptr, void *__tail);
