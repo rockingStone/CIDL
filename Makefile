@@ -13,7 +13,8 @@ SOINSTALLDIR = /usr/local/lib
 HEADINSTALLDIR = /usr/local/include/awn
 #CC = /usr/bin/gcc-7
 LDFLAGS	= -ldl
-CCFLAGS += -ggdb
+#CCFLAGS += -ggdb
+CCFLAGS += -O3
 
 .PHONY: all
 all: $(OUTPUTFILE)

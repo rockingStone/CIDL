@@ -28,7 +28,7 @@ int ts_close (int fd);
 ssize_t ts_write(int file, void *buf, size_t length);
 size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s);
 void* ts_memcpy_traced(void *dest, void *src, size_t n);
-void* ts_memcpy(void *dest, void *src, size_t n, ...);
+void* ts_memcpy(void *dest, void *src, size_t n);
 ssize_t ts_read(int fd, void *buf, size_t nbytes);
 void* ts_realloc(void *ptr, size_t size, void* tail);
 
@@ -1095,7 +1095,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 			struct recBlockEntry *srcLastEntry = srcRes[0]->recModEntry;
 			struct recBlockEntry *blockEntry = TAILQ_LAST(srcRes[0]->listHead, tailhead);
 //			struct recBlockEntry *delBlockEntry;
-			struct memRec* rec;
+			struct memRec* rec = 0;
 			int idx = 0, uplimit = MEMRECPERENTRY;
 			//xzjin 这里应该是略过拷贝src同页面里比src小的记录
 			//xzjin 不应该在里面吗，为什么从里面移出来了
@@ -1263,7 +1263,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 
 //xzjin 普通的memcpy但是会做地址跟踪,这个是针对从mmap区域的copy
 //ts_memcpy_traced是针对拷贝traced（从mmap或traced区域拷贝过一次的）的内容
-void* ts_memcpy(void *dest, void *src, size_t n, ...){
+void* ts_memcpy(void *dest, void *src, size_t n){
 //	DEBUG("Memcpy start,dest:%p, src:%p, len:%llu\n",
 //				 dest, src, n);
 #if REC_INSERT_TEST 
