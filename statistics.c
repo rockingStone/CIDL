@@ -4,7 +4,7 @@
 
 void print_statistics(void){
 	float tmp;
-	unsigned long usedMemory;
+	unsigned long usedMemory __attribute__((unused));
 
 	MSG("====================== IO statistics: ======================\n");
 	MSG(" mmap %u\n", num_mmap);
@@ -25,9 +25,9 @@ void print_statistics(void){
 		 (( RECBLOCKENTRYPOOLSIZE - RECBLOCKENTRYPOOLIDX)*(sizeof(struct recBlockEntry*)+sizeof(struct recBlockEntry))) +
 		 (( RECARRPOOLSIZE - RECARRPOOLIDX)*(sizeof(struct memRec*)+sizeof(struct memRec)));
 	MSG(" Really used memory:%lu\n", usedMemory);
-	MSG(" ts_write bytes :%llu\n", ts_write_size);
+ 	UNBLOCKABLE_MSG(" ts_write bytes :%llu\n", ts_write_size);
 	tmp = ((double)ts_write_same_size/ts_write_size)*100;
-	MSG(" ts_write same bytes :%llu, occupy %.2f%%\n", ts_write_same_size, tmp);
+ 	UNBLOCKABLE_MSG(" ts_write same bytes :%llu, occupy %.2f%%\n", ts_write_same_size, tmp);
 	tmp = ((double)ts_write_not_found_size/ts_write_size)*100;
 	MSG(" ts_write not found bytes :%llu, occupy %.2f%%\n", ts_write_not_found_size, tmp);
 	tmp = (double)(ts_metadataItem*32*100)/ts_write_size;

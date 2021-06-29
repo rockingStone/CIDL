@@ -9,7 +9,7 @@
 
 #undef SHOW_MSG
 #ifndef SHOW_MSG
-	#define SHOW_MSG 1
+	#define SHOW_MSG 0
 #endif
 
 #undef PRINT_DEBUG_FILE
@@ -51,6 +51,8 @@ void printMem(void* mem, int lineNr);
 #define ERROR_IF_PRINT(r, data, elem) if(data == elem) { DEBUG("errno == %s (%i): %s\n", MK_STR(elem), elem, strerror(elem)); }
 
 #define PRINTFUNC fprintf 
+
+#define UNBLOCKABLE_MSG(format, ...) do{PRINTFUNC(PRINT_FD, "\033[01;32mMSG(\e[m\033[01;36mF:%s L:%d\e[m\033[01;33m):\e[m" , __func__ , __LINE__); PRINTFUNC(PRINT_FD,  format, ##__VA_ARGS__); fflush(PRINT_FD); }while(0)
 
 #if SHOW_MSG
 	#define MSG(format, ...) do{PRINTFUNC(PRINT_FD, "\033[01;32mMSG(\e[m\033[01;36mF:%s L:%d\e[m\033[01;33m):\e[m" , __func__ , __LINE__); PRINTFUNC(PRINT_FD,  format, ##__VA_ARGS__); fflush(PRINT_FD); }while(0)

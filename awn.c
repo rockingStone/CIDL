@@ -364,7 +364,8 @@ void delMap(RBNodePtr *root, RBNodePtr addr){
 // Creates the set of standard posix functions as a module.
 __attribute__((constructor))void init(void) {
 	execv_done = 0;
-	int tmp, err;
+	int tmp;
+	int err __attribute__((unused));
 	MSG("Initializing the libawn.so.\n");
 
 	//xzjin Put dlopen before call to memcpy and mmap call.
@@ -1519,14 +1520,13 @@ ts_memcpy_returnPoint:
 
 //xzjin read content to buf use ts_memcpy and set offset to correct pos
 ssize_t ts_read(int fd, void *buf, size_t nbytes){
-
 	struct fileMapTreeNode **targetNodep;
 	struct fileMapTreeNode *node;
 	struct fileMapTreeNode *treeNode;
 	void* copyBegin;
 	size_t copyLen;
 	off_t seekRet;
-	int err;
+	int err __attribute__((unused));
 
 	treeNode = allocateFileMapTreeNode();
 	//treeNode->fileName = fd2path[fd%100];

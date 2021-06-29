@@ -5,7 +5,7 @@
 #include "sys/queue.h"
 
 void listFileMapNodeAction(const void *nodep, const VISIT which, const int depth){
-    struct fileMapTreeNode *fmNode;
+    struct fileMapTreeNode *fmNode __attribute__((unused));
 
     switch (which) {
     case preorder:
@@ -31,7 +31,7 @@ void listFileMapTree() {
 
 void showRecMapNode(struct recTreeNode **nodep){
     struct recTreeNode *fmNode;
-    struct tailhead* head;
+    struct tailhead* head __attribute__((unused));
 	fmNode = *(struct recTreeNode **) nodep;
 	head = fmNode->listHead;
 

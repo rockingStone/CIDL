@@ -8,7 +8,8 @@ typedef unsigned char u8;
 void printMem(void* mem, int lineNr){
 		int i=0;
 		for(;i<lineNr;i++){
-			u8* id = (u8*)(mem+16*i);
+			u8* id __attribute__((unused));
+			id = (u8*)(mem+16*i);
 			MSG("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x\n",
 				 *(u8*)((unsigned long long)id + 0), *(u8*)((unsigned long long)id + 1),
 				 *(u8*)((unsigned long long)id + 2), *(u8*)((unsigned long long)id + 3),
