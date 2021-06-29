@@ -101,11 +101,6 @@ struct fileMapTreeNode** FILEMAPTREENODEPOOLPTR;
 
 extern unsigned long long totalAllocSize;
 
-struct recBlockEntry* RECBLOCKENTRYPOOL;
-#define RECBLOCKENTRYPOOLSIZE 60000
-int RECBLOCKENTRYPOOLIDX;
-struct recBlockEntry** RECBLOCKENTRYPOOLPTR;
-
 struct fileMapTreeNode *lastTs_memcpyFmNode;
 
 struct {

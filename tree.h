@@ -6,19 +6,6 @@
 
 unsigned long reclamedRecNode;
 
-//xzjin single list element
-#ifndef  USE_STAIL
-	struct recBlockEntry{
-		struct memRec* recArr;		//这里是一块连续struct memRec地址的开始
-		TAILQ_ENTRY(recBlockEntry) entries;     /* Singly-linked List. */
-	};
-#else
-	struct recBlockEntry{
-		struct memRec* recArr;		//这里是一块连续struct memRec地址的开始
-		SLIST_ENTRY(recBlockEntry) entries;     /* Singly-linked List. */
-	};
-#endif	// USE_STAIL
-
 #ifndef  USE_STAIL
 struct recTreeNode{
 	void* pageNum;

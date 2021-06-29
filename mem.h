@@ -32,6 +32,19 @@ struct tailhead {
 	struct recBlockEntry * *tqh_last;	/* addr of last next element */
 };
 
+//xzjin single list element
+#ifndef  USE_STAIL
+	struct recBlockEntry{
+		struct memRec* recArr;		//这里是一块连续struct memRec地址的开始
+		TAILQ_ENTRY(recBlockEntry) entries;     /* Singly-linked List. */
+	};
+#else
+	struct recBlockEntry{
+		struct memRec* recArr;		//这里是一块连续struct memRec地址的开始
+		SLIST_ENTRY(recBlockEntry) entries;     /* Singly-linked List. */
+	};
+#endif	// USE_STAIL
+
 inline struct recTreeNode *allocateRecTreeNode() __attribute__((always_inline));
 //xzjin TODO 现在对于recTreeNode没有回收方式，同样tailHead也是
 void withdrawRecTreeNode(struct recTreeNode * ptr);
@@ -110,7 +123,41 @@ inline struct tailhead *allocateTailHead(){
 //	return SLISTHEADPOOLPTR[SLISTHEADPOOLIDX];
 //}
 
+struct recBlockEntry* RECBLOCKENTRYPOOL;
+unsigned long RECBLOCKENTRYPOOLSIZE;
+int RECBLOCKENTRYPOOLIDX;
+struct recBlockEntry** RECBLOCKENTRYPOOLPTR;
+
 inline struct recBlockEntry *allocateRecBlockEntry(){
+	if(UNLIKELY(RECBLOCKENTRYPOOLIDX<=0)){
+        struct recBlockEntry** poolDepot;
+		unsigned long long allocSize;
+
+        allocSize = sizeof(struct recBlockEntry)*RECBLOCKENTRYPOOLSIZE;
+		totalAllocSize += allocSize;
+
+		RECBLOCKENTRYPOOL = malloc(allocSize);
+		if(!RECBLOCKENTRYPOOL){
+			ERROR("Could not allocate space for RECBLOCKENTRYPOOL.\n");
+			assert(0);
+		}
+        //poolDepot = realloc(RECBLOCKENTRYPOOLPTR, sizeof(struct recBlockEntry*)*RECBLOCKENTRYPOOLSIZE*2);
+        poolDepot = malloc(sizeof(struct recBlockEntry*)*RECBLOCKENTRYPOOLSIZE*2);
+		totalAllocSize += sizeof(struct recBlockEntry*)*RECBLOCKENTRYPOOLSIZE;
+		if(!poolDepot){
+			ERROR("Could not allocate space for RECBLOCKENTRYPOOLPTR.\n");
+			assert(0);
+		}
+        memcpy(poolDepot, RECBLOCKENTRYPOOLPTR, RECBLOCKENTRYPOOLIDX * sizeof(struct recBlockEntry*));
+        free(RECBLOCKENTRYPOOLPTR);
+        RECBLOCKENTRYPOOLPTR = poolDepot;
+		RECBLOCKENTRYPOOLPTR[RECBLOCKENTRYPOOLIDX] = RECBLOCKENTRYPOOL;
+		for(int i=RECBLOCKENTRYPOOLIDX+1, end = RECBLOCKENTRYPOOLIDX+RECBLOCKENTRYPOOLSIZE; i< end; i++){
+			RECBLOCKENTRYPOOLPTR[i] = RECBLOCKENTRYPOOLPTR[i-1] + 1;
+		}
+		RECBLOCKENTRYPOOLIDX += RECBLOCKENTRYPOOLSIZE;
+        RECBLOCKENTRYPOOLSIZE += RECBLOCKENTRYPOOLSIZE;
+	}
 	assert(RECBLOCKENTRYPOOLIDX>0);
 	RECBLOCKENTRYPOOLIDX--;
 	return RECBLOCKENTRYPOOLPTR[RECBLOCKENTRYPOOLIDX];

@@ -413,6 +413,7 @@ __attribute__((constructor))void init(void) {
 		totalAllocSize = 0;
         RECARRPOOLSIZE = 6000;
         TAILHEADPOOLSIZE = RECTREENODEPOOLSIZE;
+		RECBLOCKENTRYPOOLSIZE = 6000;
 		
 		allocSize = sizeof(struct recTreeNode)*RECTREENODEPOOLSIZE;
 		totalAllocSize += allocSize;
