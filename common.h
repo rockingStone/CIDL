@@ -81,12 +81,7 @@ void* recTreeRoot;
 void* fileMapTreeRoot;
 void* fileMapNameTreeRoot;
 
-struct recTreeNode* RECTREENODEPOOL;
-#define RECTREENODEPOOLSIZE 2500
-int RECTREENODEPOOLIDX;
-int RECTREENODETHRESHOLD;
 #define RECTREENODETHRESHOLDRATIO (0.6)
-struct recTreeNode** RECTREENODEPOOLPTR;
 
 /**xzjin fd to path map, <fd>'s path is in 
  * fd%FILEMAPTREENODEPOOLSIZE; which means when
@@ -104,22 +99,12 @@ struct fileMapTreeNode** FILEMAPTREENODEPOOLPTR;
 //int SLISTHEADPOOLIDX;
 //struct slisthead** SLISTHEADPOOLPTR;
 
-//xzjin TAILHEAD和RECTREENODE的数目一定是相同的
-struct tailhead* TAILHEADPOOL;
-#define TAILHEADPOOLSIZE RECTREENODEPOOLSIZE
-int TAILHEADPOOLIDX;
-struct tailhead** TAILHEADPOOLPTR;
+extern unsigned long long totalAllocSize;
 
 struct recBlockEntry* RECBLOCKENTRYPOOL;
 #define RECBLOCKENTRYPOOLSIZE 60000
 int RECBLOCKENTRYPOOLIDX;
 struct recBlockEntry** RECBLOCKENTRYPOOLPTR;
-
-struct memRec* RECARRPOOL;
-unsigned long long RECARRPOOLTAIL;
-#define RECARRPOOLSIZE 60000
-int RECARRPOOLIDX;
-struct memRec** RECARRPOOLPTR;
 
 struct fileMapTreeNode *lastTs_memcpyFmNode;
 

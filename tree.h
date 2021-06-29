@@ -6,23 +6,6 @@
 
 unsigned long reclamedRecNode;
 
-struct fMap{
-	void* start;	//文件映射的开始
-	void* tail;		//文件映射的结束
-	int usedTime;
-	int fd;
-	char* fileName;
-	unsigned long offset;	//文件映射部分相对于文件开头的偏移
-};
-
-//xzjin 对于跨页的记录，就记录在开始地址对应的记录里，反正最后会遍历对比
-struct memRec{
-	unsigned long fileOffset;
-	char* fileName;
-	short pageOffset;		//记录在页内的偏移，memRec是对应一个页的一条记录，页号是记录在树节点的
-//	short fd;
-};
-
 //xzjin single list element
 #ifndef  USE_STAIL
 	struct recBlockEntry{
@@ -35,17 +18,6 @@ struct memRec{
 		SLIST_ENTRY(recBlockEntry) entries;     /* Singly-linked List. */
 	};
 #endif	// USE_STAIL
-
-//xzjin single list head
-struct slisthead{
-    struct  recBlockEntry *slh_first;	/* first element */	
-};
-
-//xzjin tail queue list
-struct tailhead {
-	struct recBlockEntry *tqh_first;		/* first element */
-	struct recBlockEntry * *tqh_last;	/* addr of last next element */
-};
 
 #ifndef  USE_STAIL
 struct recTreeNode{

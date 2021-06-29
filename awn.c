@@ -39,6 +39,7 @@ instrumentation_type fileMap_time, fileUnmap_time, insert_rec_time;
 instrumentation_type ts_memcpy_tfind_file_time;
 
 
+unsigned long long totalAllocSize = 0;
 extern int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void* firstDiffPos);	
 
 inline void writeRec(unsigned long fileOffset, void* src, void* dest,
@@ -409,7 +410,9 @@ __attribute__((constructor))void init(void) {
 	//xzjin Allocate pool for node
 	{
 		unsigned long long allocSize;
-		unsigned long long totalAllocSize = 0;
+		totalAllocSize = 0;
+        RECARRPOOLSIZE = 6000;
+        TAILHEADPOOLSIZE = RECTREENODEPOOLSIZE;
 		
 		allocSize = sizeof(struct recTreeNode)*RECTREENODEPOOLSIZE;
 		totalAllocSize += allocSize;
@@ -520,7 +523,7 @@ __attribute__((constructor))void init(void) {
 		}
 		for(int i=0; i<RECARRPOOLSIZE; i++){
 			RECARRPOOLPTR[i] = RECARRPOOL+MEMRECPERENTRY*i;
-			RECARRPOOLTAIL = (unsigned long long)RECARRPOOLPTR[i];
+			//RECARRPOOLTAIL = (unsigned long long)RECARRPOOLPTR[i];
 		}
 		RECARRPOOLIDX = RECARRPOOLSIZE;
 		MSG("Allocate %llu bytes memory.\n", totalAllocSize);
@@ -1095,7 +1098,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 			struct recBlockEntry *srcLastEntry = srcRes[0]->recModEntry;
 			struct recBlockEntry *blockEntry = TAILQ_LAST(srcRes[0]->listHead, tailhead);
 //			struct recBlockEntry *delBlockEntry;
-			struct memRec* rec = 0;
+			struct memRec* rec = blockEntry->recArr;
 			int idx = 0, uplimit = MEMRECPERENTRY;
 			//xzjin 这里应该是略过拷贝src同页面里比src小的记录
 			//xzjin 不应该在里面吗，为什么从里面移出来了
@@ -1103,6 +1106,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 			//	uplimit = srcRes[0]->memRecIdx;
 			//}
 			//int destOffset = addr2PageOffset(dest);
+            // if current page is begin page, omit 
 			if(start == srcPageNum){
 				int destOffset = addr2PageOffset(src);
 				//xzjin 先找到从哪个recArr开始拷贝
