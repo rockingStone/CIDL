@@ -9,7 +9,7 @@
 
 #undef SHOW_MSG
 #ifndef SHOW_MSG
-	#define SHOW_MSG 0
+	#define SHOW_MSG 1
 #endif
 
 #undef PRINT_DEBUG_FILE

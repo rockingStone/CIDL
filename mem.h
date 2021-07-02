@@ -95,7 +95,7 @@ inline struct tailhead *allocateTailHead(){
 		}
 
         tailheadDepot = malloc(sizeof(struct tailhead*)*TAILHEADPOOLSIZE*2);
-		totalAllocSize += sizeof(struct tailhead*)*TAILHEADPOOLSIZE*2;
+		totalAllocSize += sizeof(struct tailhead*)*TAILHEADPOOLSIZE;
 		if(!totalAllocSize){
 			ERROR("Could not allocate space for TAILHEADPOOLPTR.\n");
 			assert(0);

@@ -1708,7 +1708,7 @@ int ts_open(const char *path, int oflag, ...){
 	char *abpath = NULL;
     struct stat st;
 	int result, err;
-	mode_t mode;
+	mode_t mode = 0;
 	long mmapRet __attribute__((unused));
     va_list ap;
 
@@ -1756,7 +1756,7 @@ int ts_openat (char* dirName, int dirfd, const char *path, int oflag, ...){
 	char fullpath[PATH_MAX] = "\0";
     struct stat st;
 	int result, err;
-	mode_t mode;
+	mode_t mode = 0;
 	long mmapRet __attribute__((unused));
     va_list ap;
 

@@ -25,6 +25,7 @@ void print_statistics(void){
 		 (( RECBLOCKENTRYPOOLSIZE - RECBLOCKENTRYPOOLIDX)*(sizeof(struct recBlockEntry*)+sizeof(struct recBlockEntry))) +
 		 (( RECARRPOOLSIZE - RECARRPOOLIDX)*(sizeof(struct memRec*)+sizeof(struct memRec)));
 	MSG(" Really used memory:%lu\n", usedMemory);
+	MSG(" Total allocated memory:%llu\n", totalAllocSize);
  	UNBLOCKABLE_MSG(" ts_write bytes :%llu\n", ts_write_size);
 	tmp = ((double)ts_write_same_size/ts_write_size)*100;
  	UNBLOCKABLE_MSG(" ts_write same bytes :%llu, occupy %.2f%%\n", ts_write_same_size, tmp);
