@@ -6,6 +6,7 @@
 
 #ifdef BASE_VERSION
 #include <gmodule.h>
+#include <glib.h>
 static GHashTable* searchedMemRec = NULL;
 #endif	//BASE_VERSION
 
@@ -48,6 +49,8 @@ void listRecTree();
 void listRecTreeDetail();
 void checkEmptyRecTreeNode();
 int recCompare(const void *pa, const void *pb);
+int overlapRec(const void *pa, const void *pb);
+int overlapRecBegBigger(const void *pa, const void *pb);
 int fileMapTreeInsDelCompare(const void *pa, const void *pb);
 int fileMapNameTreeInsDelCompare(const void *pa, const void *pb);
 int fileMapTreeSearchCompare(const void *pa, const void *pb);

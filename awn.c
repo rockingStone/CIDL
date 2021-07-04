@@ -181,11 +181,11 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 
 void deleteRec(void* src, unsigned long length){
 	struct memRec *rec, **searchRes;
-	g_hash_table_remove_all(searchedMemRec);
+	//g_hash_table_remove_all(searchedMemRec);
 	rec = allocateMemRecArr();
 	rec->startMemory = (unsigned long long)src;
 	rec->tailMemory = (unsigned long long)src + length;
-	searchRes = tfind(rec, &recTreeRoot, recCompare);
+	searchRes = tfind(rec, &recTreeRoot, overlapRec);
 /** xzjin compare relationship			
  * a.			|_________|			  a ? b
  * b.2 	|____________|					= b.tailMemory = a.startMemory-1;
@@ -195,23 +195,29 @@ void deleteRec(void* src, unsigned long length){
  * b.5 				|______________|	= b.startMemory = a.tail;
 */
 	while(searchRes){
+		//gpointer hashEntry = malloc(sizeof(struct memRec*));
 		struct memRec *b = *searchRes;
+		//hashEntry = b;
+		//TODO This assumes the tfind searchs from head to tail.
+		rec->startMemory = b->tailMemory + 1;
+		//g_hash_table_add(searchedMemRec, hashEntry);
+
 		if(b->startMemory<rec->startMemory){	//b.2, b.3
 			b->tailMemory = rec->startMemory -1;
 		}else if(b->tailMemory <= rec->startMemory){		//b.4
-			tdelete(rec, &recTreeRoot, recCompare);
+			tdelete(rec, &recTreeRoot, overlapRec);
+			free(b);
 		}else{	//b.5
 			b->tailMemory = rec->startMemory;
 		}
-
-		searchRes = tfind(rec, &recTreeRoot, recCompare);
+		searchRes = tfind(rec, &recTreeRoot, overlapRec);
 	}
 
 	withdrawMemRecArr(rec);
 }
 
-inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName,
-	 unsigned long length) __attribute__((always_inline));
+inline void insertRec(unsigned long fileOffset, void* src, void* dest,
+	 char* fileName, unsigned long length) __attribute__((always_inline));
 inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 	 char* fileName, unsigned long length){
 
@@ -629,6 +635,7 @@ int ts_isMemTraced(void* ptr){
 	return pt != NULL;
 }
 
+#ifndef BASE_VERSION
 //compare and call write to file metedata
 inline unsigned long cmpWrite(unsigned long bufCmpStart, struct memRec *mrp, void* buf,
 		  unsigned long tail, void** diffPos,
@@ -685,7 +692,6 @@ inline unsigned long cmpWrite(unsigned long bufCmpStart, struct memRec *mrp, voi
 	return addLen;
 }
 
-#ifndef BASE_VERSION
 ssize_t do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 	 unsigned long long start, unsigned long long end){
 	START_TIMING(compare_mem_t, compare_mem_time);
@@ -787,9 +793,79 @@ ssize_t do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 	END_TIMING(compare_mem_t, compare_mem_time);
 }
 #else
+//compare and call write to file metedata
+inline unsigned long cmpWrite(struct memRec *mrp, 
+		  unsigned long tail, void** diffPos) __attribute__((always_inline));
+inline unsigned long cmpWrite(struct memRec *mrp, unsigned long tail, void** diffPos){
+	START_TIMING(cmp_write_t, cmp_write_time);
+	unsigned long bufCmpStart = mrp->startMemory;
+	unsigned long fileCmpStart;
+	unsigned long cmpLen;
+	unsigned long addLen = 0;	//same content length	
+	struct fileMapTreeNode fmNode, **fmSearNodep, *fmTarNode;
+//	MSG("CMP write, fileOffset:%lu, pageOffset:%d, fileName:%s.\n",
+//		mrp[i].fileOffset, mrp[i].pageOffset, mrp[i].fileName);
+
+#ifdef CMPWRITE
+	//TODO xzjin 这里文件应该有很强的局部性，可以用一个文件节点缓存
+	fmNode.fileName = mrp->fileName;
+	fmSearNodep = tfind(&fmNode, &fileMapNameTreeRoot, fileMapNameTreeInsDelCompare);
+//	assert(fmSearNodep);
+	//zxjin TODO maybe add UNLIKELY?
+	if(UNLIKELY(!fmSearNodep)) return (~0);
+	fmTarNode = *fmSearNodep;
+
+	//xzjin 检查文件偏移对不对
+	if(LIKELY(fmTarNode->offset <= mrp->fileOffset)){
+		//xzjin 文件映射的开始+内存追踪的文件偏移-文件映射的偏移
+		fileCmpStart = (unsigned long)(fmTarNode->start+mrp->fileOffset-fmTarNode->offset);
+#if PATCH
+		//xzjin 对于patch命令，fileCmpStart把对比位置设置到实际写的位置，而不是记录位置
+		fileCmpStart += (unsigned long)buf-bufCmpStart;
+		bufCmpStart = (unsigned long)buf;
+#endif //PATCH
+		cmpLen = tail-bufCmpStart;
+		START_TIMING(memcmp_asm_t, memcmp_asm_time);
+		//xzjin TODO 可以改成无论比较结果，都设置diffPos，减少比较后面的if语句
+		int cmpRet = memcmp_avx2_asm((void*)bufCmpStart, (void*)fileCmpStart, cmpLen, diffPos);
+		END_TIMING(memcmp_asm_t, memcmp_asm_time);
+		if(cmpRet){		//different
+			addLen = (tail<(unsigned long)*diffPos?tail:(unsigned long)*diffPos) - bufCmpStart;
+		}else{		//same
+			addLen = cmpLen;
+			*diffPos = (void*)tail;
+		}
+		ts_metadataItem++;
+//		MSG("Cmp write: same len:%lu, buf:%p, file buf:%p, diffPos:%lu, cmpRet:%d, fd:%d, fileName:%s\n\n",
+//			addLen, bufCmpStart, fileCmpStart, *diffPos, cmpRet, fd, fmTarNode->fileName);
+		ts_write_same_size += addLen;
+	}else{
+		MSG("ts_write fMapCache not hit\n");
+	}
+//	END_TIMING(cmp_write_t, cmp_write_time);
+#endif //CMPWRITE
+	return addLen;
+}
+
 ssize_t do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 	 unsigned long long start, unsigned long long end){
 
+	struct memRec *rec, **searchRes;
+	void** diffPos;
+	rec = allocateMemRecArr();
+	rec->startMemory = (unsigned long long)buf;
+	rec->tailMemory = (unsigned long long)buf + length;
+	searchRes = tfind(rec, &recTreeRoot, overlapRecBegBigger);
+
+	while(searchRes){
+		struct memRec *b = *searchRes;
+		//TODO This assumes the tfind searchs from head to tail.
+		rec->startMemory = b->tailMemory + 1;
+		cmpWrite(b, tail, diffPos);
+		searchRes = tfind(rec, &recTreeRoot, overlapRecBegBigger);
+	}
+
+	withdrawMemRecArr(rec);
 }
 
 #endif	//BASE_VERSION
@@ -815,6 +891,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 	return ret;
 }
 
+#ifndef BASE_VERSION
 size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
 	void *t = (void*)buf;
 	unsigned long tail;
@@ -1018,10 +1095,11 @@ size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
 #endif //USE_TS_FUNC 
 	return ret;
 }
+#endif	//BASE_VERSION
 
+#ifndef BASE_VERSION
 //xzjin 拷贝内存到新地址然后删除旧映射
 void* ts_memcpy_traced(void *dest, void *src, size_t n){
-
 	unsigned long long start = (unsigned long long)addr2PageNum(src);
 	unsigned long long srcPageNum = start;
 	unsigned long long destStart = (unsigned long long)addr2PageNum(dest);
@@ -1211,6 +1289,106 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 	
 	return ret;
 }
+#else
+//xzjin 拷贝内存到新地址然后删除旧映射
+void* ts_memcpy_traced(void *dest, void *src, size_t n){
+	unsigned long long start = (unsigned long long)addr2PageNum(src);
+	unsigned long long srcPageNum = start;
+	unsigned long long destStart = (unsigned long long)addr2PageNum(dest);
+	unsigned long long end = (unsigned long long)addr2PageNum((void*)((unsigned long long)src+n));
+	struct recTreeNode searchNode;
+	void *ret;
+
+	ret = memcpy(CALL_MEMCPY);
+
+#if USE_TS_FUNC
+//	DEBUG("ts_memcpy_traced: From: %lu, from tail: %lu, to： %lu, to tail: %lu, length: %lu.\n",
+//		src, src+n, dest, dest+n, n);
+	START_TIMING(mem_from_mem_trace_t, mem_from_mem_trace_time);
+	//xzjin TODO,对不是从页开始的内容做memRec的拼接
+	for(int i=0; start<=end; start++,destStart++,i++){
+//		DEBUG("start:%lu.\n", start);
+		searchNode.pageNum = (void*)start;
+		struct recTreeNode **srcRes = tfind(&searchNode, &recTreeRoot, recCompare);
+		//src address is in tree and dest address is not
+		if(srcRes){
+			struct recBlockEntry *srcLastEntry = srcRes[0]->recModEntry;
+			struct recBlockEntry *blockEntry = TAILQ_LAST(srcRes[0]->listHead, tailhead);
+//			struct recBlockEntry *delBlockEntry;
+			struct memRec* rec = blockEntry->recArr;
+			int idx = 0, uplimit = MEMRECPERENTRY;
+			//xzjin 这里应该是略过拷贝src同页面里比src小的记录
+			//xzjin 不应该在里面吗，为什么从里面移出来了
+			//if(blockEntry == srcLastEntry){
+			//	uplimit = srcRes[0]->memRecIdx;
+			//}
+			//int destOffset = addr2PageOffset(dest);
+            // if current page is begin page, omit 
+			if(start == srcPageNum){
+				int destOffset = addr2PageOffset(src);
+				//xzjin 先找到从哪个recArr开始拷贝
+				do{
+					if(srcRes[0]->recModEntry == srcLastEntry){
+						uplimit = srcRes[0]->memRecIdx;
+					}
+					rec = blockEntry->recArr;
+					if(rec[uplimit-1].pageOffset>= destOffset){
+						break;
+					}
+					blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
+				}while(blockEntry);
+
+				if(!blockEntry){
+//					MSG("No offset bigger than copy offset, continue.\n");
+					continue;
+				}
+
+				//xzjin 这里从被拷贝的地方截断了，相当于删除了,
+				//这就是有很多空地址的原因
+				//xzjin 再从recArr里面找具体的条目
+				for(idx=0; idx < uplimit; idx++){
+					if(rec[idx].pageOffset >= destOffset){
+						srcRes[0]->memRecIdx = idx;
+						srcRes[0]->recModEntry = blockEntry;
+						break;
+					}
+				}
+			}
+
+			//Copy record item to dest
+			for(; idx < uplimit; idx++){
+				struct memRec *curMemRec = rec+idx;
+				void* copySrc = getAddr((void*)start, curMemRec->pageOffset);
+				void* copyDest;
+ 				copyDest = dest+(copySrc-src);
+
+				//Test Compare whether content are the same
+				insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
+			}
+
+			blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
+			//xzjin TODO 这里是不是可以和上面合并,函数太长了
+			while(blockEntry){
+				if(blockEntry == srcLastEntry){
+					uplimit = srcRes[0]->memRecIdx;
+				}
+				rec = blockEntry->recArr;
+				for(idx = 0; idx < uplimit; idx++){
+					struct memRec *curMemRec = rec+idx;
+					void* copySrc = getAddr((void*)start, curMemRec->pageOffset);
+					void* copyDest = dest+(copySrc-src);
+					insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
+				}
+				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
+			}
+		}
+	}
+	END_TIMING(mem_from_mem_trace_t, mem_from_mem_trace_time);
+#endif	//USE_TS_FUNC
+	
+	return ret;
+}
+#endif	//BASE_VERSION
 
 //xzjin 普通的memcpy但是会做地址跟踪,这个是针对从mmap区域的copy
 //ts_memcpy_traced是针对拷贝traced（从mmap或traced区域拷贝过一次的）的内容
@@ -1300,7 +1478,11 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 		dest += diff;
 	}while(startPageNum<=endPageNum);
 #else
+#ifndef	BASE_VERSION
 	insertRec(fileOffset, src, dest, fmNode->fileName);
+#else
+	insertRec(fileOffset, src, dest, fmNode->fileName, n);
+#endif	//BASE_VERSION
 #endif //PATCH
 	//END_TIMING(insert_rec_t,  insert_rec_time);
 	
@@ -1341,7 +1523,7 @@ ts_memcpy_returnPoint:
 	return ret;
 }
 
-
+#ifndef BASE_VERSION
 //xzjin 普通的memcpy但是会做地址跟踪,这个是针对从mmap区域的copy
 //ts_memcpy_traced是针对拷贝traced（从mmap或traced区域拷贝过一次的）的内容
 void* ts_memcpy_withFile(void *dest, void *src, size_t n,
@@ -1462,6 +1644,7 @@ ts_memcpy_returnPoint:
 #endif	//USE_TS_FUNC
 	return ret;
 }
+#endif BASE_VERSION
 
 //xzjin read content to buf use ts_memcpy and set offset to correct pos
 ssize_t ts_read(int fd, void *buf, size_t nbytes){
@@ -1510,6 +1693,7 @@ ssize_t ts_read(int fd, void *buf, size_t nbytes){
 	return copyLen;
 }
 
+#ifndef BASE_VERSION
 void* ts_realloc(void *ptr, size_t size, void* tail){
 	void *ret;
 	unsigned long long start = (unsigned long long)addr2PageNum(ptr);
@@ -1594,6 +1778,7 @@ void* ts_realloc(void *ptr, size_t size, void* tail){
 #endif 	//USE_TS_FUNC
 	return ret;
 }
+#endif	//BASE_VERSION
 
 //xzjin 释放内存，同时释放内存跟踪的内容
 void ts_free(void* ptr, void* tail){

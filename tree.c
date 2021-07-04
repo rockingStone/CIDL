@@ -146,10 +146,41 @@ int recCompare(const void *pa, const void *pb) {
 int recCompare(const void *pa, const void *pb) {
     const struct memRec* a = pa;
     const struct memRec* b = pb;
+//	gpointer ha = malloc(sizeof(void*));
+//	gpointer hb = malloc(sizeof(void*));
+//	ha = pa;
+//	hb = pb;
     if ((unsigned long)a->startMemory < (unsigned long)b->startMemory)
+//	 ||
+//		g_hash_table_contains(searchedMemRec, ha))
         return -1;
     if ((unsigned long)a->startMemory > (unsigned long)b->startMemory)
+//	 ||
+//		g_hash_table_contains(searchedMemRec, hb))
         return 1;
+    return 0;
+}
+
+//xzjin changed b.2 b.3 to not equal to simplify compare
+/** xzjin compare relationship			
+ * a.			|_________|			  a ? b
+ * b.1 	|___|							>
+ * b.2 	|____________|					>
+ * b.3 	|__________________________|	>
+ * b.4 				|___|				=
+ * b.5 				|______________|	=
+ * b.6 						|___|		<
+*/
+int overlapRecBegBigger(const void *pa, const void *pb){
+    const struct memRec* a = pa;
+    const struct memRec* b = pb;
+    if ((unsigned long)(a->startMemory) > (unsigned long)(b->startMemory))
+//	&&
+//            (unsigned long)(a->startMemory) > (unsigned long)(b->tailMemory))
+        return 1;
+    if ((unsigned long)(a->startMemory) < (unsigned long)(b->startMemory)&&
+            (unsigned long)(a->tailMemory) < (unsigned long)(b->startMemory))
+        return -1;
     return 0;
 }
 
@@ -223,6 +254,7 @@ int fileMapTreeSearchCompare(const void *pa, const void *pb) {
     return 0;
 }
 
+#ifndef BASE_VERSION
 //xzjin 遍历打印红黑树节点里的记录
 void listRecTreeNode(void *pageNum){
 	struct recTreeNode node,**pt;
@@ -258,6 +290,7 @@ void listRecTreeNode(void *pageNum){
 		}
 	}
 }
+#endif	//BASE_VERSION
 
 struct recTreeNode* addTreeNode(void* pageNum){
 
