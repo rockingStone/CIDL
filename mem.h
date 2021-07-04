@@ -13,6 +13,7 @@ struct fMap{
 	unsigned long offset;	//文件映射部分相对于文件开头的偏移
 };
 
+#ifndef BASE_VERSION
 //xzjin 对于跨页的记录，就记录在开始地址对应的记录里，反正最后会遍历对比
 struct memRec{
 	unsigned long fileOffset;
@@ -20,6 +21,14 @@ struct memRec{
 	short pageOffset;		//记录在页内的偏移，memRec是对应一个页的一条记录，页号是记录在树节点的
 //	short fd;
 };
+#else
+struct memRec{
+	unsigned long fileOffset;
+	char* fileName;
+	unsigned long long startMemory;
+	unsigned long long tailMemory; 	//The tailMemory is not copied.
+};
+#endif //BASE_VERSION
 
 //xzjin single list head
 struct slisthead{
@@ -45,6 +54,7 @@ struct tailhead {
 	};
 #endif	// USE_STAIL
 
+void initMemory();
 inline struct recTreeNode *allocateRecTreeNode() __attribute__((always_inline));
 //xzjin TODO 现在对于recTreeNode没有回收方式，同样tailHead也是
 void withdrawRecTreeNode(struct recTreeNode * ptr);

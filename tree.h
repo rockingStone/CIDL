@@ -4,6 +4,11 @@
 #include "common.h"
 #include "mem.h"
 
+#ifdef BASE_VERSION
+#include <gmodule.h>
+static GHashTable* searchedMemRec = NULL;
+#endif	//BASE_VERSION
+
 unsigned long reclamedRecNode;
 
 #ifndef  USE_STAIL

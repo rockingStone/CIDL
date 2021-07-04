@@ -131,6 +131,7 @@ void checkEmptyRecTreeNode(){
 	twalk(recTreeRoot, checkEmptyNodeAction);
 }
 
+#ifndef BASE_VERSION
 int recCompare(const void *pa, const void *pb) {
     const struct recTreeNode* a = pa;
     const struct recTreeNode* b = pb;
@@ -140,6 +141,39 @@ int recCompare(const void *pa, const void *pb) {
         return 1;
     return 0;
 }
+#else
+
+int recCompare(const void *pa, const void *pb) {
+    const struct memRec* a = pa;
+    const struct memRec* b = pb;
+    if ((unsigned long)a->startMemory < (unsigned long)b->startMemory)
+        return -1;
+    if ((unsigned long)a->startMemory > (unsigned long)b->startMemory)
+        return 1;
+    return 0;
+}
+
+/** xzjin compare relationship			
+ * a.			|_________|			  a ? b
+ * b.1 	|___|							>
+ * b.2 	|____________|					=
+ * b.3 	|__________________________|	=
+ * b.4 				|___|				=
+ * b.5 				|______________|	=
+ * b.6 						|___|		<
+*/
+int overlapRec(const void *pa, const void *pb){
+    const struct memRec* a = pa;
+    const struct memRec* b = pb;
+    if ((unsigned long)(a->startMemory) > (unsigned long)(b->startMemory)&&
+            (unsigned long)(a->startMemory) > (unsigned long)(b->tailMemory))
+        return 1;
+    if ((unsigned long)(a->startMemory) < (unsigned long)(b->startMemory)&&
+            (unsigned long)(a->tailMemory) < (unsigned long)(b->startMemory))
+        return -1;
+    return 0;
+}
+#endif	//BASE_VERSION
 
 /** xzjin 用映射的开始地址做索引,用在unmap时候, memory copy时候结合
 * fileMapTreeSearchCompare(next next function)查找内存是不是拷贝

@@ -42,6 +42,7 @@ instrumentation_type ts_memcpy_tfind_file_time;
 unsigned long long totalAllocSize = 0;
 extern int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void* firstDiffPos);	
 
+#ifndef BASE_VERSION
 inline void writeRec(unsigned long fileOffset, void* src, void* dest,
 	 void* pageNum, char* fileName) __attribute__((always_inline));
 inline void writeRec(unsigned long fileOffset, void* src, void* dest,
@@ -93,8 +94,10 @@ inline void writeRec(unsigned long fileOffset, void* src, void* dest,
 }
 
 //xzjin src is UNUSED and UNCHECKED
-inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName) __attribute__((always_inline));
-inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName){
+inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName,
+	 unsigned long length) __attribute__((always_inline));
+inline void insertRec(unsigned long fileOffset, void* src, void* dest,
+	 char* fileName, unsigned long length){
 	void* pageNum = addr2PageNum(dest);
 
 	//DEBUG("insterRec.\n");
@@ -173,6 +176,56 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fil
 		MSG("lastRec.lastIdx ERROR\n");
 	}
 }
+
+#else
+
+void deleteRec(void* src, unsigned long length){
+	struct memRec *rec, **searchRes;
+	g_hash_table_remove_all(searchedMemRec);
+	rec = allocateMemRecArr();
+	rec->startMemory = (unsigned long long)src;
+	rec->tailMemory = (unsigned long long)src + length;
+	searchRes = tfind(rec, &recTreeRoot, recCompare);
+/** xzjin compare relationship			
+ * a.			|_________|			  a ? b
+ * b.2 	|____________|					= b.tailMemory = a.startMemory-1;
+ * 			//TODO add the tail part into memory record
+ * b.3 	|__________________________|	= b.tailMemory = a.startMemory-1;
+ * b.4 				|___|				= delete b;
+ * b.5 				|______________|	= b.startMemory = a.tail;
+*/
+	while(searchRes){
+		struct memRec *b = *searchRes;
+		if(b->startMemory<rec->startMemory){	//b.2, b.3
+			b->tailMemory = rec->startMemory -1;
+		}else if(b->tailMemory <= rec->startMemory){		//b.4
+			tdelete(rec, &recTreeRoot, recCompare);
+		}else{	//b.5
+			b->tailMemory = rec->startMemory;
+		}
+
+		searchRes = tfind(rec, &recTreeRoot, recCompare);
+	}
+
+	withdrawMemRecArr(rec);
+}
+
+inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName,
+	 unsigned long length) __attribute__((always_inline));
+inline void insertRec(unsigned long fileOffset, void* src, void* dest,
+	 char* fileName, unsigned long length){
+
+	struct memRec *rec;
+	rec = allocateMemRecArr();
+	deleteRec(src, length);
+	rec->fileName= fileName;
+	rec->fileOffset = fileOffset;
+	rec->startMemory = (unsigned long long)src;
+	rec->tailMemory = (unsigned long long)src + length;
+
+	rec =tsearch(rec, &recTreeRoot, recCompare);
+}
+#endif //BASE_VERSION
 
 void insertPro(void *addr,int pro){
 //	void * pageNum = addr2PageNum(addr);
@@ -375,6 +428,7 @@ __attribute__((constructor))void init(void) {
 	mmapSrcCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	mmapDestCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	FD2PATH = calloc(FILEMAPTREENODEPOOLSIZE, sizeof(char*));
+	searchedMemRec = g_hash_table_new(NULL, NULL);
 
 	memset(openFileArray, 0, sizeof(openFileArray));
 	debug_fd = fopen("log", "w");
@@ -408,127 +462,7 @@ __attribute__((constructor))void init(void) {
 //	RBPPIdx = RBPOOLSIZE-1;
 
 	//xzjin Allocate pool for node
-	{
-		unsigned long long allocSize;
-		totalAllocSize = 0;
-        RECARRPOOLSIZE = 6000;
-        TAILHEADPOOLSIZE = RECTREENODEPOOLSIZE;
-		RECBLOCKENTRYPOOLSIZE = 6000;
-		
-		allocSize = sizeof(struct recTreeNode)*RECTREENODEPOOLSIZE;
-		totalAllocSize += allocSize;
-		RECTREENODEPOOL = malloc(allocSize);
-		if(!RECTREENODEPOOL){
-			ERROR("Could not allocate space for RECTREENODEPOOL.\n");
-			assert(0);
-		}
-		allocSize = sizeof(struct recTreeNode*)*RECTREENODEPOOLSIZE;
-		totalAllocSize += allocSize;
-		RECTREENODEPOOLPTR = malloc(allocSize);
-		if(!RECTREENODEPOOLPTR){
-			ERROR("Could not allocate space for RECTREENODEPOOLPTR.\n");
-			assert(0);
-		}
-		for(int i=0; i<RECTREENODEPOOLSIZE; i++){
-			RECTREENODEPOOLPTR[i] = RECTREENODEPOOL+i;
-		}
-		RECTREENODEPOOLIDX = RECTREENODEPOOLSIZE;
-		RECTREENODETHRESHOLD = RECTREENODEPOOLSIZE*RECTREENODETHRESHOLDRATIO;
-
-		allocSize = sizeof(struct fileMapTreeNode)*FILEMAPTREENODEPOOLSIZE;
-		totalAllocSize += allocSize;
-		FILEMAPTREENODEPOOL = malloc(allocSize);
-		if(!FILEMAPTREENODEPOOL){
-			ERROR("Could not allocate space for FILEMAPTREENODEPOOL.\n");
-			assert(0);
-		}
-		allocSize = sizeof(struct fileMapTreeNode*)*RECTREENODEPOOLSIZE;
-		totalAllocSize += allocSize;
-		FILEMAPTREENODEPOOLPTR = malloc(allocSize);
-		if(!FILEMAPTREENODEPOOLPTR){
-			ERROR("Could not allocate space for FILEMAPTREENODEPOOLPTR.\n");
-			assert(0);
-		}
-		for(int i=0; i<FILEMAPTREENODEPOOLSIZE; i++){
-			FILEMAPTREENODEPOOLPTR[i] = FILEMAPTREENODEPOOL+i;
-		}
-		FILEMAPTREENODEPOOLIDX = FILEMAPTREENODEPOOLSIZE;
-
-//		SLISTHEADPOOL = malloc(sizeof(struct slisthead)*SLISTHEADPOOLSIZE);
-//		if(!SLISTHEADPOOL){
-//			ERROR("Could not allocate space for SLISTHEADPOOL.\n");
-//			assert(0);
-//		}
-//		SLISTHEADPOOLPTR = malloc(sizeof(struct slisthead*)*SLISTHEADPOOLSIZE);
-//		if(!SLISTHEADPOOLPTR){
-//			ERROR("Could not allocate space for SLISTHEADPOOLPTR.\n");
-//			assert(0);
-//		}
-//		for(int i=0; i<SLISTHEADPOOLSIZE; i++){
-//			SLISTHEADPOOLPTR[i] = SLISTHEADPOOL+i;
-//		}
-//		SLISTHEADPOOLIDX = SLISTHEADPOOLSIZE;
-
-		allocSize = sizeof(struct tailhead)*TAILHEADPOOLSIZE;
-		totalAllocSize += allocSize;
-		TAILHEADPOOL = malloc(allocSize);
-		if(!TAILHEADPOOL){
-			ERROR("Could not allocate space for TAILHEADPOOL.\n");
-			assert(0);
-		}
-		allocSize = sizeof(struct tailhead*)*TAILHEADPOOLSIZE;
-		totalAllocSize += allocSize;
-		TAILHEADPOOLPTR = malloc(allocSize);
-		if(!TAILHEADPOOLPTR){
-			ERROR("Could not allocate space for TAILHEADPOOLPTR.\n");
-			assert(0);
-		}
-		for(int i=0; i<TAILHEADPOOLSIZE; i++){
-			TAILHEADPOOLPTR[i] = TAILHEADPOOL+i;
-		}
-		TAILHEADPOOLIDX = TAILHEADPOOLSIZE;
-
-		allocSize = sizeof(struct recBlockEntry)*RECBLOCKENTRYPOOLSIZE;
-		totalAllocSize += allocSize;
-		RECBLOCKENTRYPOOL = malloc(allocSize);
-		if(!RECBLOCKENTRYPOOL){
-			ERROR("Could not allocate space for RECBLOCKENTRYPOOL.\n");
-			assert(0);
-		}
-		allocSize = sizeof(struct recBlockEntry*)*RECBLOCKENTRYPOOLSIZE;
-		totalAllocSize += allocSize;
-		RECBLOCKENTRYPOOLPTR = malloc(allocSize);
-		if(!RECBLOCKENTRYPOOLPTR){
-			ERROR("Could not allocate space for RECBLOCKENTRYPOOLPTR.\n");
-			assert(0);
-		}
-		for(int i=0; i<RECBLOCKENTRYPOOLSIZE; i++){
-			RECBLOCKENTRYPOOLPTR[i] = RECBLOCKENTRYPOOL+i;
-		}
-		RECBLOCKENTRYPOOLIDX = RECBLOCKENTRYPOOLSIZE;
-
-		//xzjin 注意这里RECARRPOOL的类型是memRec的指针，不是memRec[MEMRECPERENTRY],申请的时候应该是+-MEMRECPERENTRY
-		allocSize = sizeof(struct memRec)*MEMRECPERENTRY*RECARRPOOLSIZE;
-		totalAllocSize += allocSize;
-		RECARRPOOL = malloc(allocSize);
-		if(!RECARRPOOL){
-			ERROR("Could not allocate space for RECARRPOOL.\n");
-			assert(0);
-		}
-		allocSize = sizeof(struct memRec*)*RECARRPOOLSIZE;
-		totalAllocSize += allocSize;
-		RECARRPOOLPTR = malloc(allocSize);
-		if(!RECARRPOOLPTR){
-			ERROR("Could not allocate space for RECARRPOOLPTR.\n");
-			assert(0);
-		}
-		for(int i=0; i<RECARRPOOLSIZE; i++){
-			RECARRPOOLPTR[i] = RECARRPOOL+MEMRECPERENTRY*i;
-			//RECARRPOOLTAIL = (unsigned long long)RECARRPOOLPTR[i];
-		}
-		RECARRPOOLIDX = RECARRPOOLSIZE;
-		MSG("Allocate %llu bytes memory.\n", totalAllocSize);
-	}
+	initMemory();
 
 #if USE_PKEY
     nonProKey = pkey_alloc(0, 0);
@@ -751,32 +685,18 @@ inline unsigned long cmpWrite(unsigned long bufCmpStart, struct memRec *mrp, voi
 	return addLen;
 }
 
-ssize_t ts_write(int file, void *buf, size_t length){
-	void *t = buf;
-	unsigned long tail = (unsigned long)buf+length;
-	unsigned long long start = (unsigned long long)addr2PageNum(t);
-	unsigned long long end = (unsigned long long)addr2PageNum((void*)((unsigned long long)buf+length));
+#ifndef BASE_VERSION
+ssize_t do_ts_write(int file, void *buf, size_t length, unsigned long tail,
+	 unsigned long long start, unsigned long long end){
+	START_TIMING(compare_mem_t, compare_mem_time);
+	int toTailLen, idx; 
 	struct recTreeNode searchNode;
-	struct memRec *mrp;
 	void* diffPos = 0;
 	void* bufCmpStart;
+	struct memRec *mrp;
 	unsigned long sameLen;
 	int sameContentTimes = 0;
 	int curWriteSameLen = 0;
-	int toTailLen;
-	int idx; 
-
-	//TODO xzjin 这个是不是要在用户空间维护一下，太耗时了
-	//off_t fpos = lseek(file, 0, SEEK_CUR);
-	ts_write_size += length;
-	START_TIMING(ts_write_t, ts_write_time);
-	unsigned long ret = write(CALL_WRITE);
-	END_TIMING(ts_write_t, ts_write_time);
-//	MSG("ts_write: buf:%p, file:%d, len: %llu, fileName:%s\n", 
-//		buf, file, length, GETPATH(file));
-//	listRecTreeDetail();
-#if USE_TS_FUNC 
-	START_TIMING(compare_mem_t, compare_mem_time);
 	//xzjin 因为是比较连续的地址，所以不用在开始重新初始化diffPos变量
 	for(int i=0; start<=end; start++,i++){
 //		int writeLenCurPage = 4096;
@@ -865,6 +785,32 @@ ssize_t ts_write(int file, void *buf, size_t length){
 //	MSG("ts_write buf:%p, tail:%p, length:%lu, same time:%d, same len:%d, same occupy:%d%%\n\n\n",
 //		 buf, tail, length, sameContentTimes, curWriteSameLen, (int)(curWriteSameLen*100/length));
 	END_TIMING(compare_mem_t, compare_mem_time);
+}
+#else
+ssize_t do_ts_write(int file, void *buf, size_t length, unsigned long tail,
+	 unsigned long long start, unsigned long long end){
+
+}
+
+#endif	//BASE_VERSION
+
+ssize_t ts_write(int file, void *buf, size_t length){
+	void *t = buf;
+	unsigned long tail = (unsigned long)buf+length;
+	unsigned long long start = (unsigned long long)addr2PageNum(t);
+	unsigned long long end = (unsigned long long)addr2PageNum((void*)((unsigned long long)buf+length));
+
+	//TODO xzjin 这个是不是要在用户空间维护一下，太耗时了
+	//off_t fpos = lseek(file, 0, SEEK_CUR);
+	ts_write_size += length;
+	START_TIMING(ts_write_t, ts_write_time);
+	unsigned long ret = write(CALL_WRITE);
+	END_TIMING(ts_write_t, ts_write_time);
+//	MSG("ts_write: buf:%p, file:%d, len: %llu, fileName:%s\n", 
+//		buf, file, length, GETPATH(file));
+//	listRecTreeDetail();
+#if USE_TS_FUNC 
+	do_ts_write(file, buf, length, tail, start, end);
 #endif //USE_TS_FUNC 
 	return ret;
 }
