@@ -895,6 +895,27 @@ ssize_t ts_write(int file, void *buf, size_t length){
 	return ret;
 }
 
+ssize_t ts_pwrite(int file, void *buf, size_t length, off64_t offset){
+	void *t = buf;
+	unsigned long tail = (unsigned long)buf+length;
+	unsigned long long start = (unsigned long long)addr2PageNum(t);
+	unsigned long long end = (unsigned long long)addr2PageNum((void*)((unsigned long long)buf+length));
+
+	//TODO xzjin 这个是不是要在用户空间维护一下，太耗时了
+	//off_t fpos = lseek(file, 0, SEEK_CUR);
+	ts_write_size += length;
+	START_TIMING(ts_write_t, ts_write_time);
+	unsigned long ret = pwrite(CALL_WRITE, offset);
+	END_TIMING(ts_write_t, ts_write_time);
+//	MSG("ts_write: buf:%p, file:%d, len: %llu, fileName:%s\n", 
+//		buf, file, length, GETPATH(file));
+//	listRecTreeDetail();
+#if USE_TS_FUNC 
+	do_ts_write(file, buf, length, tail, start, end);
+#endif //USE_TS_FUNC 
+	return ret;
+}
+
 #ifndef BASE_VERSION
 size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s){
 	void *t = (void*)buf;

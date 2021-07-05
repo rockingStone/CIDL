@@ -28,6 +28,11 @@ extern void *ts_memcpy_traced(void * __dest, void * __src,
    __THROW.  */
 extern ssize_t  ts_write(int __fd, void *__buf, size_t __n);
 
+/* Write N bytes of BUF to FD at the given position OFFSET without
+   changing the file pointer.  Return the number written, or -1.  */
+extern ssize_t ts_pwrite(int __fd, void *__buf, size_t __n,
+			 __off64_t __offset);
+
 /* Map addresses starting near ADDR and extending for LEN bytes.  from
    OFFSET into the file FD describes according to PROT and FLAGS.  If ADDR
    is nonzero, it is the desired mapping address.  If the MAP_FIXED bit is
