@@ -94,10 +94,10 @@ inline void writeRec(unsigned long fileOffset, void* src, void* dest,
 }
 
 //xzjin src is UNUSED and UNCHECKED
-inline void insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName,
-	 unsigned long length) __attribute__((always_inline));
 inline void insertRec(unsigned long fileOffset, void* src, void* dest,
-	 char* fileName, unsigned long length){
+	 char* fileName) __attribute__((always_inline));
+inline void insertRec(unsigned long fileOffset, void* src, void* dest,
+	 char* fileName){
 	void* pageNum = addr2PageNum(dest);
 
 	//DEBUG("insterRec.\n");
@@ -435,7 +435,9 @@ __attribute__((constructor))void init(void) {
 	mmapSrcCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	mmapDestCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	FD2PATH = calloc(FILEMAPTREENODEPOOLSIZE, sizeof(char*));
+#ifdef BASE_VERSION
 	searchedMemRec = g_hash_table_new(NULL, NULL);
+#endif	//BASE_VERSION
 
 	memset(openFileArray, 0, sizeof(openFileArray));
 	debug_fd = fopen("log", "w");
@@ -693,7 +695,7 @@ inline unsigned long cmpWrite(unsigned long bufCmpStart, struct memRec *mrp, voi
 	return addLen;
 }
 
-ssize_t do_ts_write(int file, void *buf, size_t length, unsigned long tail,
+void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 	 unsigned long long start, unsigned long long end){
 	START_TIMING(compare_mem_t, compare_mem_time);
 	int toTailLen, idx; 
@@ -793,6 +795,7 @@ ssize_t do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 //		 buf, tail, length, sameContentTimes, curWriteSameLen, (int)(curWriteSameLen*100/length));
 	END_TIMING(compare_mem_t, compare_mem_time);
 }
+
 #else
 //compare and call write to file metedata
 inline unsigned long cmpWrite(struct memRec *mrp, 
@@ -1306,84 +1309,28 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 //	DEBUG("ts_memcpy_traced: From: %lu, from tail: %lu, to： %lu, to tail: %lu, length: %lu.\n",
 //		src, src+n, dest, dest+n, n);
 	START_TIMING(mem_from_mem_trace_t, mem_from_mem_trace_time);
-	//xzjin TODO,对不是从页开始的内容做memRec的拼接
-	for(int i=0; start<=end; start++,destStart++,i++){
-//		DEBUG("start:%lu.\n", start);
-		searchNode.pageNum = (void*)start;
-		struct recTreeNode **srcRes = tfind(&searchNode, &recTreeRoot, recCompare);
-		//src address is in tree and dest address is not
-		if(srcRes){
-			struct recBlockEntry *srcLastEntry = srcRes[0]->recModEntry;
-			struct recBlockEntry *blockEntry = TAILQ_LAST(srcRes[0]->listHead, tailhead);
-//			struct recBlockEntry *delBlockEntry;
-			struct memRec* rec = blockEntry->recArr;
-			int idx = 0, uplimit = MEMRECPERENTRY;
-			//xzjin 这里应该是略过拷贝src同页面里比src小的记录
-			//xzjin 不应该在里面吗，为什么从里面移出来了
-			//if(blockEntry == srcLastEntry){
-			//	uplimit = srcRes[0]->memRecIdx;
-			//}
-			//int destOffset = addr2PageOffset(dest);
-            // if current page is begin page, omit 
-			if(start == srcPageNum){
-				int destOffset = addr2PageOffset(src);
-				//xzjin 先找到从哪个recArr开始拷贝
-				do{
-					if(srcRes[0]->recModEntry == srcLastEntry){
-						uplimit = srcRes[0]->memRecIdx;
-					}
-					rec = blockEntry->recArr;
-					if(rec[uplimit-1].pageOffset>= destOffset){
-						break;
-					}
-					blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
-				}while(blockEntry);
+	struct memRec *rec, **searchRes;
+	//g_hash_table_remove_all(searchedMemRec);
+	rec = allocateMemRecArr();
+	rec->startMemory = (unsigned long long)src;
+	rec->tailMemory = (unsigned long long)src + n;
+	searchRes = tfind(rec, &recTreeRoot, overlapRecBegBigger);
+	while(searchRes){
+		struct memRec *b = *searchRes;
+		void* insertDest = dest+(b->startMemory - (unsigned long long)src);
+		size_t copyLen = b->startMemory<end?b->startMemory:end;
+		copyLen = copyLen - (unsigned long long)insertDest;
+		//memcpy require src, dest not overlap
+		//Insert only delete the record overlapped with memcpy dest range
+		//b is the memory record in memcpy src, thus will not be deleted
+		insertRec(b->fileOffset, src, insertDest, b->fileName, copyLen);
+		tdelete(rec, &recTreeRoot, overlapRecBegBigger);
+		free(b);
 
-				if(!blockEntry){
-//					MSG("No offset bigger than copy offset, continue.\n");
-					continue;
-				}
-
-				//xzjin 这里从被拷贝的地方截断了，相当于删除了,
-				//这就是有很多空地址的原因
-				//xzjin 再从recArr里面找具体的条目
-				for(idx=0; idx < uplimit; idx++){
-					if(rec[idx].pageOffset >= destOffset){
-						srcRes[0]->memRecIdx = idx;
-						srcRes[0]->recModEntry = blockEntry;
-						break;
-					}
-				}
-			}
-
-			//Copy record item to dest
-			for(; idx < uplimit; idx++){
-				struct memRec *curMemRec = rec+idx;
-				void* copySrc = getAddr((void*)start, curMemRec->pageOffset);
-				void* copyDest;
- 				copyDest = dest+(copySrc-src);
-
-				//Test Compare whether content are the same
-				insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
-			}
-
-			blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
-			//xzjin TODO 这里是不是可以和上面合并,函数太长了
-			while(blockEntry){
-				if(blockEntry == srcLastEntry){
-					uplimit = srcRes[0]->memRecIdx;
-				}
-				rec = blockEntry->recArr;
-				for(idx = 0; idx < uplimit; idx++){
-					struct memRec *curMemRec = rec+idx;
-					void* copySrc = getAddr((void*)start, curMemRec->pageOffset);
-					void* copyDest = dest+(copySrc-src);
-					insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
-				}
-				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
-			}
-		}
+		searchRes = tfind(rec, &recTreeRoot, overlapRecBegBigger);
 	}
+
+	withdrawMemRecArr(rec);
 	END_TIMING(mem_from_mem_trace_t, mem_from_mem_trace_time);
 #endif	//USE_TS_FUNC
 	
@@ -1645,7 +1592,7 @@ ts_memcpy_returnPoint:
 #endif	//USE_TS_FUNC
 	return ret;
 }
-#endif BASE_VERSION
+#endif	//BASE_VERSION
 
 //xzjin read content to buf use ts_memcpy and set offset to correct pos
 ssize_t ts_read(int fd, void *buf, size_t nbytes){
