@@ -74,12 +74,14 @@ void showRecMapNodeDetail(struct recTreeNode **nodep){
 	}
 }
 #else
+//void printRec(struct memRec *rec){
+//	MSG("startMemory: %llu, tailMemory:%llu, fileOffset:%lu, fileName: %s.\n",
+//		rec->startMemory, rec->tailMemory ,rec->fileOffset ,rec->fileName);
+//}
 void showRecMapNodeDetail(struct memRec** nodep){
     struct  memRec* rec;
 	rec = *(struct memRec**) nodep;
-
-	MSG("startMemory: %llu, tailMemory:%llu, fileOffset:%lu, fileName: %s.\n",
-		rec->startMemory, rec->tailMemory ,rec->fileOffset ,rec->fileName);
+	printRec(rec);
 }
 #endif	//BASE_VERSION
 

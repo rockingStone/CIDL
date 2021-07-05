@@ -195,6 +195,7 @@ void deleteRec(void* src, unsigned long length){
  * b.5 				|______________|	= b.startMemory = a.tail;
 */
 	while(searchRes){
+		MSG("Modify/delete record.\n");
 		//gpointer hashEntry = malloc(sizeof(struct memRec*));
 		struct memRec *b = *searchRes;
 		//hashEntry = b;
@@ -226,10 +227,13 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 	deleteRec(src, length);
 	rec->fileName= fileName;
 	rec->fileOffset = fileOffset;
-	rec->startMemory = (unsigned long long)src;
-	rec->tailMemory = (unsigned long long)src + length;
+	rec->startMemory = (unsigned long long)dest;
+	rec->tailMemory = (unsigned long long)dest+ length;
+//	rec->startMemory = (unsigned long long)src;
+//	rec->tailMemory = (unsigned long long)src + length;
 
-	rec =tsearch(rec, &recTreeRoot, recCompare);
+	printRec(rec);
+	tsearch(rec, &recTreeRoot, recCompare);
 }
 #endif //BASE_VERSION
 
@@ -1495,8 +1499,9 @@ ts_memcpy_returnPoint:
 //ts_memcpy_traced是针对拷贝traced（从mmap或traced区域拷贝过一次的）的内容
 void* ts_memcpy_withFile(void *dest, void *src, size_t n,
 	 struct fileMapTreeNode *fmNode){
-//	DEBUG("Memcpy start,dest:%p, src:%p, len:%llu\n",
-//				 dest, src, n);
+	MSG("Memcpy dest:%llu, src:%llu, len:%lu\n",
+				 (unsigned long long)dest, (unsigned long long)src, n);
+
 #if REC_INSERT_TEST 
 	struct recTreeNode node,**pt;
 #endif

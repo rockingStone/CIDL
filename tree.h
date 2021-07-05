@@ -5,14 +5,17 @@
 #include "mem.h"
 
 #ifdef BASE_VERSION
-#include <gmodule.h>
-#include <glib.h>
+//#include <gmodule.h>
+//#include <glib.h>
 //static GHashTable* searchedMemRec = NULL;
 #endif	//BASE_VERSION
 
 unsigned long reclamedRecNode;
 
 #ifndef  USE_STAIL
+//void printRec(struct memRec *);
+#define printRec(rec)  	MSG("startMemory: %llu, tailMemory:%llu, fileOffset:%lu, fileName: %s.\n", \
+		rec->startMemory, rec->tailMemory ,rec->fileOffset ,rec->fileName)
 struct recTreeNode{
 	void* pageNum;
     struct tailhead* listHead;

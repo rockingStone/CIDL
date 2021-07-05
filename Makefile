@@ -13,12 +13,14 @@ SOINSTALLDIR = /usr/local/lib
 HEADINSTALLDIR = /usr/local/include/awn
 #CC = /usr/bin/gcc-7
 LDFLAGS	= -ldl
-#CCFLAGS += -ggdb
-CCFLAGS += -O3
 
 .PHONY: all
+all: CCFLAGS += -O3
 all: $(OUTPUTFILE)
 
+.PHONY: debug
+debug: CCFLAGS += -ggdb
+debug: $(OUTPUTFILE)
 # Build libgeorgeringo.so from george.o, ringo.o, 
 # and georgeringo.o; subst is the search-and-replace 
 # function demonstrated in Recipe 1.16
