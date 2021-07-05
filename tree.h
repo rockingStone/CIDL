@@ -43,7 +43,11 @@ void listFileMapNodeAction(const void *nodep, const VISIT which, const int depth
 void listFileMapTree();
 void showRecMapNode(struct recTreeNode **nodep);
 void listRecMapAction(const void *nodep, const VISIT which, const int depth);
+#ifndef BASE_VERSION
 void showRecMapNodeDetail(struct recTreeNode **nodep);
+#else
+void showRecMapNodeDetail(struct memRec** nodep);
+#endif //BASE_VERSION
 void listRecMapActionDetail(const void *nodep, const VISIT which, const int depth);
 void listRecTree();
 void listRecTreeDetail();

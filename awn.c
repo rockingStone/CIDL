@@ -840,8 +840,7 @@ inline unsigned long cmpWrite(struct memRec *mrp, unsigned long tail, void** dif
 			*diffPos = (void*)tail;
 		}
 		ts_metadataItem++;
-//		MSG("Cmp write: same len:%lu, buf:%p, file buf:%p, diffPos:%lu, cmpRet:%d, fd:%d, fileName:%s\n\n",
-//			addLen, bufCmpStart, fileCmpStart, *diffPos, cmpRet, fd, fmTarNode->fileName);
+		MSG("addLen: %lu\n", addLen);
 		ts_write_same_size += addLen;
 	}else{
 		MSG("ts_write fMapCache not hit\n");
@@ -855,6 +854,8 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 	 unsigned long long start, unsigned long long end){
 
 	struct memRec *rec, **searchRes;
+
+	listRecTreeDetail();
 	void** diffPos = NULL;
 	rec = allocateMemRecArr();
 	rec->startMemory = (unsigned long long)buf;
@@ -863,6 +864,7 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 
 	while(searchRes){
 		struct memRec *b = *searchRes;
+		MSG("find rec: %s\n", b->fileName);
 		//TODO This assumes the tfind searchs from head to tail.
 		rec->startMemory = b->tailMemory + 1;
 		cmpWrite(b, tail, diffPos);
@@ -911,6 +913,7 @@ ssize_t ts_pwrite(int file, void *buf, size_t length, off64_t offset){
 //		buf, file, length, GETPATH(file));
 //	listRecTreeDetail();
 #if USE_TS_FUNC 
+	MSG("fd:%d, buf:%lu, length:%lu\n", file, (unsigned long)buf, length);
 	do_ts_write(file, buf, length, tail, start, end);
 #endif //USE_TS_FUNC 
 	return ret;
@@ -1630,7 +1633,7 @@ ssize_t ts_read(int fd, void *buf, size_t nbytes){
 	targetNodep = tfind(treeNode, &fileMapNameTreeRoot, fileMapNameTreeInsDelCompare);
 	withdrawFileMapTreeNode(treeNode);
 	if(UNLIKELY(!targetNodep)){
-		MSG("find mmap ERROR, file not mapped.\n");
+		ERROR("find mmap ERROR, file not mapped.\n");
 		exit(-1);
 	}
 //	MSG("read from file:%s\n", fd2path[fd%100]);
@@ -1639,7 +1642,7 @@ ssize_t ts_read(int fd, void *buf, size_t nbytes){
 	seekRet = lseek(fd, 0, SEEK_CUR);
 	if(seekRet == -1){
 		err = errno;
-		MSG("lseek ERROR, %s, errno %d.\n", strerror(err), err);
+		ERROR("lseek ERROR, %s, errno %d.\n", strerror(err), err);
 		exit(-1);
 	}
 	copyBegin = (void *)(node->start+(seekRet - node->offset));
@@ -1651,11 +1654,11 @@ ssize_t ts_read(int fd, void *buf, size_t nbytes){
 	seekRet = lseek(fd, copyLen, SEEK_CUR);
 	err = errno;
 	if(seekRet == -1){
-		MSG("seek to %ld.\n", seekRet+copyLen);
-		MSG("lseek ERROR, %s, errno %d.\n", strerror(err), err);
+		ERROR("seek to %ld.\n", seekRet+copyLen);
+		ERROR("lseek ERROR, %s, errno %d.\n", strerror(err), err);
 		exit(-1);
 	}
-	MSG("ts_read to %p ,len %ld ,from %p, fd:%d, fileName:%s.\n",
+	DEBUG("ts_read to %p ,len %ld ,from %p, fd:%d, fileName:%s.\n",
 		buf, copyLen, copyBegin, fd, GETPATH(fd));
 	return copyLen;
 }

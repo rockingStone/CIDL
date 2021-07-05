@@ -55,6 +55,7 @@ void listRecMapAction(const void *nodep, const VISIT which, const int depth){
     }
 }
 
+#ifndef BASE_VERSION
 void showRecMapNodeDetail(struct recTreeNode **nodep){
     struct recTreeNode *fmNode;
     struct tailhead* head;
@@ -72,7 +73,17 @@ void showRecMapNodeDetail(struct recTreeNode **nodep){
 		listRecTreeNode(fmNode->pageNum);
 	}
 }
+#else
+void showRecMapNodeDetail(struct memRec** nodep){
+    struct  memRec* rec;
+	rec = *(struct memRec**) nodep;
 
+	MSG("startMemory: %llu, tailMemory:%llu, fileOffset:%lu, fileName: %s.\n",
+		rec->startMemory, rec->tailMemory ,rec->fileOffset ,rec->fileName);
+}
+#endif	//BASE_VERSION
+
+#ifndef BASE_VERSION
 void listRecMapActionDetail(const void *nodep, const VISIT which, const int depth){
 
     switch (which) {
@@ -88,6 +99,23 @@ void listRecMapActionDetail(const void *nodep, const VISIT which, const int dept
         break;
     }
 }
+#else
+void listRecMapActionDetail(const void *nodep, const VISIT which, const int depth){
+
+    switch (which) {
+    case preorder:
+        break;
+    case postorder:
+		showRecMapNodeDetail((struct memRec**)nodep);
+        break;
+    case endorder:
+        break;
+    case leaf:
+		showRecMapNodeDetail((struct memRec**)nodep);
+        break;
+    }
+}
+#endif	//BASE_VERSION
 
 void listRecTree(){
 	twalk(recTreeRoot, listRecMapAction);
@@ -254,9 +282,9 @@ int fileMapTreeSearchCompare(const void *pa, const void *pb) {
     return 0;
 }
 
-#ifndef BASE_VERSION
 //xzjin 遍历打印红黑树节点里的记录
 void listRecTreeNode(void *pageNum){
+#ifndef BASE_VERSION
 	struct recTreeNode node,**pt;
 	struct recBlockEntry *ent, *mostRecentModifiedEnry;
 	node.pageNum = pageNum;
@@ -289,8 +317,8 @@ void listRecTreeNode(void *pageNum){
 				recArr->fileName, bufAddr);
 		}
 	}
-}
 #endif	//BASE_VERSION
+}
 
 struct recTreeNode* addTreeNode(void* pageNum){
 
