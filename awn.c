@@ -436,7 +436,7 @@ __attribute__((constructor))void init(void) {
 	mmapDestCache = calloc(MMAPCACHESIZE, sizeof(struct searchCache));
 	FD2PATH = calloc(FILEMAPTREENODEPOOLSIZE, sizeof(char*));
 #ifdef BASE_VERSION
-	searchedMemRec = g_hash_table_new(NULL, NULL);
+//	searchedMemRec = g_hash_table_new(NULL, NULL);
 #endif	//BASE_VERSION
 
 	memset(openFileArray, 0, sizeof(openFileArray));
@@ -851,11 +851,11 @@ inline unsigned long cmpWrite(struct memRec *mrp, unsigned long tail, void** dif
 	return addLen;
 }
 
-ssize_t do_ts_write(int file, void *buf, size_t length, unsigned long tail,
+void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 	 unsigned long long start, unsigned long long end){
 
 	struct memRec *rec, **searchRes;
-	void** diffPos;
+	void** diffPos = NULL;
 	rec = allocateMemRecArr();
 	rec->startMemory = (unsigned long long)buf;
 	rec->tailMemory = (unsigned long long)buf + length;
@@ -1296,11 +1296,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 #else
 //xzjin 拷贝内存到新地址然后删除旧映射
 void* ts_memcpy_traced(void *dest, void *src, size_t n){
-	unsigned long long start = (unsigned long long)addr2PageNum(src);
-	unsigned long long srcPageNum = start;
-	unsigned long long destStart = (unsigned long long)addr2PageNum(dest);
 	unsigned long long end = (unsigned long long)addr2PageNum((void*)((unsigned long long)src+n));
-	struct recTreeNode searchNode;
 	void *ret;
 
 	ret = memcpy(CALL_MEMCPY);
@@ -1471,7 +1467,6 @@ ts_memcpy_returnPoint:
 	return ret;
 }
 
-#ifndef BASE_VERSION
 //xzjin 普通的memcpy但是会做地址跟踪,这个是针对从mmap区域的copy
 //ts_memcpy_traced是针对拷贝traced（从mmap或traced区域拷贝过一次的）的内容
 void* ts_memcpy_withFile(void *dest, void *src, size_t n,
@@ -1552,7 +1547,12 @@ void* ts_memcpy_withFile(void *dest, void *src, size_t n,
 		dest += diff;
 	}while(startPageNum<=endPageNum);
 #else
+#ifndef BASE_VERSION
 	insertRec(fileOffset, src, dest, fmNode->fileName);
+#else
+	insertRec(fileOffset, src, dest, fmNode->fileName, n);
+#endif	//BASE_VERSION
+
 #endif //PATCH
 	//END_TIMING(insert_rec_t,  insert_rec_time);
 	
@@ -1592,7 +1592,6 @@ ts_memcpy_returnPoint:
 #endif	//USE_TS_FUNC
 	return ret;
 }
-#endif	//BASE_VERSION
 
 //xzjin read content to buf use ts_memcpy and set offset to correct pos
 ssize_t ts_read(int fd, void *buf, size_t nbytes){

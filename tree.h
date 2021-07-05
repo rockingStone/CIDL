@@ -7,7 +7,7 @@
 #ifdef BASE_VERSION
 #include <gmodule.h>
 #include <glib.h>
-static GHashTable* searchedMemRec = NULL;
+//static GHashTable* searchedMemRec = NULL;
 #endif	//BASE_VERSION
 
 unsigned long reclamedRecNode;

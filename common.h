@@ -5,8 +5,8 @@
 //typedef long long off64_t;
 #endif
 
-//#define BASE_VERSION
-#undef BASE_VERSION
+#define BASE_VERSION
+//#undef BASE_VERSION
 #define _GNU_SOURCE
 
 #include <ctype.h>
