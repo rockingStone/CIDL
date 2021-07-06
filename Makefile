@@ -15,12 +15,20 @@ HEADINSTALLDIR = /usr/local/include/awn
 LDFLAGS	= -ldl
 
 .PHONY: all
-all: CCFLAGS += -O3
+all: CCFLAGS += -O3 -UBASE_VERSION
 all: $(OUTPUTFILE)
 
 .PHONY: debug
-debug: CCFLAGS += -ggdb
+debug: CCFLAGS += -ggdb -UBASE_VERSION
 debug: $(OUTPUTFILE)
+
+.PHONY: base
+base: CCFLAGS += -O3 -DBASE_VERSION
+base: $(OUTPUTFILE)
+
+.PHONY: basedebug
+basedebug: CCFLAGS += -ggdb -DBASE_VERSION
+basedebug: $(OUTPUTFILE)
 # Build libgeorgeringo.so from george.o, ringo.o, 
 # and georgeringo.o; subst is the search-and-replace 
 # function demonstrated in Recipe 1.16

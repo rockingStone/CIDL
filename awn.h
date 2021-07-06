@@ -9,6 +9,8 @@
 extern "C" {
 #endif
 
+extern void ts_print_statistics();
+
 /* Copy N bytes of SRC to DEST.  */
 extern void *ts_memcpy (void * __dest, void * __src,
 		     size_t __n) ;

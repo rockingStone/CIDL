@@ -232,7 +232,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 //	rec->startMemory = (unsigned long long)src;
 //	rec->tailMemory = (unsigned long long)src + length;
 
-	printRec(rec);
+//	printRec(rec);
 	tsearch(rec, &recTreeRoot, recCompare);
 }
 #endif //BASE_VERSION
@@ -426,10 +426,15 @@ void delMap(RBNodePtr *root, RBNodePtr addr){
 
 // Creates the set of standard posix functions as a module.
 __attribute__((constructor))void init(void) {
+#ifndef BASE_VERSION
+	char* version = "";
+#else
+	char* version = "BASE";
+#endif	//BASE_VERSION
 	execv_done = 0;
 	int tmp;
 	int err __attribute__((unused));
-	MSG("Initializing the libawn.so.\n");
+	MSG("Initializing the libawn.so, %s.\n", version);
 
 	//xzjin Put dlopen before call to memcpy and mmap call.
 	ts_write_size = 0;
@@ -844,11 +849,14 @@ inline unsigned long cmpWrite(struct memRec *mrp, unsigned long tail, void** dif
 			*diffPos = (void*)tail;
 		}
 		ts_metadataItem++;
-		MSG("addLen: %lu\n", addLen);
+		//MSG("addLen: %lu\n", addLen);
 		ts_write_same_size += addLen;
 	}else{
-		MSG("ts_write fMapCache not hit\n");
+		//MSG("ts_write fMapCache not hit\n");
 	}
+//	MSG("same length: %llu, %p, pid:%d, ppid:%d.\n",
+//		 ts_write_same_size, &ts_write_same_size, getpid(), getppid());
+// 	MSG(" ts_write bytes :%llu\n", ts_write_size);
 //	END_TIMING(cmp_write_t, cmp_write_time);
 #endif //CMPWRITE
 	return addLen;
@@ -859,8 +867,8 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 
 	struct memRec *rec, **searchRes;
 
-	listRecTreeDetail();
-	void** diffPos = NULL;
+	//listRecTreeDetail();
+	void* diffPos = NULL;
 	rec = allocateMemRecArr();
 	rec->startMemory = (unsigned long long)buf;
 	rec->tailMemory = (unsigned long long)buf + length;
@@ -868,10 +876,10 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 
 	while(searchRes){
 		struct memRec *b = *searchRes;
-		MSG("find rec: %s\n", b->fileName);
+		//MSG("find rec: %s\n", b->fileName);
 		//TODO This assumes the tfind searchs from head to tail.
 		rec->startMemory = b->tailMemory + 1;
-		cmpWrite(b, tail, diffPos);
+		cmpWrite(b, tail, &diffPos);
 		searchRes = tfind(rec, &recTreeRoot, overlapRecBegBigger);
 	}
 
@@ -917,7 +925,7 @@ ssize_t ts_pwrite(int file, void *buf, size_t length, off64_t offset){
 //		buf, file, length, GETPATH(file));
 //	listRecTreeDetail();
 #if USE_TS_FUNC 
-	MSG("fd:%d, buf:%lu, length:%lu\n", file, (unsigned long)buf, length);
+	//MSG("fd:%d, buf:%lu, length:%lu\n", file, (unsigned long)buf, length);
 	do_ts_write(file, buf, length, tail, start, end);
 #endif //USE_TS_FUNC 
 	return ret;
@@ -1499,8 +1507,8 @@ ts_memcpy_returnPoint:
 //ts_memcpy_traced是针对拷贝traced（从mmap或traced区域拷贝过一次的）的内容
 void* ts_memcpy_withFile(void *dest, void *src, size_t n,
 	 struct fileMapTreeNode *fmNode){
-	MSG("Memcpy dest:%llu, src:%llu, len:%lu\n",
-				 (unsigned long long)dest, (unsigned long long)src, n);
+//	MSG("Memcpy dest:%llu, src:%llu, len:%lu\n",
+//				 (unsigned long long)dest, (unsigned long long)src, n);
 
 #if REC_INSERT_TEST 
 	struct recTreeNode node,**pt;
@@ -1806,7 +1814,7 @@ void ts_free(void* ptr, void* tail){
 }
 
 __attribute__((destructor))void fini(void) {
-	print_statistics();
+	ts_print_statistics();
 	PRINT_TIME();
 }
 

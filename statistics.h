@@ -9,22 +9,22 @@
 
 #define INSTRUMENT_CALLS 0
 
-unsigned int num_memcpy_read;
-unsigned int num_memcpy_write;
-unsigned int num_mmap;
-unsigned long long memcpy_read_size;
-unsigned long long memcpy_write_size;
-unsigned long long ts_write_size;
-unsigned long long ts_write_not_found_size;
-unsigned long long ts_write_same_size;
-unsigned long ts_metadataItem;
-//xzjin
-long long able_to_reduce_size;
-long long able_to_reduce_time;
-unsigned long long total_syscalls;
-unsigned long long deleted_size;
+unsigned int num_memcpy_read __attribute__((unused));
+unsigned int num_memcpy_write __attribute__((unused));
+unsigned int num_mmap __attribute__((unused));
+unsigned long long memcpy_read_size __attribute__((unused));
+unsigned long long memcpy_write_size __attribute__((unused));
+unsigned long long ts_write_size __attribute__((unused));
+unsigned long long ts_write_not_found_size __attribute__((unused));
+unsigned long long ts_write_same_size __attribute__((unused));
+unsigned long ts_metadataItem __attribute__((unused));
+//xzjin 
+long long able_to_reduce_size __attribute__((unused));
+long long able_to_reduce_time __attribute__((unused));
+unsigned long long total_syscalls __attribute__((unused));
+unsigned long long deleted_size __attribute__((unused));
 
-void print_statistics(void);
+void ts_print_statistics(void);
 
 enum instrumentation_vars {
 	appends_t,

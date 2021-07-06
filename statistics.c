@@ -2,7 +2,7 @@
 #include "statistics.h"
 #include "tree.h"
 
-void print_statistics(void){
+void ts_print_statistics(void){
 	float tmp;
 	unsigned long usedMemory __attribute__((unused));
 
@@ -28,7 +28,8 @@ void print_statistics(void){
 	MSG(" Total allocated memory:%llu\n", totalAllocSize);
  	UNBLOCKABLE_MSG(" ts_write bytes :%llu\n", ts_write_size);
 	tmp = ((double)ts_write_same_size/ts_write_size)*100;
- 	UNBLOCKABLE_MSG(" ts_write same bytes :%llu, occupy %.2f%%\n", ts_write_same_size, tmp);
+ 	UNBLOCKABLE_MSG(" ts_write same bytes :%llu, occupy %.2f%%\n", ts_write_same_size,  tmp);
+	MSG("ts_write_same_size addr :%p, pid:%d, ppid:%d\n", &ts_write_same_size, getpid(), getppid());
 	tmp = ((double)ts_write_not_found_size/ts_write_size)*100;
 	MSG(" ts_write not found bytes :%llu, occupy %.2f%%\n", ts_write_not_found_size, tmp);
 	tmp = (double)(ts_metadataItem*32*100)/ts_write_size;
