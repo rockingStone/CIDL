@@ -40,7 +40,7 @@ instrumentation_type ts_memcpy_tfind_file_time;
 
 
 unsigned long long totalAllocSize = 0;
-extern int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void* firstDiffPos);	
+extern int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void** firstDiffPos);
 
 #ifndef BASE_VERSION
 inline void writeRec(unsigned long fileOffset, void* src, void* dest,
@@ -806,6 +806,18 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 }
 
 #else
+
+int memcmp_bbb(void *s1, void *s2, size_t n, void** firstDiffPos){
+	char* a = (char*)s1;
+	char* b = (char*)s2;
+	for(int i=0; i<n; i++, a++, b++){
+		if((*a)-(*b)){
+			*firstDiffPos = (void*)a;
+			return (*a)-(*b);
+		}
+	}
+	return 0;
+}
 //compare and call write to file metedata
 inline unsigned long cmpWrite(struct memRec *mrp, 
 		  unsigned long tail, void** diffPos) __attribute__((always_inline));
@@ -839,8 +851,8 @@ inline unsigned long cmpWrite(struct memRec *mrp, unsigned long tail, void** dif
 #endif //PATCH
 		cmpLen = tail-bufCmpStart;
 		START_TIMING(memcmp_asm_t, memcmp_asm_time);
-		//xzjin TODO 可以改成无论比较结果，都设置diffPos，减少比较后面的if语句
-		int cmpRet = memcmp_avx2_asm((void*)bufCmpStart, (void*)fileCmpStart, cmpLen, diffPos);
+		//int cmpRet = memcmp_avx2_asm((void*)bufCmpStart, (void*)fileCmpStart, cmpLen, diffPos);
+		int cmpRet = memcmp_bbb((void*)bufCmpStart, (void*)fileCmpStart, cmpLen, diffPos);
 		END_TIMING(memcmp_asm_t, memcmp_asm_time);
 		if(cmpRet){		//different
 			addLen = (tail<(unsigned long)*diffPos?tail:(unsigned long)*diffPos) - bufCmpStart;
@@ -849,11 +861,13 @@ inline unsigned long cmpWrite(struct memRec *mrp, unsigned long tail, void** dif
 			*diffPos = (void*)tail;
 		}
 		ts_metadataItem++;
-		//MSG("addLen: %lu\n", addLen);
+//		MSG("addLen: %lu\n", addLen);
 		ts_write_same_size += addLen;
 	}else{
 		//MSG("ts_write fMapCache not hit\n");
 	}
+//	MSG("buf cmp start:%lu, file cmp start:%lu, diffPos:%lu\n",
+//		 (unsigned long)bufCmpStart, (unsigned long)fileCmpStart, (unsigned long)(*diffPos));
 //	MSG("same length: %llu, %p, pid:%d, ppid:%d.\n",
 //		 ts_write_same_size, &ts_write_same_size, getpid(), getppid());
 // 	MSG(" ts_write bytes :%llu\n", ts_write_size);
