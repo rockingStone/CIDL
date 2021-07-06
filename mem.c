@@ -177,8 +177,14 @@ void withdrawRecBlockEntry(struct recBlockEntry *ptr){
 	RECBLOCKENTRYPOOLIDX++;
 }
 
+#ifndef BASE_VERSION
 void withdrawMemRecArr(struct memRec *ptr){
 	assert(RECARRPOOLIDX<RECARRPOOLSIZE);
 	RECARRPOOLPTR[RECARRPOOLIDX] = ptr;
 	RECARRPOOLIDX++;
 }
+#else
+void withdrawMemRecArr(struct memRec *ptr){
+	free(ptr);
+}
+#endif	//BASE_VERSION

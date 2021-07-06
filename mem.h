@@ -178,6 +178,7 @@ unsigned long RECARRPOOLSIZE;
 int RECARRPOOLIDX;
 struct memRec** RECARRPOOLPTR;
 
+#ifndef BASE_VERSION
 inline struct memRec *allocateMemRecArr(){
 	if(UNLIKELY(RECARRPOOLIDX<=0)){
         struct memRec** poolDepot;
@@ -215,5 +216,15 @@ inline struct memRec *allocateMemRecArr(){
 	RECARRPOOLIDX--;
 	return RECARRPOOLPTR[RECARRPOOLIDX];
 }
+#else 
+inline struct memRec *allocateMemRecArr(){
+	struct memRec* ret = malloc(sizeof(struct memRec));
+	if(!ret){
+		ERROR("alloc struct memRec ERROR.\n");
+		exit(-1);
+	}
+	return ret;
+}
+#endif	//BASE_VERSION
 
 #endif //__AWN_MEM__

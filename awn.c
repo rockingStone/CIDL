@@ -207,7 +207,7 @@ void deleteRec(void* src, unsigned long length){
 			b->tailMemory = rec->startMemory -1;
 		}else if(b->tailMemory <= rec->startMemory){		//b.4
 			tdelete(rec, &recTreeRoot, overlapRec);
-			free(b);
+			withdrawMemRecArr(b);
 		}else{	//b.5
 			b->tailMemory = rec->startMemory;
 		}
