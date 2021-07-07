@@ -13,6 +13,8 @@
 #define CMPWRITE
 #undef TS_MEMCPY_CMPWRITE
 
+static int ts_writeTime = 0;
+
 //Debug help func
 void init(void);
 void listRecTreeNode(void *pageNum);
@@ -180,11 +182,21 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 #else
 
 void deleteRec(void* src, unsigned long length){
-	struct memRec *rec, **searchRes;
+	struct memRec *rec, **searchRes = NULL;
 	//g_hash_table_remove_all(searchedMemRec);
 	rec = allocateMemRecArr();
+	//MSG("alloc rec:%p\n", rec);
 	rec->startMemory = (unsigned long long)src;
 	rec->tailMemory = (unsigned long long)src + length;
+	rec->fileName = NULL;
+	rec->fileOffset = 0;
+	if(rec->startMemory >= rec->tailMemory){
+		MSG("rec error\n");
+	}
+	//xzjin assert
+	assert(rec->startMemory<rec->tailMemory);
+	assert(rec->startMemory>343596402010 && rec->tailMemory>343596402010);
+
 	searchRes = tfind(rec, &recTreeRoot, overlapRec);
 /** xzjin compare relationship			
  * a.			|_________|			  a ? b
@@ -195,9 +207,11 @@ void deleteRec(void* src, unsigned long length){
  * b.5 				|______________|	= b.startMemory = a.tail;
 */
 	while(searchRes){
-		MSG("Modify/delete record.\n");
+		//MSG("Modify/delete record.\n");
 		//gpointer hashEntry = malloc(sizeof(struct memRec*));
 		struct memRec *b = *searchRes;
+		if(b==rec)	listRecTreeDetail();
+		//printRec(b);
 		//hashEntry = b;
 		//TODO This assumes the tfind searchs from head to tail.
 		rec->startMemory = b->tailMemory + 1;
@@ -205,15 +219,25 @@ void deleteRec(void* src, unsigned long length){
 
 		if(b->startMemory<rec->startMemory){	//b.2, b.3
 			b->tailMemory = rec->startMemory -1;
+			//xzjin assert
+			assertRec(b);
 		}else if(b->tailMemory <= rec->startMemory){		//b.4
 			tdelete(rec, &recTreeRoot, overlapRec);
+			MSG("b:%p\n", b);
 			withdrawMemRecArr(b);
 		}else{	//b.5
 			b->tailMemory = rec->startMemory;
+			//xzjin assert
+			assertRec(b);
 		}
+		if(rec->startMemory >= rec->tailMemory) break;
+		//xzjin assert
+		assert(rec->startMemory<rec->tailMemory);
+		assert(rec->startMemory>343596402010 && rec->tailMemory>343596402010);
 		searchRes = tfind(rec, &recTreeRoot, overlapRec);
 	}
 
+	//MSG("free rec:%p\n", rec);
 	withdrawMemRecArr(rec);
 }
 
@@ -223,7 +247,9 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 	 char* fileName, unsigned long length){
 
 	struct memRec *rec;
+	//MSG("%s: START\n", __func__);
 	rec = allocateMemRecArr();
+	//MSG("length:%lu, fileOffset:%lu\n", length, fileOffset);
 	deleteRec(src, length);
 	rec->fileName= fileName;
 	rec->fileOffset = fileOffset;
@@ -232,8 +258,12 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 //	rec->startMemory = (unsigned long long)src;
 //	rec->tailMemory = (unsigned long long)src + length;
 
-//	printRec(rec);
+	//printRec(rec);
+	//xzjin assert
+	assertRec(rec);
+	//assert(rec->fileOffset<100000000000002);
 	tsearch(rec, &recTreeRoot, recCompare);
+	//MSG("%s: END\n", __func__);
 }
 #endif //BASE_VERSION
 
@@ -810,12 +840,15 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 int memcmp_bbb(void *s1, void *s2, size_t n, void** firstDiffPos){
 	char* a = (char*)s1;
 	char* b = (char*)s2;
+	//MSG("%s, start.\n", __func__);
 	for(int i=0; i<n; i++, a++, b++){
 		if((*a)-(*b)){
 			*firstDiffPos = (void*)a;
+			//MSG("%s, end.\n", __func__);
 			return (*a)-(*b);
 		}
 	}
+	//MSG("%s, end.\n", __func__);
 	return 0;
 }
 //compare and call write to file metedata
@@ -831,6 +864,7 @@ inline unsigned long cmpWrite(struct memRec *mrp, unsigned long tail, void** dif
 //	MSG("CMP write, fileOffset:%lu, pageOffset:%d, fileName:%s.\n",
 //		mrp[i].fileOffset, mrp[i].pageOffset, mrp[i].fileName);
 
+	//MSG("%s, start.\n", __func__);
 #ifdef CMPWRITE
 	//TODO xzjin 这里文件应该有很强的局部性，可以用一个文件节点缓存
 	fmNode.fileName = mrp->fileName;
@@ -872,6 +906,7 @@ inline unsigned long cmpWrite(struct memRec *mrp, unsigned long tail, void** dif
 //		 ts_write_same_size, &ts_write_same_size, getpid(), getppid());
 // 	MSG(" ts_write bytes :%llu\n", ts_write_size);
 //	END_TIMING(cmp_write_t, cmp_write_time);
+	//MSG("%s, end.\n", __func__);
 #endif //CMPWRITE
 	return addLen;
 }
@@ -879,6 +914,7 @@ inline unsigned long cmpWrite(struct memRec *mrp, unsigned long tail, void** dif
 void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 	 unsigned long long start, unsigned long long end){
 
+	//MSG("%s, start.\n", __func__);
 	struct memRec *rec, **searchRes;
 
 	//listRecTreeDetail();
@@ -893,16 +929,28 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 		//MSG("find rec: %s\n", b->fileName);
 		//TODO This assumes the tfind searchs from head to tail.
 		rec->startMemory = b->tailMemory + 1;
+		//printRec(b);
+		//printRec(rec);
 		cmpWrite(b, tail, &diffPos);
+		if(rec->startMemory >= rec->tailMemory) break;
+		//xzjin assert
+		assert(rec->startMemory<rec->tailMemory);
+		assert(rec->startMemory>343596402010 && rec->tailMemory>343596402010);
+		//xzjin assert
+		assertRec(b);
 		searchRes = tfind(rec, &recTreeRoot, overlapRecBegBigger);
 	}
 
 	withdrawMemRecArr(rec);
+	//MSG("%s, end.\n", __func__);
 }
 
 #endif	//BASE_VERSION
 
 ssize_t ts_write(int file, void *buf, size_t length){
+	//MSG("%s, start.\n", __func__);
+	ts_writeTime++;
+	ts_writeTime = ts_writeTime%0xFFFFFF;
 	void *t = buf;
 	unsigned long tail = (unsigned long)buf+length;
 	unsigned long long start = (unsigned long long)addr2PageNum(t);
@@ -920,6 +968,7 @@ ssize_t ts_write(int file, void *buf, size_t length){
 #if USE_TS_FUNC 
 	do_ts_write(file, buf, length, tail, start, end);
 #endif //USE_TS_FUNC 
+	//MSG("%s, end.\n", __func__);
 	return ret;
 }
 
@@ -1346,7 +1395,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 #else
 //xzjin 拷贝内存到新地址然后删除旧映射
 void* ts_memcpy_traced(void *dest, void *src, size_t n){
-	unsigned long long end = (unsigned long long)addr2PageNum((void*)((unsigned long long)src+n));
+	unsigned long long end = (unsigned long long)src+n;
 	void *ret;
 
 	ret = memcpy(CALL_MEMCPY);
@@ -1364,14 +1413,28 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 	while(searchRes){
 		struct memRec *b = *searchRes;
 		void* insertDest = dest+(b->startMemory - (unsigned long long)src);
-		size_t copyLen = b->startMemory<end?b->startMemory:end;
-		copyLen = copyLen - (unsigned long long)insertDest;
+		//xzjin trace tail and copy src tail, choose the smaller one
+		size_t copyLen = b->tailMemory<end?b->tailMemory:end;
+		//printRec(b);
+		//MSG("length:%lu, insertDest:%llu, end:%llu\n",
+		//	 copyLen, (unsigned long long)insertDest, end);
+		//copyLen = copyLen - (unsigned long long)insertDest;
+		copyLen = copyLen - (unsigned long long)src;
+		if(copyLen>32768){
+			printRec(b);
+			MSG("length:%lu, insertDest:%llu, end:%llu\n",
+				 copyLen, (unsigned long long)insertDest, end);
+			MSG("123\n");
+		}
 		//memcpy require src, dest not overlap
 		//Insert only delete the record overlapped with memcpy dest range
 		//b is the memory record in memcpy src, thus will not be deleted
-		insertRec(b->fileOffset, src, insertDest, b->fileName, copyLen);
+		//xzjin 先delete,再insert,不然可能会影响delete的判断
 		tdelete(rec, &recTreeRoot, overlapRecBegBigger);
-		free(b);
+		//xzjin must release b after insert, because b may change after release
+		//influence offset and fileName
+		insertRec(b->fileOffset, src, insertDest, b->fileName, copyLen);
+		withdrawMemRecArr(b);
 
 		searchRes = tfind(rec, &recTreeRoot, overlapRecBegBigger);
 	}
@@ -1456,6 +1519,8 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 //		src, dest,fmNode->start, fmNode->tail, fmNode->offset, fmNode->fileName);
 	//xzjin 记录log信息
 	fileOffset = fmNode->offset+(src-fmNode->start);
+//	MSG("file offset: %lu, fmNode->offset:%lu, src:%lu, fmNode->start:%lu\n",
+//		fileOffset, fmNode->offset, src, fmNode->start);
 	//START_TIMING(insert_rec_t,  insert_rec_time);
 #if PATCH
 	//xzjin 对于patch, 每页加一个记录
