@@ -9,6 +9,26 @@ void initMemory(){
 	TAILHEADPOOLSIZE = RECTREENODEPOOLSIZE;
 	RECBLOCKENTRYPOOLSIZE = 6000;
 	
+	allocSize = sizeof(struct fileMapTreeNode)*FILEMAPTREENODEPOOLSIZE;
+	totalAllocSize += allocSize;
+	FILEMAPTREENODEPOOL = malloc(allocSize);
+	if(!FILEMAPTREENODEPOOL){
+		ERROR("Could not allocate space for FILEMAPTREENODEPOOL.\n");
+		assert(0);
+	}
+	allocSize = sizeof(struct fileMapTreeNode*)*RECTREENODEPOOLSIZE;
+	totalAllocSize += allocSize;
+	FILEMAPTREENODEPOOLPTR = malloc(allocSize);
+	if(!FILEMAPTREENODEPOOLPTR){
+		ERROR("Could not allocate space for FILEMAPTREENODEPOOLPTR.\n");
+		assert(0);
+	}
+	for(int i=0; i<FILEMAPTREENODEPOOLSIZE; i++){
+		FILEMAPTREENODEPOOLPTR[i] = FILEMAPTREENODEPOOL+i;
+	}
+	FILEMAPTREENODEPOOLIDX = FILEMAPTREENODEPOOLSIZE;
+
+#ifndef BASE_VERSION
 	allocSize = sizeof(struct recTreeNode)*RECTREENODEPOOLSIZE;
 	totalAllocSize += allocSize;
 	RECTREENODEPOOL = malloc(allocSize);
@@ -28,25 +48,6 @@ void initMemory(){
 	}
 	RECTREENODEPOOLIDX = RECTREENODEPOOLSIZE;
 	RECTREENODETHRESHOLD = RECTREENODEPOOLSIZE*RECTREENODETHRESHOLDRATIO;
-
-	allocSize = sizeof(struct fileMapTreeNode)*FILEMAPTREENODEPOOLSIZE;
-	totalAllocSize += allocSize;
-	FILEMAPTREENODEPOOL = malloc(allocSize);
-	if(!FILEMAPTREENODEPOOL){
-		ERROR("Could not allocate space for FILEMAPTREENODEPOOL.\n");
-		assert(0);
-	}
-	allocSize = sizeof(struct fileMapTreeNode*)*RECTREENODEPOOLSIZE;
-	totalAllocSize += allocSize;
-	FILEMAPTREENODEPOOLPTR = malloc(allocSize);
-	if(!FILEMAPTREENODEPOOLPTR){
-		ERROR("Could not allocate space for FILEMAPTREENODEPOOLPTR.\n");
-		assert(0);
-	}
-	for(int i=0; i<FILEMAPTREENODEPOOLSIZE; i++){
-		FILEMAPTREENODEPOOLPTR[i] = FILEMAPTREENODEPOOL+i;
-	}
-	FILEMAPTREENODEPOOLIDX = FILEMAPTREENODEPOOLSIZE;
 
 //		SLISTHEADPOOL = malloc(sizeof(struct slisthead)*SLISTHEADPOOLSIZE);
 //		if(!SLISTHEADPOOL){
@@ -101,7 +102,7 @@ void initMemory(){
 	}
 	RECBLOCKENTRYPOOLIDX = RECBLOCKENTRYPOOLSIZE;
 
-#ifndef BASE_VERSION
+//#ifndef BASE_VERSION
 	//xzjin 注意这里RECARRPOOL的类型是memRec的指针，不是memRec[MEMRECPERENTRY],申请的时候应该是+-MEMRECPERENTRY
 	allocSize = sizeof(struct memRec)*MEMRECPERENTRY*RECARRPOOLSIZE;
 	totalAllocSize += allocSize;
@@ -122,28 +123,28 @@ void initMemory(){
 		//RECARRPOOLTAIL = (unsigned long long)RECARRPOOLPTR[i];
 	}
 	RECARRPOOLIDX = RECARRPOOLSIZE;
-#else
-	allocSize = sizeof(struct memRec)*RECARRPOOLSIZE;
-	totalAllocSize += allocSize;
-	RECARRPOOL = malloc(allocSize);
-	if(!RECARRPOOL){
-		ERROR("Could not allocate space for RECARRPOOL.\n");
-		assert(0);
-	}
-	allocSize = sizeof(struct memRec*)*RECARRPOOLSIZE;
-	totalAllocSize += allocSize;
-	RECARRPOOLPTR = malloc(allocSize);
-	if(!RECARRPOOLPTR){
-		ERROR("Could not allocate space for RECARRPOOLPTR.\n");
-		assert(0);
-	}
-	for(int i=0; i<RECARRPOOLSIZE; i++){
-		RECARRPOOLPTR[i] = RECARRPOOL+i;
-		//RECARRPOOLTAIL = (unsigned long long)RECARRPOOLPTR[i];
-	}
-	RECARRPOOLIDX = RECARRPOOLSIZE;
-#endif	//BASE_VERSION
-
+//#else
+//	allocSize = sizeof(struct memRec)*RECARRPOOLSIZE;
+//	totalAllocSize += allocSize;
+//	RECARRPOOL = malloc(allocSize);
+//	if(!RECARRPOOL){
+//		ERROR("Could not allocate space for RECARRPOOL.\n");
+//		assert(0);
+//	}
+//	allocSize = sizeof(struct memRec*)*RECARRPOOLSIZE;
+//	totalAllocSize += allocSize;
+//	RECARRPOOLPTR = malloc(allocSize);
+//	if(!RECARRPOOLPTR){
+//		ERROR("Could not allocate space for RECARRPOOLPTR.\n");
+//		assert(0);
+//	}
+//	for(int i=0; i<RECARRPOOLSIZE; i++){
+//		RECARRPOOLPTR[i] = RECARRPOOL+i;
+//		//RECARRPOOLTAIL = (unsigned long long)RECARRPOOLPTR[i];
+//	}
+//	RECARRPOOLIDX = RECARRPOOLSIZE;
+//#endif	//BASE_VERSION
+#endif //BASE_VERSION
 	MSG("Allocate %llu bytes memory.\n", totalAllocSize);
 }
 //xzjin TODO 现在对于recTreeNode没有回收方式，同样tailHead也是
@@ -186,5 +187,6 @@ void withdrawMemRecArr(struct memRec *ptr){
 #else
 void withdrawMemRecArr(struct memRec *ptr){
 	free(ptr);
+	totalAllocSize -= sizeof(struct memRec);
 }
 #endif	//BASE_VERSION

@@ -28,6 +28,12 @@ struct memRec{
 	unsigned long long startMemory;
 	unsigned long long tailMemory; 	//The tailMemory is not copied.
 };
+
+#define assertRec(rec) 	do{ assert(rec->startMemory<rec->tailMemory); \
+	assert(rec->startMemory>343596402010 && rec->tailMemory>343596402010); \
+	assert(rec->fileOffset<100000000000002); \
+	assert(rec->fileName); }while(0)
+
 #endif //BASE_VERSION
 
 //xzjin single list head
@@ -218,11 +224,14 @@ inline struct memRec *allocateMemRecArr(){
 }
 #else 
 inline struct memRec *allocateMemRecArr(){
+	//MSG("malloc rec\n");
 	struct memRec* ret = malloc(sizeof(struct memRec));
 	if(!ret){
 		ERROR("alloc struct memRec ERROR.\n");
 		exit(-1);
 	}
+
+	totalAllocSize += sizeof(struct memRec);
 	return ret;
 }
 #endif	//BASE_VERSION

@@ -1,0 +1,706 @@
++ /pmem/dedupDir//rebuild
+Clean dir.
++ fio_modified /home/xzjin/awn/expriment/fio/dedupRatio-128.fio
+MSG(F:init L:467):Initializing the libawn.so, BASE.
+MSG(F:initMemory L:148):Allocate 118304 bytes memory.
+MSG(F:init L:567):init: END
+SSD-rand: (g=0): rw=randwrite, bs=(R) 128B-128B, (W) 128B-128B, (T) 128B-128B, ioengine=psync, iodepth=1
+fio-3.27-32-g6ee1-dirty
+fio_backend.
+Starting 1 process
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:214878048
+MSG(F:ts_print_statistics L:29): ts_write bytes :2147483648
+MSG(F:ts_print_statistics L:31): ts_write same bytes :859058779, occupy 40.00%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f78b5f5e3a0, pid:3380, ppid:3338
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy 0.00%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :16777215, metadata occupy 25.00% write data.
+
+SSD-rand: (groupid=0, jobs=1): err= 0: pid=3380: Fri Jul  9 17:20:08 2021
+  write: IOPS=478k, BW=58.3MiB/s (61.2MB/s)(2048MiB/35101msec); 0 zone resets
+    clat (nsec): min=841, max=6070.7k, avg=1504.07, stdev=2375.08
+     lat (nsec): min=873, max=6070.8k, avg=1534.62, stdev=2386.00
+    clat percentiles (nsec):
+     |  1.00th=[ 1160],  5.00th=[ 1208], 10.00th=[ 1240], 20.00th=[ 1272],
+     | 30.00th=[ 1288], 40.00th=[ 1320], 50.00th=[ 1368], 60.00th=[ 1384],
+     | 70.00th=[ 1432], 80.00th=[ 1480], 90.00th=[ 1656], 95.00th=[ 1960],
+     | 99.00th=[ 4960], 99.50th=[ 5344], 99.90th=[ 6112], 99.95th=[ 6496],
+     | 99.99th=[ 8096]
+   bw (  KiB/s): min= 9358, max=65253, per=100.00%, avg=59759.81, stdev=10944.69, samples=70
+   iops        : min=74864, max=522026, avg=478081.54, stdev=87557.94, samples=70
+  lat (nsec)   : 1000=0.01%
+  lat (usec)   : 2=95.21%, 4=1.69%, 10=3.10%, 20=0.01%, 50=0.01%
+  lat (usec)   : 100=0.01%, 250=0.01%, 500=0.01%, 750=0.01%, 1000=0.01%
+  lat (msec)   : 2=0.01%, 4=0.01%, 10=0.01%
+  cpu          : usr=35.86%, sys=64.12%, ctx=79, majf=0, minf=79240
+  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=0,16777216,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=1
+
+Run status group 0 (all jobs):
+  WRITE: bw=58.3MiB/s (61.2MB/s), 58.3MiB/s-58.3MiB/s (61.2MB/s-61.2MB/s), io=2048MiB (2147MB), run=35101-35101msec
+
+Disk stats (read/write):
+  pmem1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:118304
+MSG(F:ts_print_statistics L:29): ts_write bytes :0
+MSG(F:ts_print_statistics L:31): ts_write same bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f78b5f5e3a0, pid:3338, ppid:3329
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :0, metadata occupy -nan% write data.
+
+MSG(F:fini L:1895):fileMap_t: timing = 0 us
+
++ destor /dbtmp/SSD-rand.0.0 '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 2147483648 bytes, 175674 chunks, 1 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 172 segments of 1021 chunks on average
+Dedup time(s) 3.283
+rewrite phase stops successfully!
+Record 0 sparse containers, and 0 of them are inherited
+CMA: update 517 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbtmp/SSD-rand.0.0
+number of files: 1
+number of chunks: 175674 (12224 bytes on average)
+number of unique chunks: 175674
+total size(B): 2147483648
+stored data size(B): 2147483648
+deduplication ratio: 0.0000, 1.0000
+Total time(s): 3.283
+throughput(MB/s): 623.76
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 0.490s, 4181.28MB/s
+chunk_time : 1.315s, 1557.73MB/s
+hash_time : 2.737s, 748.37MB/s
+dedup_time : 0.104s, 19617.99MB/s
+rewrite_time : 0.012s, 164010.57MB/s
+filter_time : 1.363s, 1503.05MB/s
+write_time : 1.525s, 1342.60MB/s
++ set +o xtrace
+
+
++ /pmem/dedupDir//rebuild
+Clean dir.
++ fio_modified /home/xzjin/awn/expriment/fio/dedupRatio-256.fio
+MSG(F:init L:467):Initializing the libawn.so, BASE.
+MSG(F:initMemory L:148):Allocate 118304 bytes memory.
+MSG(F:init L:567):init: END
+SSD-rand: (g=0): rw=randwrite, bs=(R) 256B-256B, (W) 256B-256B, (T) 256B-256B, ioengine=psync, iodepth=1
+fio-3.27-32-g6ee1-dirty
+fio_backend.
+Starting 1 process
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:107568096
+MSG(F:ts_print_statistics L:29): ts_write bytes :2147483648
+MSG(F:ts_print_statistics L:31): ts_write same bytes :859608245, occupy 40.03%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f0bee8fc3a0, pid:3440, ppid:3398
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy 0.00%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :8388607, metadata occupy 12.50% write data.
+
+SSD-rand: (groupid=0, jobs=1): err= 0: pid=3440: Fri Jul  9 17:20:33 2021
+  write: IOPS=413k, BW=101MiB/s (106MB/s)(2048MiB/20317msec); 0 zone resets
+    clat (nsec): min=854, max=1438.4k, avg=1631.69, stdev=1273.44
+     lat (nsec): min=884, max=1438.5k, avg=1662.08, stdev=1273.56
+    clat percentiles (nsec):
+     |  1.00th=[ 1128],  5.00th=[ 1224], 10.00th=[ 1240], 20.00th=[ 1288],
+     | 30.00th=[ 1320], 40.00th=[ 1352], 50.00th=[ 1400], 60.00th=[ 1464],
+     | 70.00th=[ 1496], 80.00th=[ 1544], 90.00th=[ 1688], 95.00th=[ 4512],
+     | 99.00th=[ 5408], 99.50th=[ 5792], 99.90th=[ 6560], 99.95th=[ 7072],
+     | 99.99th=[ 8512]
+   bw (  KiB/s): min=33055, max=128448, per=100.00%, avg=111154.54, stdev=25062.99, samples=37
+   iops        : min=132220, max=513792, avg=444619.14, stdev=100252.15, samples=37
+  lat (nsec)   : 1000=0.01%
+  lat (usec)   : 2=93.29%, 4=0.50%, 10=6.20%, 20=0.01%, 250=0.01%
+  lat (usec)   : 500=0.01%, 750=0.01%, 1000=0.01%
+  lat (msec)   : 2=0.01%
+  cpu          : usr=32.65%, sys=66.30%, ctx=13755, majf=0, minf=39398
+  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=0,8388608,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=1
+
+Run status group 0 (all jobs):
+  WRITE: bw=101MiB/s (106MB/s), 101MiB/s-101MiB/s (106MB/s-106MB/s), io=2048MiB (2147MB), run=20317-20317msec
+
+Disk stats (read/write):
+  pmem1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:118304
+MSG(F:ts_print_statistics L:29): ts_write bytes :0
+MSG(F:ts_print_statistics L:31): ts_write same bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f0bee8fc3a0, pid:3398, ppid:3329
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :0, metadata occupy -nan% write data.
+
+MSG(F:fini L:1895):fileMap_t: timing = 0 us
+
++ destor /dbtmp/SSD-rand.0.0 '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 2147483648 bytes, 172348 chunks, 1 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 169 segments of 1019 chunks on average
+Dedup time(s) 3.336
+rewrite phase stops successfully!
+Record 0 sparse containers, and 0 of them are inherited
+CMA: update 517 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbtmp/SSD-rand.0.0
+number of files: 1
+number of chunks: 172348 (12460 bytes on average)
+number of unique chunks: 172348
+total size(B): 2147483648
+stored data size(B): 2147483648
+deduplication ratio: 0.0000, 1.0000
+Total time(s): 3.337
+throughput(MB/s): 613.82
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 0.537s, 3816.67MB/s
+chunk_time : 1.310s, 1563.87MB/s
+hash_time : 2.737s, 748.20MB/s
+dedup_time : 0.103s, 19812.32MB/s
+rewrite_time : 0.012s, 176933.05MB/s
+filter_time : 1.318s, 1554.05MB/s
+write_time : 1.539s, 1330.97MB/s
++ set +o xtrace
+
+
++ /pmem/dedupDir//rebuild
+Clean dir.
++ fio_modified /home/xzjin/awn/expriment/fio/dedupRatio-512.fio
+MSG(F:init L:467):Initializing the libawn.so, BASE.
+MSG(F:initMemory L:148):Allocate 118304 bytes memory.
+MSG(F:init L:567):init: END
+SSD-rand: (g=0): rw=randwrite, bs=(R) 512B-512B, (W) 512B-512B, (T) 512B-512B, ioengine=psync, iodepth=1
+fio-3.27-32-g6ee1-dirty
+fio_backend.
+Starting 1 process
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:53843456
+MSG(F:ts_print_statistics L:29): ts_write bytes :2147483648
+MSG(F:ts_print_statistics L:31): ts_write same bytes :859607356, occupy 40.03%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f1bdbed53a0, pid:3499, ppid:3457
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy 0.00%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :4194303, metadata occupy 6.25% write data.
+
+SSD-rand: (groupid=0, jobs=1): err= 0: pid=3499: Fri Jul  9 17:20:52 2021
+  write: IOPS=281k, BW=137MiB/s (144MB/s)(2048MiB/14948msec); 0 zone resets
+    clat (nsec): min=869, max=950132, avg=2187.32, stdev=1323.26
+     lat (nsec): min=899, max=950165, avg=2217.94, stdev=1323.62
+    clat percentiles (nsec):
+     |  1.00th=[ 1272],  5.00th=[ 1336], 10.00th=[ 1400], 20.00th=[ 1544],
+     | 30.00th=[ 1624], 40.00th=[ 1688], 50.00th=[ 1768], 60.00th=[ 1880],
+     | 70.00th=[ 1992], 80.00th=[ 2192], 90.00th=[ 4512], 95.00th=[ 5024],
+     | 99.00th=[ 5984], 99.50th=[ 6432], 99.90th=[ 7712], 99.95th=[ 8256],
+     | 99.99th=[ 9664]
+   bw (  KiB/s): min=68828, max=211068, per=100.00%, avg=173974.43, stdev=38603.53, samples=23
+   iops        : min=137656, max=422136, avg=347948.96, stdev=77207.11, samples=23
+  lat (nsec)   : 1000=0.01%
+  lat (usec)   : 2=70.90%, 4=16.49%, 10=12.60%, 20=0.01%, 50=0.01%
+  lat (usec)   : 100=0.01%, 250=0.01%, 500=0.01%, 1000=0.01%
+  cpu          : usr=25.12%, sys=74.85%, ctx=66, majf=0, minf=19877
+  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=0,4194304,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=1
+
+Run status group 0 (all jobs):
+  WRITE: bw=137MiB/s (144MB/s), 137MiB/s-137MiB/s (144MB/s-144MB/s), io=2048MiB (2147MB), run=14948-14948msec
+
+Disk stats (read/write):
+  pmem1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:118304
+MSG(F:ts_print_statistics L:29): ts_write bytes :0
+MSG(F:ts_print_statistics L:31): ts_write same bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f1bdbed53a0, pid:3457, ppid:3329
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :0, metadata occupy -nan% write data.
+
+MSG(F:fini L:1895):fileMap_t: timing = 0 us
+
++ destor /dbtmp/SSD-rand.0.0 '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 2147483648 bytes, 170295 chunks, 1 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 167 segments of 1019 chunks on average
+Dedup time(s) 3.337
+rewrite phase stops successfully!
+Record 0 sparse containers, and 0 of them are inherited
+CMA: update 517 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbtmp/SSD-rand.0.0
+number of files: 1
+number of chunks: 170295 (12610 bytes on average)
+number of unique chunks: 170295
+total size(B): 2147483648
+stored data size(B): 2147483648
+deduplication ratio: 0.0000, 1.0000
+Total time(s): 3.337
+throughput(MB/s): 613.66
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 0.528s, 3876.75MB/s
+chunk_time : 1.316s, 1556.80MB/s
+hash_time : 2.734s, 749.18MB/s
+dedup_time : 0.115s, 17775.77MB/s
+rewrite_time : 0.013s, 157842.00MB/s
+filter_time : 1.412s, 1450.89MB/s
+write_time : 1.729s, 1184.65MB/s
++ set +o xtrace
+
+
++ /pmem/dedupDir//rebuild
+Clean dir.
++ fio_modified /home/xzjin/awn/expriment/fio/dedupRatio-1024.fio
+MSG(F:init L:467):Initializing the libawn.so, BASE.
+MSG(F:initMemory L:148):Allocate 118304 bytes memory.
+MSG(F:init L:567):init: END
+SSD-rand: (g=0): rw=randwrite, bs=(R) 1024B-1024B, (W) 1024B-1024B, (T) 1024B-1024B, ioengine=psync, iodepth=1
+fio-3.27-32-g6ee1-dirty
+fio_backend.
+Starting 1 process
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:26968576
+MSG(F:ts_print_statistics L:29): ts_write bytes :2147483648
+MSG(F:ts_print_statistics L:31): ts_write same bytes :859211103, occupy 40.01%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f429792b3a0, pid:3558, ppid:3516
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy 0.00%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :2097151, metadata occupy 3.12% write data.
+
+SSD-rand: (groupid=0, jobs=1): err= 0: pid=3558: Fri Jul  9 17:21:03 2021
+  write: IOPS=287k, BW=280MiB/s (294MB/s)(2048MiB/7309msec); 0 zone resets
+    clat (nsec): min=837, max=906667, avg=2357.24, stdev=1483.54
+     lat (nsec): min=867, max=906697, avg=2387.83, stdev=1483.74
+    clat percentiles (nsec):
+     |  1.00th=[ 1288],  5.00th=[ 1368], 10.00th=[ 1400], 20.00th=[ 1448],
+     | 30.00th=[ 1496], 40.00th=[ 1592], 50.00th=[ 1928], 60.00th=[ 1992],
+     | 70.00th=[ 2096], 80.00th=[ 3856], 90.00th=[ 4384], 95.00th=[ 4768],
+     | 99.00th=[ 5600], 99.50th=[ 5920], 99.90th=[ 7072], 99.95th=[ 7648],
+     | 99.99th=[ 8896]
+   bw (  KiB/s): min=21504, max=413548, per=100.00%, avg=302558.62, stdev=106421.54, samples=13
+   iops        : min=21506, max=413548, avg=302558.77, stdev=106421.10, samples=13
+  lat (nsec)   : 1000=0.04%
+  lat (usec)   : 2=60.93%, 4=21.86%, 10=17.16%, 20=0.01%, 50=0.01%
+  lat (usec)   : 250=0.01%, 500=0.01%, 750=0.01%, 1000=0.01%
+  cpu          : usr=28.23%, sys=69.14%, ctx=5736, majf=0, minf=9886
+  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=0,2097152,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=1
+
+Run status group 0 (all jobs):
+  WRITE: bw=280MiB/s (294MB/s), 280MiB/s-280MiB/s (294MB/s-294MB/s), io=2048MiB (2147MB), run=7309-7309msec
+
+Disk stats (read/write):
+  pmem1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:118304
+MSG(F:ts_print_statistics L:29): ts_write bytes :0
+MSG(F:ts_print_statistics L:31): ts_write same bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f429792b3a0, pid:3516, ppid:3329
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :0, metadata occupy -nan% write data.
+
+MSG(F:fini L:1895):fileMap_t: timing = 1 us
+
++ destor /dbtmp/SSD-rand.0.0 '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 2147483648 bytes, 205568 chunks, 1 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 201 segments of 1022 chunks on average
+Dedup time(s) 3.403
+rewrite phase stops successfully!
+Record 0 sparse containers, and 0 of them are inherited
+CMA: update 517 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbtmp/SSD-rand.0.0
+number of files: 1
+number of chunks: 205568 (10446 bytes on average)
+number of unique chunks: 205549
+total size(B): 2147483648
+stored data size(B): 2147289088
+deduplication ratio: 0.0001, 1.0001
+Total time(s): 3.403
+throughput(MB/s): 601.81
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 0.591s, 3464.64MB/s
+chunk_time : 1.284s, 1594.44MB/s
+hash_time : 2.744s, 746.30MB/s
+dedup_time : 0.125s, 16400.53MB/s
+rewrite_time : 0.013s, 153087.16MB/s
+filter_time : 1.482s, 1381.53MB/s
+write_time : 1.523s, 1344.62MB/s
++ set +o xtrace
+
+
++ /pmem/dedupDir//rebuild
+Clean dir.
++ fio_modified /home/xzjin/awn/expriment/fio/dedupRatio-4096.fio
+MSG(F:init L:467):Initializing the libawn.so, BASE.
+MSG(F:initMemory L:148):Allocate 118304 bytes memory.
+MSG(F:init L:567):init: END
+SSD-rand: (g=0): rw=randwrite, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=psync, iodepth=1
+fio-3.27-32-g6ee1-dirty
+fio_backend.
+Starting 1 process
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:6830656
+MSG(F:ts_print_statistics L:29): ts_write bytes :2147483648
+MSG(F:ts_print_statistics L:31): ts_write same bytes :859181685, occupy 40.01%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f26c9d973a0, pid:3618, ppid:3576
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy 0.00%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :524287, metadata occupy 0.78% write data.
+
+SSD-rand: (groupid=0, jobs=1): err= 0: pid=3618: Fri Jul  9 17:21:13 2021
+  write: IOPS=84.2k, BW=329MiB/s (345MB/s)(2048MiB/6229msec); 0 zone resets
+    clat (usec): min=2, max=982, avg= 3.44, stdev= 1.76
+     lat (usec): min=2, max=982, avg= 3.48, stdev= 1.76
+    clat percentiles (nsec):
+     |  1.00th=[ 2192],  5.00th=[ 2256], 10.00th=[ 2320], 20.00th=[ 2384],
+     | 30.00th=[ 2448], 40.00th=[ 2544], 50.00th=[ 3088], 60.00th=[ 4192],
+     | 70.00th=[ 4384], 80.00th=[ 4448], 90.00th=[ 4768], 95.00th=[ 5280],
+     | 99.00th=[ 5920], 99.50th=[ 6240], 99.90th=[ 7008], 99.95th=[ 7328],
+     | 99.99th=[ 8384]
+   bw (  KiB/s): min=219208, max=892640, per=100.00%, avg=757564.80, stdev=300950.91, samples=5
+   iops        : min=54802, max=223160, avg=189391.20, stdev=75237.73, samples=5
+  lat (usec)   : 4=58.80%, 10=41.20%, 20=0.01%, 250=0.01%, 1000=0.01%
+  cpu          : usr=17.37%, sys=82.50%, ctx=12, majf=0, minf=2507
+  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=0,524288,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=1
+
+Run status group 0 (all jobs):
+  WRITE: bw=329MiB/s (345MB/s), 329MiB/s-329MiB/s (345MB/s-345MB/s), io=2048MiB (2147MB), run=6229-6229msec
+
+Disk stats (read/write):
+  pmem1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:118304
+MSG(F:ts_print_statistics L:29): ts_write bytes :0
+MSG(F:ts_print_statistics L:31): ts_write same bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f26c9d973a0, pid:3576, ppid:3329
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :0, metadata occupy -nan% write data.
+
+MSG(F:fini L:1895):fileMap_t: timing = 1 us
+
++ destor /dbtmp/SSD-rand.0.0 '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 2147483648 bytes, 185723 chunks, 1 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 182 segments of 1020 chunks on average
+Dedup time(s) 3.412
+rewrite phase stops successfully!
+Record 0 sparse containers, and 0 of them are inherited
+CMA: update 507 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbtmp/SSD-rand.0.0
+number of files: 1
+number of chunks: 185723 (11562 bytes on average)
+number of unique chunks: 182301
+total size(B): 2147483648
+stored data size(B): 2105415483
+deduplication ratio: 0.0196, 1.0200
+Total time(s): 3.412
+throughput(MB/s): 600.20
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 0.540s, 3794.97MB/s
+chunk_time : 1.301s, 1573.88MB/s
+hash_time : 2.736s, 748.51MB/s
+dedup_time : 0.175s, 11713.37MB/s
+rewrite_time : 0.014s, 146045.78MB/s
+filter_time : 1.405s, 1457.39MB/s
+write_time : 1.533s, 1336.07MB/s
++ set +o xtrace
+
+
++ /pmem/dedupDir//rebuild
+Clean dir.
++ fio_modified /home/xzjin/awn/expriment/fio/dedupRatio-8192.fio
+MSG(F:init L:467):Initializing the libawn.so, BASE.
+MSG(F:initMemory L:148):Allocate 118304 bytes memory.
+MSG(F:init L:567):init: END
+SSD-rand: (g=0): rw=randwrite, bs=(R) 8192B-8192B, (W) 8192B-8192B, (T) 8192B-8192B, ioengine=psync, iodepth=1
+fio-3.27-32-g6ee1-dirty
+fio_backend.
+Starting 1 process
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:3476320
+MSG(F:ts_print_statistics L:29): ts_write bytes :2147483648
+MSG(F:ts_print_statistics L:31): ts_write same bytes :859652404, occupy 40.03%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f1a09edc3a0, pid:3677, ppid:3635
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy 0.00%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :262143, metadata occupy 0.39% write data.
+
+SSD-rand: (groupid=0, jobs=1): err= 0: pid=3677: Fri Jul  9 17:21:23 2021
+  write: IOPS=46.6k, BW=364MiB/s (382MB/s)(2048MiB/5627msec); 0 zone resets
+    clat (usec): min=3, max=697, avg= 6.22, stdev= 2.49
+     lat (usec): min=3, max=697, avg= 6.25, stdev= 2.49
+    clat percentiles (nsec):
+     |  1.00th=[ 3920],  5.00th=[ 4048], 10.00th=[ 4080], 20.00th=[ 4192],
+     | 30.00th=[ 4320], 40.00th=[ 4832], 50.00th=[ 5152], 60.00th=[ 7840],
+     | 70.00th=[ 8160], 80.00th=[ 8384], 90.00th=[ 9024], 95.00th=[ 9280],
+     | 99.00th=[10176], 99.50th=[10560], 99.90th=[11456], 99.95th=[11840],
+     | 99.99th=[12736]
+   bw (  KiB/s): min=847264, max=1030512, per=100.00%, avg=984308.00, stdev=91363.42, samples=4
+   iops        : min=105908, max=128814, avg=123038.50, stdev=11420.43, samples=4
+  lat (usec)   : 4=3.16%, 10=95.25%, 20=1.59%, 50=0.01%, 100=0.01%
+  lat (usec)   : 250=0.01%, 750=0.01%
+  cpu          : usr=15.50%, sys=84.46%, ctx=11, majf=0, minf=1274
+  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=0,262144,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=1
+
+Run status group 0 (all jobs):
+  WRITE: bw=364MiB/s (382MB/s), 364MiB/s-364MiB/s (382MB/s-382MB/s), io=2048MiB (2147MB), run=5627-5627msec
+
+Disk stats (read/write):
+  pmem1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:118304
+MSG(F:ts_print_statistics L:29): ts_write bytes :0
+MSG(F:ts_print_statistics L:31): ts_write same bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f1a09edc3a0, pid:3635, ppid:3329
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy -nan%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :0, metadata occupy -nan% write data.
+
+MSG(F:fini L:1895):fileMap_t: timing = 0 us
+
++ destor /dbtmp/SSD-rand.0.0 '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 2147483648 bytes, 194583 chunks, 1 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 191 segments of 1018 chunks on average
+Dedup time(s) 3.449
+rewrite phase stops successfully!
+Record 0 sparse containers, and 0 of them are inherited
+CMA: update 451 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbtmp/SSD-rand.0.0
+number of files: 1
+number of chunks: 194583 (11036 bytes on average)
+number of unique chunks: 169704
+total size(B): 2147483648
+stored data size(B): 1873228989
+deduplication ratio: 0.1277, 1.1464
+Total time(s): 3.450
+throughput(MB/s): 593.59
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 0.491s, 4167.54MB/s
+chunk_time : 1.283s, 1596.09MB/s
+hash_time : 2.740s, 747.43MB/s
+dedup_time : 0.215s, 9516.73MB/s
+rewrite_time : 0.014s, 147806.00MB/s
+filter_time : 1.390s, 1473.90MB/s
+write_time : 1.558s, 1314.23MB/s
++ set +o xtrace
+

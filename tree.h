@@ -14,7 +14,8 @@ unsigned long reclamedRecNode;
 
 #ifndef  USE_STAIL
 //void printRec(struct memRec *);
-#define printRec(rec)  	MSG("startMemory: %llu, tailMemory:%llu, fileOffset:%lu, fileName: %s.\n", \
+#define printRec(rec) printf("%s-%d: %p, startMemory: %llu, tailMemory:%llu, fileOffset:%lu, fileName: %s.\n", \
+		__func__, __LINE__, rec, \
 		rec->startMemory, rec->tailMemory ,rec->fileOffset ,rec->fileName)
 struct recTreeNode{
 	void* pageNum;

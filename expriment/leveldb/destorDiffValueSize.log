@@ -1,0 +1,347 @@
++ /pmem/dedupDir/rebuild
+Clean dir.
++ dbPath=/dbRepo//db128/
++ destor /dbRepo//db128/ '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 488752237 bytes, 44187 chunks, 233 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 44 segments of 1004 chunks on average
+Dedup time(s) 0.793
+rewrite phase stops successfully!
+Record 0 sparse containers, and 0 of them are inherited
+CMA: update 112 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbRepo//db128/
+number of files: 233
+number of chunks: 44187 (11060 bytes on average)
+number of unique chunks: 41917
+total size(B): 488752237
+stored data size(B): 463578384
+deduplication ratio: 0.0515, 1.0543
+Total time(s): 0.794
+throughput(MB/s): 587.26
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 0.390s, 1196.61MB/s
+chunk_time : 0.295s, 1577.53MB/s
+hash_time : 0.633s, 736.67MB/s
+dedup_time : 0.049s, 9581.88MB/s
+rewrite_time : 0.003s, 144664.95MB/s
+filter_time : 0.341s, 1367.78MB/s
+write_time : 0.383s, 1217.02MB/s
++ du -sb /pmem/dedupDir/backup.log /pmem/dedupDir/container.pool /pmem/dedupDir/destor.stat /pmem/dedupDir/index /pmem/dedupDir/manifest /pmem/dedupDir/rebuild /pmem/dedupDir/recipes
+118	/pmem/dedupDir/backup.log
+469762056	/pmem/dedupDir/container.pool
+80	/pmem/dedupDir/destor.stat
+1345444	/pmem/dedupDir/index
+562	/pmem/dedupDir/manifest
+242	/pmem/dedupDir/rebuild
+1429290	/pmem/dedupDir/recipes
++ set +o xtrace
+
+
++ /pmem/dedupDir/rebuild
+Clean dir.
++ dbPath=/dbRepo//db256/
++ destor /dbRepo//db256/ '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 1117666824 bytes, 100149 chunks, 530 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 98 segments of 1021 chunks on average
+Dedup time(s) 1.884
+rewrite phase stops successfully!
+Record 0 sparse containers, and 0 of them are inherited
+CMA: update 252 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbRepo//db256/
+number of files: 530
+number of chunks: 100149 (11160 bytes on average)
+number of unique chunks: 93701
+total size(B): 1117666824
+stored data size(B): 1045613328
+deduplication ratio: 0.0645, 1.0689
+Total time(s): 1.884
+throughput(MB/s): 565.67
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 0.300s, 3549.16MB/s
+chunk_time : 0.673s, 1582.77MB/s
+hash_time : 1.435s, 743.02MB/s
+dedup_time : 0.193s, 5514.52MB/s
+rewrite_time : 0.007s, 156403.54MB/s
+filter_time : 0.686s, 1553.21MB/s
+write_time : 0.769s, 1385.71MB/s
++ du -sb /pmem/dedupDir/backup.log /pmem/dedupDir/container.pool /pmem/dedupDir/destor.stat /pmem/dedupDir/index /pmem/dedupDir/manifest /pmem/dedupDir/rebuild /pmem/dedupDir/recipes
+118	/pmem/dedupDir/backup.log
+1056964616	/pmem/dedupDir/container.pool
+80	/pmem/dedupDir/destor.stat
+3002532	/pmem/dedupDir/index
+1402	/pmem/dedupDir/manifest
+242	/pmem/dedupDir/rebuild
+3234576	/pmem/dedupDir/recipes
++ set +o xtrace
+
+
++ /pmem/dedupDir/rebuild
+Clean dir.
++ dbPath=/dbRepo//db512/
++ destor /dbRepo//db512/ '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 2936731167 bytes, 264504 chunks, 1435 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 259 segments of 1021 chunks on average
+Dedup time(s) 5.918
+rewrite phase stops successfully!
+Record 0 sparse containers, and 0 of them are inherited
+CMA: update 661 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbRepo//db512/
+number of files: 1435
+number of chunks: 264504 (11102 bytes on average)
+number of unique chunks: 247282
+total size(B): 2936731167
+stored data size(B): 2746047166
+deduplication ratio: 0.0649, 1.0694
+Total time(s): 5.919
+throughput(MB/s): 473.20
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 0.831s, 3371.93MB/s
+chunk_time : 1.899s, 1474.54MB/s
+hash_time : 3.855s, 726.41MB/s
+dedup_time : 1.337s, 2095.00MB/s
+rewrite_time : 0.023s, 122439.67MB/s
+filter_time : 2.100s, 1333.95MB/s
+write_time : 2.520s, 1111.19MB/s
++ du -sb /pmem/dedupDir/backup.log /pmem/dedupDir/container.pool /pmem/dedupDir/destor.stat /pmem/dedupDir/index /pmem/dedupDir/manifest /pmem/dedupDir/rebuild /pmem/dedupDir/recipes
+118	/pmem/dedupDir/backup.log
+2772434952	/pmem/dedupDir/container.pool
+80	/pmem/dedupDir/destor.stat
+7917124	/pmem/dedupDir/index
+3856	/pmem/dedupDir/manifest
+242	/pmem/dedupDir/rebuild
+8539390	/pmem/dedupDir/recipes
++ set +o xtrace
+
+
++ /pmem/dedupDir/rebuild
+Clean dir.
++ dbPath=/dbRepo//db1024/
++ destor /dbRepo//db1024/ '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 7065189800 bytes, 636404 chunks, 3491 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 622 segments of 1023 chunks on average
+Dedup time(s) 15.879
+rewrite phase stops successfully!
+Record 1 sparse containers, and 0 of them are inherited
+CMA: update 1559 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbRepo//db1024/
+number of files: 3491
+number of chunks: 636404 (11101 bytes on average)
+number of unique chunks: 582238
+total size(B): 7065189800
+stored data size(B): 6474263400
+deduplication ratio: 0.0836, 1.0913
+Total time(s): 15.880
+throughput(MB/s): 424.29
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 5.282s, 1275.60MB/s
+chunk_time : 4.708s, 1431.29MB/s
+hash_time : 9.557s, 705.00MB/s
+dedup_time : 4.766s, 1413.70MB/s
+rewrite_time : 0.060s, 112315.01MB/s
+filter_time : 5.193s, 1297.48MB/s
+write_time : 5.963s, 1129.90MB/s
++ du -sb /pmem/dedupDir/backup.log /pmem/dedupDir/container.pool /pmem/dedupDir/destor.stat /pmem/dedupDir/index /pmem/dedupDir/manifest /pmem/dedupDir/rebuild /pmem/dedupDir/recipes
+118	/pmem/dedupDir/backup.log
+6538919944	/pmem/dedupDir/container.pool
+80	/pmem/dedupDir/destor.stat
+18635716	/pmem/dedupDir/index
+9803	/pmem/dedupDir/manifest
+242	/pmem/dedupDir/rebuild
+20588931	/pmem/dedupDir/recipes
++ set +o xtrace
+
+
++ /pmem/dedupDir/rebuild
+Clean dir.
++ dbPath=/dbRepo//db4096/
++ destor /dbRepo//db4096/ '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 41534026142 bytes, 3725935 chunks, 22535 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 3639 segments of 1023 chunks on average
+Dedup time(s) 99.682
+rewrite phase stops successfully!
+Record 0 sparse containers, and 0 of them are inherited
+CMA: update 7242 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbRepo//db4096/
+number of files: 22535
+number of chunks: 3725935 (11147 bytes on average)
+number of unique chunks: 2628843
+total size(B): 41534026142
+stored data size(B): 30092514309
+deduplication ratio: 0.2755, 1.3802
+Total time(s): 99.686
+throughput(MB/s): 397.35
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 12.371s, 3201.71MB/s
+chunk_time : 27.970s, 1416.17MB/s
+hash_time : 56.564s, 700.27MB/s
+dedup_time : 34.032s, 1163.90MB/s
+rewrite_time : 0.385s, 102851.69MB/s
+filter_time : 29.537s, 1341.03MB/s
+write_time : 31.545s, 1255.65MB/s
++ du -sb /pmem/dedupDir/backup.log /pmem/dedupDir/container.pool /pmem/dedupDir/destor.stat /pmem/dedupDir/index /pmem/dedupDir/manifest /pmem/dedupDir/rebuild /pmem/dedupDir/recipes
+118	/pmem/dedupDir/backup.log
+30375149576	/pmem/dedupDir/container.pool
+80	/pmem/dedupDir/destor.stat
+84127076	/pmem/dedupDir/index
+49584	/pmem/dedupDir/manifest
+242	/pmem/dedupDir/rebuild
+126681807	/pmem/dedupDir/recipes
++ set +o xtrace
+
+
++ /pmem/dedupDir/rebuild
+Clean dir.
++ dbPath=/dbRepo//db8192/
++ destor /dbRepo//db8192/ '-pchunk-algorithm fastcdc'
+chunck algorithm:6.
+Init recipe store successfully
+container file:/pmem/dedupDir//container.pool
+Init container store successfully
+Init index module successfully
+==== backup begin ====
+Read 0 inherited sparse containers
+job 0, 90239600826 bytes, 8036995 chunks, 49883 files processed
+read phase stops successfully!
+chunk phase stops successfully!
+hash phase stops successfully!
+dedup phase stops successfully: 7849 segments of 1023 chunks on average
+Dedup time(s) 223.664
+rewrite phase stops successfully!
+Record 1 sparse containers, and 0 of them are inherited
+CMA: update 12591 records.
+filter phase stops successfully!
+flushing hash table!
+flushing hash table successfully!
+append phase stops successfully!
+==== backup end ====
+job id: 0
+backup path: /dbRepo//db8192/
+number of files: 49883
+number of chunks: 8036995 (11228 bytes on average)
+number of unique chunks: 4465759
+total size(B): 90239600826
+stored data size(B): 52315205047
+deduplication ratio: 0.4203, 1.7249
+Total time(s): 223.670
+throughput(MB/s): 384.76
+number of zero chunks: 0
+size of zero chunks: 0
+number of rewritten chunks: 0
+size of rewritten chunks: 0
+rewritten rate in size: 0.000
+read_time : 64.208s, 1340.32MB/s
+chunk_time : 62.955s, 1367.00MB/s
+hash_time : 126.288s, 681.45MB/s
+dedup_time : 80.140s, 1073.86MB/s
+rewrite_time : 0.996s, 86361.63MB/s
+filter_time : 55.779s, 1542.86MB/s
+write_time : 57.788s, 1489.22MB/s
++ du -sb /pmem/dedupDir/backup.log /pmem/dedupDir/container.pool /pmem/dedupDir/destor.stat /pmem/dedupDir/index /pmem/dedupDir/manifest /pmem/dedupDir/rebuild /pmem/dedupDir/recipes
+118	/pmem/dedupDir/backup.log
+52810481672	/pmem/dedupDir/container.pool
+80	/pmem/dedupDir/destor.stat
+142908388	/pmem/dedupDir/index
+89618	/pmem/dedupDir/manifest
+242	/pmem/dedupDir/rebuild
+281101092	/pmem/dedupDir/recipes
++ set +o xtrace
+
