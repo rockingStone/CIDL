@@ -410,10 +410,10 @@ void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
 
 	node = *nodep;
 	head = node->listHead;
-	ent = TAILQ_FIRST(head);
 	//if(TAILQ_EMPTY(head))
 	//xzjin list是空或者只有一个元素且这个列表是空的
 	if(node->memRecIdx==0 && !(TAILQ_NEXT(ent, entries))){
+	    ent = TAILQ_FIRST(head);
 		reclamedRecNode++;
 		delNode.pageNum = node->pageNum;
 		withdrawMemRecArr(ent->recArr);
@@ -425,7 +425,36 @@ void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
 		//xzjin 删除时候要用pageNum做判断，所以在删除之后再清空
 		memset(node, 0, sizeof(struct recTreeNode));
 //		MSG("delete recNode pageNum:%p\n", delNode.pageNum);
-	}
+	}else{  //遍历元素，清除原文件已经被unmap的内容
+#define NEXTKEEPED()
+#define NEXTSEARCHING()
+        struct memRec *keeped, *searching;
+	    struct recBlockEntry *keepEnt, *searchingEnt;
+        int keepMaxIdx, keepMaxIdx;
+	    ent = TAILQ_LAST(head, tailhead);
+
+	    keepEnt = searchingEnt = ent;
+        keepMaxIdx = keepMaxIdx = TAILQ_PREV(ent, tailhead, entries)?(MEMRECPERENTRY-1):(node->memRecIdx-1);
+        keeped = searching = ent->recArr;
+
+        while(searching){
+            // File unmapped 
+            if(openFileArray[(searching->fd)%MAX_FILE_NUM]){
+                if(keeped != searching){
+                    memcpy(keeped, searching, sizeof(struct memRec));
+                    keeped = NEXTKEEPED();
+                    searching = NEXTSEARCHING();
+                    continue;
+                }else{
+                    searching = NEXTSEARCHING();
+                    continue;
+                }
+            }
+            keeped = NEXTKEEPED();
+            searching = NEXTSEARCHING();
+        }
+
+    }
 }
 
 void reclaimRecTreeNode(const void *nodep, const VISIT which, const int depth){

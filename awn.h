@@ -11,24 +11,24 @@ extern "C" {
 
 extern void ts_print_statistics();
 
-/* Copy N bytes of SRC to DEST.  */
-extern void *ts_memcpy (void * __dest, void * __src,
-		     size_t __n) ;
+/* Copy N bytes of SRC to DEST. */
+extern void* ts_memcpy (void * __dest, void * __src,
+		   size_t __n) ;
 
-/* Free a block allocated by `malloc', `realloc' or `calloc'.  */
+/* Free a block allocated by `malloc', `realloc' or `calloc'. */
 extern void ts_free (void *__ptr, void *__tail);
 
 //extern int ts_memTraced(void* ptr);
 
-/* Copy N bytes of SRC to DEST, SRC is traced.  */
-extern void *ts_memcpy_traced(void * __dest, void * __src,
-		     size_t __n) ;
+/* Copy N bytes of SRC to DEST, SRC is traced. */
+extern void* ts_memcpy_traced(void * __dest, void * __src,
+		    size_t __n) ;
 
 /* Write N bytes of BUF to FD.  Return the number written, or -1.
 
    This function is a cancellation point and therefore not marked with
    __THROW.  */
-extern ssize_t  ts_write(int __fd, void *__buf, size_t __n);
+extern ssize_t ts_write(int __fd, void *__buf, size_t __n);
 
 /* Write N bytes of BUF to FD at the given position OFFSET without
    changing the file pointer.  Return the number written, or -1.  */
@@ -43,7 +43,7 @@ extern ssize_t ts_pwrite(int __fd, void *__buf, size_t __n,
    The return value is the actual mapping address chosen or MAP_FAILED
    for errors (in which case `errno' is set).  A successful `mmap' call
    deallocates any previous mapping for the affected region.  */
-extern void *ts_mmap (void *__addr, size_t __len, int __prot,
+extern void* ts_mmap (void *__addr, size_t __len, int __prot,
 		   int __flags, int __fd, __off_t __offset);
 
 /* Deallocate any mapping for the region starting at ADDR and extending LEN
@@ -58,14 +58,14 @@ extern ssize_t ts_read (int __fd, void *__buf, size_t __nbytes);
 
 /* Re-allocate the previously allocated block
    in PTR, making the new block SIZE bytes long.  */
-extern void *ts_realloc (void *ptr, size_t size, void* tail);
+extern void* ts_realloc (void *ptr, size_t size, void* tail);
 //extern void *realloc (void *__ptr, size_t __size);
 
 /* Open a file and create a new stream for it.
 
    This function is a possible cancellation point and therefore not
    marked with __THROW.  */
-extern FILE *ts_fopen (const char *filename,
+extern FILE* ts_fopen (const char *filename,
 		    const char *modes);
 
 extern int ts_openat (char* dirName, int dirfd, const char *path, int oflag, ...);
