@@ -166,63 +166,63 @@ void addMemcpyTreeNode(struct memcpyNode* node){
 
 VOID ArgBeforeExe(CHAR * name, ADDRINT from, ADDRINT to, ADDRINT size){
 	//struct memcpyNode **nodeExist;
-	void* nodeExist;
-	struct memcpyNode *existingNode;
-	struct memcpyNode *treeNode = allocateMemcpyTreeNode();
+//	void* nodeExist;
+//	struct memcpyNode *existingNode;
+//	struct memcpyNode *treeNode = allocateMemcpyTreeNode();
 
     memcpyTime++;
     TraceFile << name << "from: " << from << ", to: " << to 
     <<", length: "<< size << endl;
-	treeNode->start = (void*)to;
-	treeNode->tail = (void*)(to+size);
-    
-    /** if exist node overlap with current, 
-     *  (1) current covers existing node range, delete old node
-     *  (2) current overlap partily with existing node, modify
-     *  exist node to not overlap.
-     *  repeat until not overlap found.
-     */
-    nodeExist = addrInMemcpyTreeNode((void*)to, (void*)(to+size));
-    while(nodeExist){
-        insertExistingTime++;
-        existingNode = *(struct memcpyNode**)nodeExist;
-/** xzjin compare relationship			
- * a.			|_________|			  a(treeNode) ? b(existingNode)
- * b.1 	|___|							>
- * b.2 	|____________|					= b.tail = a.head-1
- * b.3 	|__________________________|	=
- *           add c.head = a.tail+1, c.tail = b.tail; reset b.tail = a.head-1
- * b.4 				|___|				= delete b
- * b.5 				|______________|	= b.head = a.tail+1
- * b.6 						|___|		<
-*/
-        if(treeNode->start<=existingNode->start &&
-             treeNode->tail>=existingNode->tail){   //case b.4
-            // delete existingNode
-            delTreeNode(existingNode->start, existingNode->tail, existingNode);
-        }else if(treeNode->start>existingNode->start &&
-             treeNode->tail<existingNode->tail){    //case b.3
-	        struct memcpyNode *addNode = allocateMemcpyTreeNode();
-            addNode->start = (void*)((unsigned long)treeNode->tail+1);
-            addNode->tail = existingNode->tail;
-	        //tsearch(addNode, &memcpyRecordTree, memcpyRecTreeInsDelCompare);
-            addMemcpyTreeNode(addNode);
-            existingNode->tail = (void*)((unsigned long)treeNode->start-1);
-        }else if(treeNode->start<=existingNode->tail){  //case b.2
-            existingNode->tail = (void*)((unsigned long)treeNode->start-1);
-        }else if(treeNode->tail>=existingNode->start){  //case b.5
-            existingNode->start = (void*)((unsigned long)treeNode->tail+1);
-        }else{
-            printf("        node->start:%p,         node->tail:%p\n",
-                 treeNode->start, treeNode->tail);
-            printf("existingNode->start:%p, existingNode->tail:%p\n",
-                 existingNode->start, existingNode->tail);
-            exit(-1);
-        }
-        nodeExist = addrInMemcpyTreeNode((void*)to, (void*)(to+size));
-    }
-	//tsearch(treeNode, &memcpyRecordTree, memcpyRecTreeInsDelCompare);
-    addMemcpyTreeNode(treeNode);
+//	treeNode->start = (void*)to;
+//	treeNode->tail = (void*)(to+size);
+//    
+//    /** if exist node overlap with current, 
+//     *  (1) current covers existing node range, delete old node
+//     *  (2) current overlap partily with existing node, modify
+//     *  exist node to not overlap.
+//     *  repeat until not overlap found.
+//     */
+//    nodeExist = addrInMemcpyTreeNode((void*)to, (void*)(to+size));
+//    while(nodeExist){
+//        insertExistingTime++;
+//        existingNode = *(struct memcpyNode**)nodeExist;
+///** xzjin compare relationship			
+// * a.			|_________|			  a(treeNode) ? b(existingNode)
+// * b.1 	|___|							>
+// * b.2 	|____________|					= b.tail = a.head-1
+// * b.3 	|__________________________|	=
+// *           add c.head = a.tail+1, c.tail = b.tail; reset b.tail = a.head-1
+// * b.4 				|___|				= delete b
+// * b.5 				|______________|	= b.head = a.tail+1
+// * b.6 						|___|		<
+//*/
+//        if(treeNode->start<=existingNode->start &&
+//             treeNode->tail>=existingNode->tail){   //case b.4
+//            // delete existingNode
+//            delTreeNode(existingNode->start, existingNode->tail, existingNode);
+//        }else if(treeNode->start>existingNode->start &&
+//             treeNode->tail<existingNode->tail){    //case b.3
+//	        struct memcpyNode *addNode = allocateMemcpyTreeNode();
+//            addNode->start = (void*)((unsigned long)treeNode->tail+1);
+//            addNode->tail = existingNode->tail;
+//	        //tsearch(addNode, &memcpyRecordTree, memcpyRecTreeInsDelCompare);
+//            addMemcpyTreeNode(addNode);
+//            existingNode->tail = (void*)((unsigned long)treeNode->start-1);
+//        }else if(treeNode->start<=existingNode->tail){  //case b.2
+//            existingNode->tail = (void*)((unsigned long)treeNode->start-1);
+//        }else if(treeNode->tail>=existingNode->start){  //case b.5
+//            existingNode->start = (void*)((unsigned long)treeNode->tail+1);
+//        }else{
+//            printf("        node->start:%p,         node->tail:%p\n",
+//                 treeNode->start, treeNode->tail);
+//            printf("existingNode->start:%p, existingNode->tail:%p\n",
+//                 existingNode->start, existingNode->tail);
+//            exit(-1);
+//        }
+//        nodeExist = addrInMemcpyTreeNode((void*)to, (void*)(to+size));
+//    }
+//	//tsearch(treeNode, &memcpyRecordTree, memcpyRecTreeInsDelCompare);
+//    addMemcpyTreeNode(treeNode);
 }
 
 VOID MallocAfter(ADDRINT ret){
@@ -234,10 +234,11 @@ void findImageAddIns(IMG img, const char* funName){
     // of each malloc() or free(), and the return value of malloc().
     //
     //  Find the malloc() function.
+    //printf("%s\n", __func__);
     RTN memcpyRtn = RTN_FindByName(img, funName);
-    if(memcpyRtn == RTN_Invalid()){
-        printf("find rtn failed.\n");
-    }
+//    if(memcpyRtn == RTN_Invalid()){
+//        printf("find rtn failed.\n");
+//    }
 
     if (RTN_Valid(memcpyRtn)){
         RTN_Open(memcpyRtn);
@@ -254,7 +255,7 @@ void findImageAddIns(IMG img, const char* funName){
 
         RTN_Close(memcpyRtn);
     }else{
-        printf("open rtn failed.\n");
+        //printf("open rtn failed.\n");
     }
 }
 
@@ -371,7 +372,7 @@ int main(int argc, char *argv[])
     TraceFile << hex;
     TraceFile.setf(ios::showbase);
 
-    INS_AddInstrumentFunction(Instruction, 0);
+    //INS_AddInstrumentFunction(Instruction, 0);
     // Register Image to be called to instrument functions.
     IMG_AddInstrumentFunction(Image, 0);
     PIN_AddFiniFunction(Fini, 0);
