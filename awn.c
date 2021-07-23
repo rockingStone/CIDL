@@ -46,9 +46,9 @@ extern int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void** firs
 
 #ifndef BASE_VERSION
 inline void writeRec(unsigned long fileOffset, void* src, void* dest,
-	 void* pageNum, char* fileName) __attribute__((always_inline));
+	 void* pageNum, char* fileName, short fd) __attribute__((always_inline));
 inline void writeRec(unsigned long fileOffset, void* src, void* dest,
-	 void* pageNum, char* fileName){
+	 void* pageNum, char* fileName, short fd){
 	int idx = *(lastRec.lastIdx);
 	struct memRec* pt = lastRec.lastMemRec;
 	unsigned long pageOffset = (unsigned long)dest-((unsigned long)pageNum<<PAGENUMSHIFT);
@@ -58,6 +58,7 @@ inline void writeRec(unsigned long fileOffset, void* src, void* dest,
 		pt[idx].fileOffset = fileOffset;
 		//因为在ts_memcpy_traced有时候会把pageOffset>page size的地址放到这里，所以这么做
 		pt[idx].pageOffset = pageOffset;
+		pt[idx].fd=fd;
 		//xzjin update lastRec
 //			lastRec.lastPageNum = ***;
 //			lastRec.lastMemRec = ***;
@@ -86,6 +87,7 @@ inline void writeRec(unsigned long fileOffset, void* src, void* dest,
 		recArr[0].fileOffset = fileOffset;
 		//因为在ts_memcpy_traced有时候会把pageOffset>page size的地址放到这里，所以这么做
 		recArr[0].pageOffset = pageOffset;
+		recArr[0].fd = fd;
 
 		//xzjin update lastRec
 		lastRec.lastMemRec = recArr;
@@ -97,9 +99,9 @@ inline void writeRec(unsigned long fileOffset, void* src, void* dest,
 
 //xzjin src is UNUSED and UNCHECKED
 inline void insertRec(unsigned long fileOffset, void* src, void* dest,
-	 char* fileName) __attribute__((always_inline));
+	 char* fileName, short fd) __attribute__((always_inline));
 inline void insertRec(unsigned long fileOffset, void* src, void* dest,
-	 char* fileName){
+	 char* fileName, short fd){
 	void* pageNum = addr2PageNum(dest);
 
 	//DEBUG("insterRec.\n");
@@ -151,7 +153,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 				}
 			}
 			//DEBUG("insterRec if\n");
-			writeRec(fileOffset, src, dest, pageNum, fileName);
+			writeRec(fileOffset, src, dest, pageNum, fileName, fd);
 //		    struct tailhead *head = pt[0]->listHead;
 //			checkEmptyRecTreeNode();
 		}else{	//xzjin 在树里没找到
@@ -167,7 +169,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 				MSG("lastRec.lastIdx ERROR\n");
 				exit(-1);
 			}
-			writeRec(fileOffset, src, dest, pageNum, fileName);
+			writeRec(fileOffset, src, dest, pageNum, fileName, fd);
 //			checkEmptyRecTreeNode();
 		}
 //		MSG("Node pageNum:%p, memRecIdx:%d, nodePtr:%p.\n",
@@ -1327,7 +1329,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 #endif	//TS_MEMCPY_CMPWRITE
 				//insertRec(unsigned long fileOffset, void* src, void* dest, char* fileName);
 //				DEBUG("ts_memcpy_traced UP idx:%d, uplimit:%d\n", idx, uplimit);
-				insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
+				insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName, curMemRec->fd);
 //				MSG("copy src: %lu, copy dest: %lu\n", copySrc, copyDest);
 #ifdef TS_MEMCPY_CMPWRITE
 				{
@@ -1366,7 +1368,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 					void* copySrc = getAddr((void*)start, curMemRec->pageOffset);
 					void* copyDest = dest+(copySrc-src);
 //					DEBUG("ts_memcpy_traced DOWN idx:%d, uplimit:%d\n", idx, uplimit);
-					insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName);
+					insertRec(curMemRec->fileOffset, copySrc, copyDest, curMemRec->fileName, curMemRec->fd);
 				}
 				//xzjin TODO 这里是不是也是不用删除，直接等写覆盖更好
 				//delBlockEntry = blockEntry;
@@ -1529,7 +1531,7 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 	endPageNum = addr2PageNum(destTail);
 	do{
 		unsigned long diff;
-		insertRec(fileOffset, src, dest, fmNode->fileName);
+		insertRec(fileOffset, src, dest, fmNode->fileName, fmNode->fd);
 		startPageNum++;
 		diff = ((unsigned long)startPageNum<<PAGENUMSHIFT)-(unsigned long)dest;
 		fileOffset += diff;
@@ -1538,7 +1540,7 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 	}while(startPageNum<=endPageNum);
 #else
 #ifndef	BASE_VERSION
-	insertRec(fileOffset, src, dest, fmNode->fileName);
+	insertRec(fileOffset, src, dest, fmNode->fileName, fmNode->fd);
 #else
 	insertRec(fileOffset, src, dest, fmNode->fileName, n);
 #endif	//BASE_VERSION
@@ -1655,7 +1657,7 @@ void* ts_memcpy_withFile(void *dest, void *src, size_t n,
 	endPageNum = addr2PageNum(destTail);
 	do{
 		unsigned long diff;
-		insertRec(fileOffset, src, dest, fmNode->fileName);
+		insertRec(fileOffset, src, dest, fmNode->fileName, fmNode->fd);
 		startPageNum++;
 		diff = ((unsigned long)startPageNum<<PAGENUMSHIFT)-(unsigned long)dest;
 		fileOffset += diff;
@@ -1664,7 +1666,7 @@ void* ts_memcpy_withFile(void *dest, void *src, size_t n,
 	}while(startPageNum<=endPageNum);
 #else
 #ifndef BASE_VERSION
-	insertRec(fileOffset, src, dest, fmNode->fileName);
+	insertRec(fileOffset, src, dest, fmNode->fileName, fmNode->fd);
 #else
 	insertRec(fileOffset, src, dest, fmNode->fileName, n);
 #endif	//BASE_VERSION
@@ -1820,7 +1822,7 @@ void* ts_realloc(void *ptr, size_t size, void* tail){
 					//Add record
 					dest = (void*)((unsigned long)memAddr-(unsigned long)ptr+ret);
 					DEBUG("in ts_realloc.\n");
-					insertRec(rec[i].fileOffset, NULL, dest, rec[i].fileName);
+					insertRec(rec[i].fileOffset, NULL, dest, rec[i].fileName, rec[i].fd);
 				}
 				blockEntry = TAILQ_PREV(blockEntry, tailhead, entries);
 				//xzjin after find relocate area, del all the rec in current array.

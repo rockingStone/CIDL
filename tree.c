@@ -402,6 +402,42 @@ struct recTreeNode** findAndAddRecTreeNode(struct recTreeNode *recp){
 	return destRes;
 }
 
+inline struct memRec* NEXTKEEPED(int* keepIdx, int* keepMaxIdx,
+     struct recBlockEntry** keepEnt, struct memRec *keeped, 
+	struct recTreeNode* node) __attribute__((always_inline));
+struct memRec* NEXTKEEPED(int* keepIdx, int* keepMaxIdx,
+     struct recBlockEntry** keepEnt, struct memRec *keeped, 
+	struct recTreeNode* node){
+    if(*keepIdx<*keepMaxIdx){
+        (*keepIdx)++;
+        return keeped++;
+    }else{
+        *keepEnt = TAILQ_PREV(*keepEnt, tailhead, entries);
+        if(!*keepEnt) return NULL;
+        *keepMaxIdx = TAILQ_PREV(*keepEnt, tailhead, entries)?(MEMRECPERENTRY-1):(node->memRecIdx-1);
+        *keepIdx = 0;
+        return (*keepEnt)->recArr;
+    }
+}
+
+inline struct memRec* NEXTSEARCHING(int* searchIdx, int* searchMaxIdx,
+     struct recBlockEntry** searchEnt, struct memRec *searching, 
+	struct recTreeNode* node) __attribute__((always_inline));
+struct memRec* NEXTSEARCHING(int* searchIdx, int* searchMaxIdx,
+     struct recBlockEntry** searchEnt, struct memRec *searching, 
+	struct recTreeNode* node){
+    if(*searchIdx<*searchMaxIdx){
+        (*searchIdx)++;
+        return searching++;
+    }else{
+        *searchEnt = TAILQ_PREV(*searchEnt, tailhead, entries);
+        if(!*searchEnt) return NULL;
+        *searchMaxIdx = TAILQ_PREV(*searchEnt, tailhead, entries)?(MEMRECPERENTRY-1):(node->memRecIdx-1);
+        *searchIdx = 0;
+        return (*searchEnt)->recArr;
+    }
+}
+
 void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
 	struct recTreeNode delNode;
 	struct recTreeNode* node;
@@ -410,10 +446,10 @@ void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
 
 	node = *nodep;
 	head = node->listHead;
+	ent = TAILQ_FIRST(head);
 	//if(TAILQ_EMPTY(head))
 	//xzjin list是空或者只有一个元素且这个列表是空的
 	if(node->memRecIdx==0 && !(TAILQ_NEXT(ent, entries))){
-	    ent = TAILQ_FIRST(head);
 		reclamedRecNode++;
 		delNode.pageNum = node->pageNum;
 		withdrawMemRecArr(ent->recArr);
@@ -426,15 +462,15 @@ void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
 		memset(node, 0, sizeof(struct recTreeNode));
 //		MSG("delete recNode pageNum:%p\n", delNode.pageNum);
 	}else{  //遍历元素，清除原文件已经被unmap的内容
-#define NEXTKEEPED()
-#define NEXTSEARCHING()
         struct memRec *keeped, *searching;
-	    struct recBlockEntry *keepEnt, *searchingEnt;
-        int keepMaxIdx, keepMaxIdx;
+	    struct recBlockEntry *keepEnt, *searchEnt, *delEnt;
+        int keepMaxIdx, searchMaxIdx;
+        int keepIdx, searchIdx;
 	    ent = TAILQ_LAST(head, tailhead);
 
-	    keepEnt = searchingEnt = ent;
-        keepMaxIdx = keepMaxIdx = TAILQ_PREV(ent, tailhead, entries)?(MEMRECPERENTRY-1):(node->memRecIdx-1);
+	    keepEnt = searchEnt = ent;
+        keepIdx = searchIdx = 0;
+        keepMaxIdx = searchMaxIdx = TAILQ_PREV(ent, tailhead, entries)?(MEMRECPERENTRY-1):(node->memRecIdx-1);
         keeped = searching = ent->recArr;
 
         while(searching){
@@ -442,18 +478,29 @@ void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
             if(openFileArray[(searching->fd)%MAX_FILE_NUM]){
                 if(keeped != searching){
                     memcpy(keeped, searching, sizeof(struct memRec));
-                    keeped = NEXTKEEPED();
-                    searching = NEXTSEARCHING();
+                    keeped = NEXTKEEPED(&keepIdx, &keepMaxIdx, &keepEnt, keeped, node);
+                    searching = NEXTSEARCHING(&searchIdx, &searchMaxIdx, &searchEnt, searching, node);
                     continue;
                 }else{
-                    searching = NEXTSEARCHING();
+                    searching = NEXTSEARCHING(&searchIdx, &searchMaxIdx, &searchEnt, searching, node);
                     continue;
                 }
             }
-            keeped = NEXTKEEPED();
-            searching = NEXTSEARCHING();
+            // If update outside the function, may write NULL
+            node->recModEntry = keepEnt;
+            node->memRecIdx = keepIdx;
+            keeped = NEXTKEEPED(&keepIdx, &keepMaxIdx, &keepEnt, keeped, node);
+            searching = NEXTSEARCHING(&searchIdx, &searchMaxIdx, &searchEnt, searching, node);
         }
-
+        keepEnt = node->recModEntry;
+        //TODO delete unused entry
+        delEnt = TAILQ_FIRST(head);
+        while(delEnt != keepEnt){
+			withdrawMemRecArr(delEnt->recArr);
+            TAILQ_REMOVE(head, delEnt, entries);
+			withdrawRecBlockEntry(delEnt);
+            delEnt = TAILQ_NEXT(delEnt, entries);
+        }
     }
 }
 
