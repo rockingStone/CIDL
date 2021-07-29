@@ -462,7 +462,10 @@ void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
 		memset(node, 0, sizeof(struct recTreeNode));
 //		MSG("delete recNode pageNum:%p\n", delNode.pageNum);
 	}else{  //遍历元素，清除原文件已经被unmap的内容
+<<<<<<< HEAD
 #ifndef  BASE_VERSION
+=======
+>>>>>>> 28f08cd0aa35af74586c1856760e1d9eed8b4146
         struct memRec *keeped, *searching;
 	    struct recBlockEntry *keepEnt, *searchEnt, *delEnt;
         int keepMaxIdx, searchMaxIdx;
@@ -502,7 +505,10 @@ void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
 			withdrawRecBlockEntry(delEnt);
             delEnt = TAILQ_NEXT(delEnt, entries);
         }
+<<<<<<< HEAD
 #endif //BASE_VERSION
+=======
+>>>>>>> 28f08cd0aa35af74586c1856760e1d9eed8b4146
     }
 }
 
