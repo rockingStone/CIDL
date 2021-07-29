@@ -1,19 +1,27 @@
 #! /bin/bash
 dbPathBase=/dbRepo/
 dedupPath=/pmem/dedupDir
-chunkSize=(128 256 512 1024 4096 8192)
+#chunkSize=(128 256 512 1024 4096 8192)
+chunkSize=(8192)
+#chunkMethod=("'normalized rabin'")
+chunkMethod=(fixed tttd ae rabin fastcdc)
 dbPath=""
 for s in "${chunkSize[@]}"
 do
-	#clean path
-	set -o xtrace
-	$dedupPath/rebuild
 	dbPath="$dbPathBase/db$s/"
 
-	destor $dbPath -p"chunk-algorithm fastcdc"
-	du -sb $dedupPath/*
-	set +o xtrace
-	echo; echo; 
+	for cm in "${chunkMethod[@]}"
+	do
+		#clean path
+		set -o xtrace
+		$dedupPath/rebuild
+	
+#		destor $dbPath -p"chunk-algorithm fastcdc"
+		destor $dbPath -p"chunk-algorithm $cm"
+		du -sb $dedupPath/*
+		set +o xtrace
+		echo; echo; 
+	done
 done
 #destor /home/xzjin/dbtmp -p"chunk-algorithm 'normalized rabin'"
 #destor /home/xzjin/dbtmp -p"chunk-algorithm file"
@@ -21,4 +29,7 @@ done
 #destor /home/xzjin/dbtmp -p"chunk-algorithm tttd"
 #destor /home/xzjin/dbtmp -p"chunk-algorithm ae"
 #destor /home/xzjin/dbtmp -p"chunk-algorithm rabin"
-#destor /pmem/dbtmp -p"chunk-algorithm fastcdc"
+#destor /home/xzjin/dbtmp -p"chunk-algorithm fastcdc"
+
+
+

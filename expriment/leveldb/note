@@ -1,0 +1,7 @@
+The shell to process the output of destorDiffValueSize.sh
+ grep -e "+ destor /dbRepo/" -e "Dedup time(s)" -e "deduplication ratio" -e "/pmem/dedupDir/index" -e "/pmem/dedupDir/recipes" ./destorDiffValueSize.log_1 | grep -v -e "/pmem/dedupDir/backup.log" | awk -F',' '/destor/{printf "\n\n";} /ratio/{print $1; next} {print}' | awk '/destor/{print substr($3, 12, length($3)-12)"-"substr($NF, 1 , length($NF)-1); next } /time/{print $NF; next} /ratio/{print $NF*100"%"; next} /dedupDir/{print $1; next} {print}'
+
+
+The shell to process the output of destorDiffChunkSize.sh
+grep -e "+ destor /dbRepo/" -e "Dedup time(s)" -e "deduplication ratio" -e "/pmem/dedupDir/index" -e "/pmem/dedupDir/recipes" destorDiffChunkSizeFIO40Dedup.log | grep -v -e "/pmem/dedupDir/backup.log" | awk -F',' '/destor/{printf "\n\n";} /ratio/{print $1; next} {print}' | awk '/destor/{printf substr($5,1, length($5)-1)"-"substr($7, 1, length($7)-1)"\n"; next} /time/{print $NF; next} /ratio/{print $NF*100"%"; next} /dedupDir/{print $1; next} {print}'
+grep -e "+ destor /dbRepo/" -e "Dedup time(s)" -e "deduplication ratio" -e "/pmem/dedupDir/index" -e "/pmem/dedupDir/recipes" destorDiffChunkSizeFIO40Dedup.log | grep -v -e "/pmem/dedupDir/backup.log" | awk -F',' '/destor/{printf "\n\n";} /ratio/{print $1; next} {print}' | awk '/destor/{printf substr($3,12, length($3))"-"substr($5, 1, length($5)-1)"\n"; next} /time/{print $NF; next} /ratio/{print $NF*100"%"; next} /dedupDir/{print $1; next} {print}'

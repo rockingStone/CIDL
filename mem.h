@@ -19,7 +19,7 @@ struct memRec{
 	unsigned long fileOffset;
 	char* fileName;
 	short pageOffset;		//记录在页内的偏移，memRec是对应一个页的一条记录，页号是记录在树节点的
-//	short fd;
+	short fd;
 };
 #else
 struct memRec{

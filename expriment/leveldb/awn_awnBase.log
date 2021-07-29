@@ -251,3 +251,195 @@ real	0m4.854s
 user	0m5.304s
 sys	0m2.210s
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+xzjin@node2410:26:~/awn/expriment/leveldb$ time /pmem/benchmark/db_bench_modified --benchmarks=fillrandom --db=/pmem/dbtmp
+MSG(F:init L:469):Initializing the libawn.so, BASE.
+MSG(F:initMemory L:148):Allocate 118304 bytes memory.
+MSG(F:init L:569):init: END
+LevelDB:    version 1.22
+Date:       Thu Jul 29 10:27:01 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     100 bytes each (50 bytes after compression)
+Entries:    1000000
+RawSize:    110.6 MB (estimated)
+FileSize:   62.9 MB (estimated)
+------------------------------------------------
+fillrandom   :       4.765 micros/op;   23.2 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:56109024
+MSG(F:ts_print_statistics L:29): ts_write bytes :201555761
+MSG(F:ts_print_statistics L:31): ts_write same bytes :8756, occupy 0.00%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7fc54b7a23a0, pid:6487, ppid:6147
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy 0.00%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :68152, metadata occupy 1.08% write data.
+
+MSG(F:fini L:1899):fileMap_t: timing = 226 us
+MSG(F:fini L:1899):fileUnmap_t: timing = 1967 us
+MSG(F:fini L:1899):memcmp_asm_t: timing = 1813 us
+MSG(F:fini L:1899):mem_from_file_trace_t: timing = 929741 us
+MSG(F:fini L:1899):mem_from_mem_trace_t: timing = 644159 us
+MSG(F:fini L:1899):ts_write_t: timing = 229593 us
+MSG(F:fini L:1899):compare occupy ts_write: 0.00%
+
+
+real	0m4.906s
+user	0m5.169s
+sys	0m2.234s
+xzjin@node2410:27:~/awn/expriment/leveldb$ time /pmem/benchmark/db_bench_modified --benchmarks=fillrandom --db=/pmem/dbtmp
+MSG(F:init L:469):Initializing the libawn.so, BASE.
+MSG(F:initMemory L:148):Allocate 118304 bytes memory.
+MSG(F:init L:569):init: END
+LevelDB:    version 1.22
+Date:       Thu Jul 29 10:27:15 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     100 bytes each (50 bytes after compression)
+Entries:    1000000
+RawSize:    110.6 MB (estimated)
+FileSize:   62.9 MB (estimated)
+------------------------------------------------
+fillrandom   :       4.878 micros/op;   22.7 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:56251872
+MSG(F:ts_print_statistics L:29): ts_write bytes :202064726
+MSG(F:ts_print_statistics L:31): ts_write same bytes :11941, occupy 0.01%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7fc249f453a0, pid:6491, ppid:6147
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy 0.00%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :50596, metadata occupy 0.80% write data.
+
+MSG(F:fini L:1899):fileMap_t: timing = 220 us
+MSG(F:fini L:1899):fileUnmap_t: timing = 1531 us
+MSG(F:fini L:1899):memcmp_asm_t: timing = 1351 us
+MSG(F:fini L:1899):mem_from_file_trace_t: timing = 973275 us
+MSG(F:fini L:1899):mem_from_mem_trace_t: timing = 675455 us
+MSG(F:fini L:1899):ts_write_t: timing = 228661 us
+MSG(F:fini L:1899):compare occupy ts_write: 0.00%
+
+
+real	0m4.968s
+user	0m5.269s
+sys	0m2.270s
+xzjin@node2410:27:~/awn/expriment/leveldb$ time /pmem/benchmark/db_bench_modified --benchmarks=fillrandom --db=/pmem/dbtmp
+MSG(F:init L:469):Initializing the libawn.so, BASE.
+MSG(F:initMemory L:148):Allocate 118304 bytes memory.
+MSG(F:init L:569):init: END
+LevelDB:    version 1.22
+Date:       Thu Jul 29 10:27:22 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     100 bytes each (50 bytes after compression)
+Entries:    1000000
+RawSize:    110.6 MB (estimated)
+FileSize:   62.9 MB (estimated)
+------------------------------------------------
+fillrandom   :       4.777 micros/op;   23.2 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:56249280
+MSG(F:ts_print_statistics L:29): ts_write bytes :202056514
+MSG(F:ts_print_statistics L:31): ts_write same bytes :8757, occupy 0.00%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f17b52d23a0, pid:6494, ppid:6147
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy 0.00%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :68282, metadata occupy 1.08% write data.
+
+MSG(F:fini L:1899):fileMap_t: timing = 216 us
+MSG(F:fini L:1899):fileUnmap_t: timing = 1738 us
+MSG(F:fini L:1899):memcmp_asm_t: timing = 1815 us
+MSG(F:fini L:1899):mem_from_file_trace_t: timing = 914132 us
+MSG(F:fini L:1899):mem_from_mem_trace_t: timing = 646688 us
+MSG(F:fini L:1899):ts_write_t: timing = 232776 us
+MSG(F:fini L:1899):compare occupy ts_write: 0.00%
+
+
+real	0m4.871s
+user	0m5.203s
+sys	0m2.219s
+xzjin@node2410:27:~/awn/expriment/leveldb$ time /pmem/benchmark/db_bench_modified --benchmarks=fillrandom --db=/pmem/dbtmp
+MSG(F:init L:469):Initializing the libawn.so, BASE.
+MSG(F:initMemory L:148):Allocate 118304 bytes memory.
+MSG(F:init L:569):init: END
+LevelDB:    version 1.22
+Date:       Thu Jul 29 10:28:47 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     100 bytes each (50 bytes after compression)
+Entries:    1000000
+RawSize:    110.6 MB (estimated)
+FileSize:   62.9 MB (estimated)
+------------------------------------------------
+fillrandom   :       4.779 micros/op;   23.1 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:0
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:0
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:0
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:0
+MSG(F:ts_print_statistics L:27): Really used memory:592000
+MSG(F:ts_print_statistics L:28): Total allocated memory:56366144
+MSG(F:ts_print_statistics L:29): ts_write bytes :202493626
+MSG(F:ts_print_statistics L:31): ts_write same bytes :9866, occupy 0.00%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7fe25596b3a0, pid:6497, ppid:6147
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :0, occupy 0.00%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :70727, metadata occupy 1.12% write data.
+
+MSG(F:fini L:1899):fileMap_t: timing = 201 us
+MSG(F:fini L:1899):fileUnmap_t: timing = 1644 us
+MSG(F:fini L:1899):memcmp_asm_t: timing = 1853 us
+MSG(F:fini L:1899):mem_from_file_trace_t: timing = 914592 us
+MSG(F:fini L:1899):mem_from_mem_trace_t: timing = 641582 us
+MSG(F:fini L:1899):ts_write_t: timing = 230152 us
+MSG(F:fini L:1899):compare occupy ts_write: 0.00%
+
+
+real	0m4.877s
+user	0m5.127s
+sys	0m2.290s
+

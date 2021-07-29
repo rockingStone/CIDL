@@ -1,20 +1,26 @@
 #! /bin/bash
-dbPath=/dbRepo/db4096/
-#dbPath=/dbRepo/db128/
 dedupPath=/pmem/dedupDir
-chunkSize=(512 1024 2048 4096 8192)
-output=""
+# NO 2048
+chunkSize=(2048)
+#chunkSize=(128 256 512 1024 4096 8192)
+chunkMethod=(fixed tttd ae rabin fastcdc)
+dbPath=/dbRepo/db1024/
+#dbPath=/dbRepo/db4096/
+
 for s in "${chunkSize[@]}"
 do
-	#clean path
-	set -o xtrace
-	$dedupPath/rebuild
+	for cm in "${chunkMethod[@]}"
+	do
 
-	destor $dbPath -p"chunk-avg-size $s" 
-#chunk-avg-size 4096
-	du -sb $dedupPath/*
-	set +o xtrace
-	echo; echo; 
+		#clean path
+		set -o xtrace
+		$dedupPath/rebuild
+	
+		destor $dbPath -p"chunk-algorithm $cm" -p"chunk-avg-size $s" 
+		du -sb $dedupPath/*
+		set +o xtrace
+		echo; echo; 
+	done
 done
 #destor /home/xzjin/dbtmp -p"chunk-algorithm 'normalized rabin'"
 #destor /home/xzjin/dbtmp -p"chunk-algorithm file"
