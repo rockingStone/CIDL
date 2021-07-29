@@ -2,7 +2,8 @@
 
 dbBash=/dbRepo/ 
 dedupPath=/pmem/dedupDir/
-directory=("/home/xzjin/tmp/FIO" "/dbtmp/FIO/" )
+#directory=("/home/xzjin/tmp/FIO" "/dbtmp/FIO/" )
+directory=("/dmdedup/FIO" )
 blockSize=(128 256 512 1024 2048 4096 8192)
 randomPer=(0 20 40 60 80 100)
 output=""

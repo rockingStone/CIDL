@@ -5,3 +5,6 @@ The shell to process the output of destorDiffValueSize.sh
 The shell to process the output of destorDiffChunkSize.sh
 grep -e "+ destor /dbRepo/" -e "Dedup time(s)" -e "deduplication ratio" -e "/pmem/dedupDir/index" -e "/pmem/dedupDir/recipes" destorDiffChunkSizeFIO40Dedup.log | grep -v -e "/pmem/dedupDir/backup.log" | awk -F',' '/destor/{printf "\n\n";} /ratio/{print $1; next} {print}' | awk '/destor/{printf substr($5,1, length($5)-1)"-"substr($7, 1, length($7)-1)"\n"; next} /time/{print $NF; next} /ratio/{print $NF*100"%"; next} /dedupDir/{print $1; next} {print}'
 grep -e "+ destor /dbRepo/" -e "Dedup time(s)" -e "deduplication ratio" -e "/pmem/dedupDir/index" -e "/pmem/dedupDir/recipes" destorDiffChunkSizeFIO40Dedup.log | grep -v -e "/pmem/dedupDir/backup.log" | awk -F',' '/destor/{printf "\n\n";} /ratio/{print $1; next} {print}' | awk '/destor/{printf substr($3,12, length($3))"-"substr($5, 1, length($5)-1)"\n"; next} /time/{print $NF; next} /ratio/{print $NF*100"%"; next} /dedupDir/{print $1; next} {print}'
+
+The shell to process FIOvaryDevPercBS.log
+grep -e "+ fio" -e "READ:" FIOvaryDevPercBS.log | awk -F'[ =]' '/fio/{printf "%4s, %4d, %20s, %3d,  ", $8, $10, $12, $14; next } /READ/{print $6}' | awk -F',' '/KiB/{tp=substr($NF, 1, length($NF)-5); tpM=tp/1024; printf "%4s, %4d,%20s, %3d,  %.2fMiB/s\n", $1, $2, $3, $4, tpM; next} {print}'
