@@ -42,7 +42,24 @@ instrumentation_type ts_memcpy_tfind_file_time;
 
 
 unsigned long long totalAllocSize = 0;
+#ifndef BASE_VERSION
 extern int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void** firstDiffPos);
+#else
+int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void** firstDiffPos);
+int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void** firstDiffPos){
+	char *c1 = s1;
+	char *c2 = s2;
+	for(int i=0; i<n; i++){
+		if(*c1-*c2 != 0){
+			*firstDiffPos = c1;
+			return (*c1-*c2);
+		}
+		c1++;
+		c2++;
+	}
+	return 0;
+}
+#endif //BASE_VERSION
 
 #ifndef BASE_VERSION
 inline void writeRec(unsigned long fileOffset, void* src, void* dest,

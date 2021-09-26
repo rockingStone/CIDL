@@ -7,7 +7,7 @@
 #include <stdatomic.h>
 #include "debug.h"
 
-#define INSTRUMENT_CALLS 0
+#define INSTRUMENT_CALLS 1
 
 unsigned int num_memcpy_read __attribute__((unused));
 unsigned int num_memcpy_write __attribute__((unused));
