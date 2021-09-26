@@ -11,10 +11,9 @@ sudo make install
 
 # Running
 1. Inclued header file (awn.h) in your source code
-2. Replace the functions that the reduncy flows by with AWN's functions
+2. Replace the functions with AWN's functions where the reduncy flows
 
 # Function list
-
 1. void ts_print_statistics();
 2. void* ts_memcpy (void * __dest, void * __src, size_t __n) ;
 3. void ts_free (void *__ptr, void *__tail);
