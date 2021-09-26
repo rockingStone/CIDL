@@ -11,7 +11,7 @@ sudo make install
 
 # Running
 1. Inclued header file (awn.h) in your source code
-2. Replace the functions with AWN's functions where the reduncy flows
+2. Replace the functions with AWN's functions where the redundancy flows
 
 # Function list
 1. void ts_print_statistics();
