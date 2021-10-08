@@ -6,8 +6,7 @@ AWN is an I/OCausality-based In-line Deduplication Library designed for NVM devi
 Linux 64bit.
 
 # INSTALL
-make
-
+make  
 sudo make install
 
 # Running
