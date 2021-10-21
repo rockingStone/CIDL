@@ -15,7 +15,7 @@ HEADINSTALLDIR = /usr/local/include/awn
 
 .PHONY: all
 all: CCFLAGS += -O3 -UBASE_VERSION
-all: LDFLAGS	= -ldl
+all: LDFLAGS	= -ldl -fcommon
 all: SSOURCES = memcmp-avx2-addr.S
 #all: $(OUTPUTFILE)
 all: compile
