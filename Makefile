@@ -62,6 +62,7 @@ install:
 	mkdir -p $(HEADINSTALLDIR)
 	cp -p $(OUTPUTFILE) $(SOINSTALLDIR)
 	cp -p $(HEADERFILE) $(HEADINSTALLDIR)
+	ldconfig
 
 ## Generate dependencies of .ccp files on .hpp files
 #include $(subst .cpp,.d,$(CSOURCES))
