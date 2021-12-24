@@ -379,7 +379,10 @@ struct recTreeNode* addTreeNode(void* pageNum){
 	treeNode->listHead = head;
 	treeNode->recModEntry = ent;	//used when insert to tail
 	treeNode->memRecIdx = 0;
+
+    pthread_mutex_lock(&recTreeMutex);
 	tsearch(treeNode, &recTreeRoot, recCompare);
+    pthread_mutex_unlock(&recTreeMutex);
 //	DEBUG_FILE("add tree node:%p, pageNum:%p\n", treeNode, pageNum);
 //	if(insertResult){
 //		DEBUG("Inserted, address:%p, instered pageNum:%lu, origin pageNum:%lu.\n",
@@ -462,10 +465,7 @@ void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
 		memset(node, 0, sizeof(struct recTreeNode));
 //		MSG("delete recNode pageNum:%p\n", delNode.pageNum);
 	}else{  //遍历元素，清除原文件已经被unmap的内容
-<<<<<<< HEAD
 #ifndef  BASE_VERSION
-=======
->>>>>>> 28f08cd0aa35af74586c1856760e1d9eed8b4146
         struct memRec *keeped, *searching;
 	    struct recBlockEntry *keepEnt, *searchEnt, *delEnt;
         int keepMaxIdx, searchMaxIdx;
@@ -505,10 +505,7 @@ void reclaimSpecialRecTreeNode (struct recTreeNode** nodep){
 			withdrawRecBlockEntry(delEnt);
             delEnt = TAILQ_NEXT(delEnt, entries);
         }
-<<<<<<< HEAD
 #endif //BASE_VERSION
-=======
->>>>>>> 28f08cd0aa35af74586c1856760e1d9eed8b4146
     }
 }
 

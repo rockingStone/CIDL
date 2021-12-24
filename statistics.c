@@ -67,6 +67,7 @@ const char *Instruprint[INSTRUMENT_NUM] = {
 	"memcmp_asm_t",
 	"mem_from_file_trace_t",
 	"mem_from_mem_trace_t",
+	"memcpy_from_mapped_trace_t",
 	"node_lookup_lock_t",
 	"nvnode_lock_t",
 	"open_t",

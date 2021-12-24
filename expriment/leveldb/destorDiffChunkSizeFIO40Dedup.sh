@@ -1,7 +1,8 @@
 #! /bin/bash
 dedupPath=/pmem/dedupDir
 # NO 2048
-blockSize=(128 256 512 1024 2048 4096 8192)
+#blockSize=(128 256 512 1024 2048 4096 8192)
+blockSize=(4096)
 chunkMethod=(fixed tttd ae rabin fastcdc)
 
 for s in "${blockSize[@]}"
@@ -13,7 +14,8 @@ do
 		set -o xtrace
 		$dedupPath/rebuild
 	
-		destor "/dbRepo/FIO"$s -p"chunk-algorithm $cm" -p"chunk-avg-size 4096"
+	#	destor "/dbRepo/FIO"$s -p"chunk-algorithm $cm" -p"chunk-avg-size 4096"
+		destor "/dbRepo/FIO8205/" -p"chunk-algorithm $cm" -p"chunk-avg-size 4096"
 		du -sb $dedupPath/*
 		set +o xtrace
 		echo; echo; 

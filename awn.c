@@ -40,6 +40,7 @@ instrumentation_type memcmp_asm_time, tfind_time, cmp_write_time;
 instrumentation_type fileMap_time, fileUnmap_time, insert_rec_time;
 instrumentation_type ts_memcpy_tfind_file_time;
 
+pthread_mutex_t recTreeMutex;
 
 unsigned long long totalAllocSize = 0;
 #ifndef BASE_VERSION
@@ -281,7 +282,9 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 	//xzjin assert
 	assertRec(rec);
 	//assert(rec->fileOffset<100000000000002);
+    pthread_mutex_lock(&recTreeMutex);
 	tsearch(rec, &recTreeRoot, recCompare);
+    pthread_mutex_unlock(&recTreeMutex);
 	//MSG("%s: END\n", __func__);
 }
 #endif //BASE_VERSION
@@ -484,6 +487,11 @@ __attribute__((constructor))void init(void) {
 	int tmp;
 	int err __attribute__((unused));
 	MSG("Initializing the libawn.so, %s.\n", version);
+	 
+	if (pthread_mutex_init(&recTreeMutex, 0)){
+        ERROR("Failed to init mutex!");
+        exit(-1);
+    }
 
 	//xzjin Put dlopen before call to memcpy and mmap call.
 	ts_write_size = 0;
@@ -1488,7 +1496,7 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 	//xzjin 如果copy的内容是跨文件的（好像不太可能）这里只记录前半段
 #if USE_TS_FUNC
  
-	START_TIMING(mem_from_file_trace_t, mem_from_file_trace_time);
+	START_TIMING( memcpy_from_mapped_trace_t, mem_from_file_trace_time);
 
 	fileMapTreeNode.start = src;
 	fileMapTreeNode.tail = src + n;
@@ -1596,13 +1604,14 @@ void* ts_memcpy(void *dest, void *src, size_t n){
 #endif	//REC_INSERT_TEST 
 //		MSG("copy src:           %lu not fount in file list.\n", src);
 ts_memcpy_returnPoint:
-	END_TIMING(mem_from_file_trace_t, mem_from_file_trace_time);
+	END_TIMING( memcpy_from_mapped_trace_t, mem_from_file_trace_time);
 #endif	//USE_TS_FUNC
 	return ret;
 }
 
-//xzjin 普通的memcpy但是会做地址跟踪,这个是针对从mmap区域的copy
 //ts_memcpy_traced是针对拷贝traced（从mmap或traced区域拷贝过一次的）的内容
+//没看懂，注意参数，直接带了一个包含拷贝源地址的节点
+//这个仅用在ts_read里面
 void* ts_memcpy_withFile(void *dest, void *src, size_t n,
 	 struct fileMapTreeNode *fmNode){
 //	MSG("Memcpy dest:%llu, src:%llu, len:%lu\n",

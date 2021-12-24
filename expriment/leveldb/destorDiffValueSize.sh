@@ -2,13 +2,14 @@
 dbPathBase=/dbRepo/
 dedupPath=/pmem/dedupDir
 #chunkSize=(128 256 512 1024 4096 8192)
-chunkSize=(8192)
+chunkSize=(4096)
 #chunkMethod=("'normalized rabin'")
 chunkMethod=(fixed tttd ae rabin fastcdc)
 dbPath=""
 for s in "${chunkSize[@]}"
 do
-	dbPath="$dbPathBase/db$s/"
+#	dbPath="$dbPathBase/db$s/"
+	dbPath="/dedupRepo/db8193"
 
 	for cm in "${chunkMethod[@]}"
 	do

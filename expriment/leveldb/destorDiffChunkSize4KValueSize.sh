@@ -1,9 +1,10 @@
 #! /bin/bash
 dedupPath=/pmem/dedupDir
 # NO 2048
-chunkSize=(2048)
-#chunkSize=(128 256 512 1024 4096 8192)
-chunkMethod=(fixed tttd ae rabin fastcdc)
+#chunkSize=(128 256 512 )
+chunkSize=(128 256 512 1024 2048 4096 8192)
+#chunkMethod=(fixed tttd ae rabin fastcdc)
+chunkMethod=(ae)
 dbPath=/dbRepo/db1024/
 #dbPath=/dbRepo/db4096/
 

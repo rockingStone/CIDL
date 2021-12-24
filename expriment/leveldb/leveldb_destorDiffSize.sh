@@ -3,8 +3,8 @@
 
 dbBash=/dbRepo/ 
 dedupPath=/pmem/dedupDir
-#valueSize=(128 256 512 1024 4096 8192)
-valueSize=(128 256 )
+#valueSize=(128 256 512 1024 2048 4096 8192)
+valueSize=(1024)
 output=""
 for s in "${valueSize[@]}"
 do
@@ -14,14 +14,11 @@ do
 	find $dbPath -type f -exec rm {} \;
 	$dedupPath/rebuild
 
-	time /pmem/benchmark/db_bench_modified --benchmarks=fillrandom --value_size=$s --db=$dbPath
-#	time /pmem/benchmark/db_bench --benchmarks=fillrandom --value_size=$s --db=$dbPath
-# 2>&1 | grep ts_write
-	#/pmem/benchmark/db_bench_modified --benchmarks=fillrandom --value_size=$s --db=$dbPath 2>&1
+#	time /pmem/benchmark/db_bench_modified --benchmarks=fillrandom --value_size=$s --db=$dbPath
+	time /pmem/benchmark/db_bench --benchmarks=fillrandom --value_size=$s --db=$dbPath
 	du -sb $dbPath
-	/usr/local/bin/destor $dbPath -p"chunk-algorithm fastcdc" 
-#| grep -e "Dedup time" -e "deduplication ratio" -e "job[[:space:]]+" -e "Total time"
-	du -sb $dedupPath/*
+#	/usr/local/bin/destor $dbPath -p"chunk-algorithm fastcdc" 
+#	du -sb $dedupPath/*
 	set +o xtrace
 	echo; echo; 
 done

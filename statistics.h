@@ -57,6 +57,7 @@ enum instrumentation_vars {
 	memcmp_asm_t,
 	mem_from_file_trace_t,
 	mem_from_mem_trace_t,
+	memcpy_from_mapped_trace_t,
 	node_lookup_lock_t,
 	nvnode_lock_t,
 	open_t,      
@@ -107,7 +108,7 @@ typedef struct timespec instrumentation_type;
 		printf("\n");		\
 		int i;							\
 		for(i=0; i<INSTRUMENT_NUM; i++)	{			\
-			if (Instrustats[i] != 0) 			\
+			if ( Instrustats[i] != 0 ) 			\
 				MSG("%s: timing = %lu us\n",		\
 				    Instruprint[i], Instrustats[i]/1000);	\
 		}							\

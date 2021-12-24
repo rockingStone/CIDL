@@ -102,6 +102,7 @@ struct fileMapTreeNode** FILEMAPTREENODEPOOLPTR;
 //struct slisthead** SLISTHEADPOOLPTR;
 
 extern unsigned long long totalAllocSize;
+extern pthread_mutex_t recTreeMutex;
 
 struct fileMapTreeNode *lastTs_memcpyFmNode;
 
