@@ -9,3 +9,23 @@ grep -e "+ destor /dbRepo/" -e "Dedup time(s)" -e "deduplication ratio" -e "/pme
 The shell to process FIOvaryDevPercBS.log
 grep -e "+ fio" -e "READ:" FIOvaryDevPercBS.log_myDisk | awk -F'[ =]' '/fio/{printf "%4s, %4d, %20s, %3d,  ", $8, $10, $12, $14; next } /READ/{print $6}' | awk -F',' '/KiB/{tp=substr($NF, 1, length($NF)-5); tpM=tp/1024; printf "%4s, %4d,%20s, %3d,  %.2fMiB/s\n", $1, $2, $3, $4, tpM; next} {print}' | awk '/ 0,/{ base=substr($NF, 1, length($NF)-5); printf "\n"} {para=substr($NF, 1, length($NF)-5); para=para*100/base; printf $0"  "para"%\n"}'
 
+base
+op 1 226 inlineDestorDiffValueSize.sh_log_4K_fullIndex | grep -e "new metadata item" -e "hash number" -e "--value_size=" -e "MB/s" -e "real" -e "ts_write same bytes" -e "duplicate percentage" -e "chunck algorithm" 
+
+128 1 226
+256 229 455
+512 457 685
+1024 687 921
+2048 923 1173
+4096 1175 1465
+8192 1467 1841
+
+
+get throughput 
+| awk '/^fillrandom/{print $(NF-1)}'
+dedup ratio
+| awk '/duplicate percentage/{print $(NF)} /ts_write same bytes/{print $(NF)}' | awk -F'%' '{print $1}'
+time cost
+| awk '/real/{print $(NF)} '
+hash/meta num
+| awk '/hash number/{print $(NF)} /new metadata item/{print substr($7, 2, length($7)-2)} '

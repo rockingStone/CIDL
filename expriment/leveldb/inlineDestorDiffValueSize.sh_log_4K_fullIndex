@@ -1,0 +1,1841 @@
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=128 --db=/pmem/db128/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FSC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:49:57 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     128 bytes each (64 bytes after compression)
+Entries:    1000000
+RawSize:    137.3 MB (estimated)
+FileSize:   76.3 MB (estimated)
+------------------------------------------------
+fillrandom   :       6.747 micros/op;   20.4 MB/s     
+MSG(F:fini L:594):duplicate size: 38937044
+MSG(F:fini L:595):write size: 774135011
+MSG(F:fini L:596):duplicate percentage: 5.03%
+MSG(F:fini L:597):chunk number:  1296240, average chunk size: 597
+MSG(F:fini L:599):hash number:  1277354
+
+real	0m6.871s
+user	0m7.498s
+sys	0m4.608s
++ du -sb /pmem/db128/
+608543966	/pmem/db128/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=128 --db=/pmem/db128/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: TTTD.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:50:05 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     128 bytes each (64 bytes after compression)
+Entries:    1000000
+RawSize:    137.3 MB (estimated)
+FileSize:   76.3 MB (estimated)
+------------------------------------------------
+fillrandom   :       7.076 micros/op;   19.4 MB/s     
+MSG(F:fini L:594):duplicate size: 33816646
+MSG(F:fini L:595):write size: 698056104
+MSG(F:fini L:596):duplicate percentage: 4.84%
+MSG(F:fini L:597):chunk number:  1289483, average chunk size: 541
+MSG(F:fini L:599):hash number:  1270805
+
+real	0m7.193s
+user	0m8.695s
+sys	0m4.109s
++ du -sb /pmem/db128/
+532414119	/pmem/db128/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=128 --db=/pmem/db128/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: AE.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:50:13 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     128 bytes each (64 bytes after compression)
+Entries:    1000000
+RawSize:    137.3 MB (estimated)
+FileSize:   76.3 MB (estimated)
+------------------------------------------------
+fillrandom   :       6.556 micros/op;   20.9 MB/s     
+MSG(F:fini L:594):duplicate size: 28070460
+MSG(F:fini L:595):write size: 719485370
+MSG(F:fini L:596):duplicate percentage: 3.90%
+MSG(F:fini L:597):chunk number:  1214892, average chunk size: 592
+MSG(F:fini L:599):hash number:  1204100
+
+real	0m6.672s
+user	0m7.892s
+sys	0m4.158s
++ du -sb /pmem/db128/
+553874557	/pmem/db128/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=128 --db=/pmem/db128/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: Rabin.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:50:20 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     128 bytes each (64 bytes after compression)
+Entries:    1000000
+RawSize:    137.3 MB (estimated)
+FileSize:   76.3 MB (estimated)
+------------------------------------------------
+fillrandom   :       7.468 micros/op;   18.4 MB/s     
+MSG(F:fini L:594):duplicate size: 26356501
+MSG(F:fini L:595):write size: 741827192
+MSG(F:fini L:596):duplicate percentage: 3.55%
+MSG(F:fini L:597):chunk number:  1259875, average chunk size: 588
+MSG(F:fini L:599):hash number:  1247674
+
+real	0m7.572s
+user	0m9.268s
+sys	0m3.752s
++ du -sb /pmem/db128/
+576217056	/pmem/db128/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=128 --db=/pmem/db128/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FastCDC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:50:28 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     128 bytes each (64 bytes after compression)
+Entries:    1000000
+RawSize:    137.3 MB (estimated)
+FileSize:   76.3 MB (estimated)
+------------------------------------------------
+fillrandom   :       6.712 micros/op;   20.5 MB/s     
+MSG(F:fini L:594):duplicate size: 31039204
+MSG(F:fini L:595):write size: 747964824
+MSG(F:fini L:596):duplicate percentage: 4.15%
+MSG(F:fini L:597):chunk number:  1212459, average chunk size: 616
+MSG(F:fini L:599):hash number:  1200957
+
+real	0m6.828s
+user	0m7.782s
+sys	0m4.411s
++ du -sb /pmem/db128/
+582448764	/pmem/db128/
++ set +o xtrace
+
+
++ /home/xzjin/leveldb_modified/build/db_bench --benchmarks=fillrandom --value_size=128 --db=/pmem/db128/
+MSG(F:init L:489):Initializing the libawn.so, .
+MSG(F:initMemory L:148):Allocate 5990304 bytes memory.
+MSG(F:init L:594):init: END
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:50:36 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     128 bytes each (64 bytes after compression)
+Entries:    1000000
+RawSize:    137.3 MB (estimated)
+FileSize:   76.3 MB (estimated)
+------------------------------------------------
+fillrandom   :       4.598 micros/op;   29.9 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:2340
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:2340
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:5840
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:5840
+MSG(F:ts_print_statistics L:27): Really used memory:20480
+MSG(F:ts_print_statistics L:28): Total allocated memory:5990304
+MSG(F:ts_print_statistics L:29): ts_write bytes :281281099
+MSG(F:ts_print_statistics L:31): ts_write same bytes :229237162, occupy 81.50%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7ffbb77e63a0, pid:452, ppid:39502
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :2193732, occupy 0.78%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :941896, metadata occupy 10.72% write data.
+
+MSG(F:fini L:1925):compare_mem_t: timing = 158318 us
+MSG(F:fini L:1925):fileMap_t: timing = 295 us
+MSG(F:fini L:1925):fileUnmap_t: timing = 1205 us
+MSG(F:fini L:1925):memcmp_asm_t: timing = 46081 us
+MSG(F:fini L:1925):mem_from_mem_trace_t: timing = 90942 us
+MSG(F:fini L:1925):memcpy_from_mapped_trace_t: timing = 648843 us
+MSG(F:fini L:1925):ts_write_t: timing = 335350 us
+MSG(F:fini L:1925):compare occupy ts_write: 47.21%
+
+
+real	0m4.652s
+user	0m5.007s
+sys	0m2.524s
++ set +o xtrace
+430437147	/pmem/db128/
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=256 --db=/pmem/db256/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FSC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:50:41 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     256 bytes each (128 bytes after compression)
+Entries:    1000000
+RawSize:    259.4 MB (estimated)
+FileSize:   137.3 MB (estimated)
+------------------------------------------------
+fillrandom   :       9.546 micros/op;   27.2 MB/s     
+MSG(F:fini L:594):duplicate size: 73660536
+MSG(F:fini L:595):write size: 1450161804
+MSG(F:fini L:596):duplicate percentage: 5.08%
+MSG(F:fini L:597):chunk number:  1538990, average chunk size: 942
+MSG(F:fini L:599):hash number:  1502074
+
+real	0m9.749s
+user	0m9.812s
+sys	0m6.329s
++ du -sb /pmem/db256/
+1160184331	/pmem/db256/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=256 --db=/pmem/db256/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: TTTD.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:50:52 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     256 bytes each (128 bytes after compression)
+Entries:    1000000
+RawSize:    259.4 MB (estimated)
+FileSize:   137.3 MB (estimated)
+------------------------------------------------
+fillrandom   :      11.505 micros/op;   22.5 MB/s     
+MSG(F:fini L:594):duplicate size: 90252514
+MSG(F:fini L:595):write size: 1421420059
+MSG(F:fini L:596):duplicate percentage: 6.35%
+MSG(F:fini L:597):chunk number:  1590925, average chunk size: 893
+MSG(F:fini L:599):hash number:  1537926
+
+real	0m11.705s
+user	0m12.694s
+sys	0m5.625s
++ du -sb /pmem/db256/
+1131582968	/pmem/db256/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=256 --db=/pmem/db256/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: AE.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:51:05 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     256 bytes each (128 bytes after compression)
+Entries:    1000000
+RawSize:    259.4 MB (estimated)
+FileSize:   137.3 MB (estimated)
+------------------------------------------------
+fillrandom   :      10.647 micros/op;   24.4 MB/s     
+MSG(F:fini L:594):duplicate size: 78130498
+MSG(F:fini L:595):write size: 1482562830
+MSG(F:fini L:596):duplicate percentage: 5.27%
+MSG(F:fini L:597):chunk number:  1462702, average chunk size: 1013
+MSG(F:fini L:599):hash number:  1429709
+
+real	0m10.863s
+user	0m11.110s
+sys	0m6.458s
++ du -sb /pmem/db256/
+1192616698	/pmem/db256/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=256 --db=/pmem/db256/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: Rabin.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:51:17 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     256 bytes each (128 bytes after compression)
+Entries:    1000000
+RawSize:    259.4 MB (estimated)
+FileSize:   137.3 MB (estimated)
+------------------------------------------------
+fillrandom   :      12.261 micros/op;   21.2 MB/s     
+MSG(F:fini L:594):duplicate size: 79242870
+MSG(F:fini L:595):write size: 1486659144
+MSG(F:fini L:596):duplicate percentage: 5.33%
+MSG(F:fini L:597):chunk number:  1520148, average chunk size: 977
+MSG(F:fini L:599):hash number:  1480172
+
+real	0m12.449s
+user	0m13.782s
+sys	0m6.006s
++ du -sb /pmem/db256/
+1196826788	/pmem/db256/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=256 --db=/pmem/db256/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FastCDC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:51:31 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     256 bytes each (128 bytes after compression)
+Entries:    1000000
+RawSize:    259.4 MB (estimated)
+FileSize:   137.3 MB (estimated)
+------------------------------------------------
+fillrandom   :      10.243 micros/op;   25.3 MB/s     
+MSG(F:fini L:594):duplicate size: 86994543
+MSG(F:fini L:595):write size: 1471507874
+MSG(F:fini L:596):duplicate percentage: 5.91%
+MSG(F:fini L:597):chunk number:  1422611, average chunk size: 1034
+MSG(F:fini L:599):hash number:  1387326
+
+real	0m10.458s
+user	0m10.723s
+sys	0m6.318s
++ du -sb /pmem/db256/
+1181555216	/pmem/db256/
++ set +o xtrace
+
+
++ /home/xzjin/leveldb_modified/build/db_bench --benchmarks=fillrandom --value_size=256 --db=/pmem/db256/
+MSG(F:init L:489):Initializing the libawn.so, .
+MSG(F:initMemory L:148):Allocate 5990304 bytes memory.
+MSG(F:init L:594):init: END
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:51:43 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     256 bytes each (128 bytes after compression)
+Entries:    1000000
+RawSize:    259.4 MB (estimated)
+FileSize:   137.3 MB (estimated)
+------------------------------------------------
+fillrandom   :       6.968 micros/op;   37.2 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:2004
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:2004
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:5504
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:5504
+MSG(F:ts_print_statistics L:27): Really used memory:63488
+MSG(F:ts_print_statistics L:28): Total allocated memory:5990304
+MSG(F:ts_print_statistics L:29): ts_write bytes :818883573
+MSG(F:ts_print_statistics L:31): ts_write same bytes :688642880, occupy 84.10%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f5e0882f3a0, pid:4011, ppid:39502
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :3492724, occupy 0.43%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :1440814, metadata occupy 5.63% write data.
+
+MSG(F:fini L:1925):compare_mem_t: timing = 305118 us
+MSG(F:fini L:1925):fileMap_t: timing = 621 us
+MSG(F:fini L:1925):fileUnmap_t: timing = 1361 us
+MSG(F:fini L:1925):memcmp_asm_t: timing = 82877 us
+MSG(F:fini L:1925):mem_from_mem_trace_t: timing = 232250 us
+MSG(F:fini L:1925):memcpy_from_mapped_trace_t: timing = 1101833 us
+MSG(F:fini L:1925):ts_write_t: timing = 830697 us
+MSG(F:fini L:1925):compare occupy ts_write: 36.73%
+
+
+real	0m7.044s
+user	0m6.714s
+sys	0m3.485s
++ set +o xtrace
+1097472225	/pmem/db256/
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=512 --db=/pmem/db512/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FSC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:51:52 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     512 bytes each (256 bytes after compression)
+Entries:    1000000
+RawSize:    503.5 MB (estimated)
+FileSize:   259.4 MB (estimated)
+------------------------------------------------
+fillrandom   :      20.144 micros/op;   25.0 MB/s     
+MSG(F:fini L:594):duplicate size: 201221073
+MSG(F:fini L:595):write size: 3418334589
+MSG(F:fini L:596):duplicate percentage: 5.89%
+MSG(F:fini L:597):chunk number:  2367008, average chunk size: 1444
+MSG(F:fini L:599):hash number:  2272082
+
+real	0m20.520s
+user	0m16.286s
+sys	0m12.471s
++ du -sb /pmem/db512/
+2870515581	/pmem/db512/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=512 --db=/pmem/db512/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: TTTD.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:52:16 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     512 bytes each (256 bytes after compression)
+Entries:    1000000
+RawSize:    503.5 MB (estimated)
+FileSize:   259.4 MB (estimated)
+------------------------------------------------
+fillrandom   :      28.851 micros/op;   17.5 MB/s     
+MSG(F:fini L:594):duplicate size: 267645060
+MSG(F:fini L:595):write size: 3482668124
+MSG(F:fini L:596):duplicate percentage: 7.69%
+MSG(F:fini L:597):chunk number:  2580368, average chunk size: 1349
+MSG(F:fini L:599):hash number:  2385998
+
+real	0m29.252s
+user	0m25.459s
+sys	0m12.846s
++ du -sb /pmem/db512/
+2934981687	/pmem/db512/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=512 --db=/pmem/db512/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: AE.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:52:49 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     512 bytes each (256 bytes after compression)
+Entries:    1000000
+RawSize:    503.5 MB (estimated)
+FileSize:   259.4 MB (estimated)
+------------------------------------------------
+fillrandom   :      22.965 micros/op;   21.9 MB/s     
+MSG(F:fini L:594):duplicate size: 221909646
+MSG(F:fini L:595):write size: 3486844191
+MSG(F:fini L:596):duplicate percentage: 6.36%
+MSG(F:fini L:597):chunk number:  2148307, average chunk size: 1623
+MSG(F:fini L:599):hash number:  2062625
+
+real	0m23.353s
+user	0m19.053s
+sys	0m12.546s
++ du -sb /pmem/db512/
+2939073912	/pmem/db512/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=512 --db=/pmem/db512/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: Rabin.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:53:16 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     512 bytes each (256 bytes after compression)
+Entries:    1000000
+RawSize:    503.5 MB (estimated)
+FileSize:   259.4 MB (estimated)
+------------------------------------------------
+fillrandom   :      28.276 micros/op;   17.8 MB/s     
+MSG(F:fini L:594):duplicate size: 254780016
+MSG(F:fini L:595):write size: 3487454601
+MSG(F:fini L:596):duplicate percentage: 7.31%
+MSG(F:fini L:597):chunk number:  2314565, average chunk size: 1506
+MSG(F:fini L:599):hash number:  2164149
+
+real	0m28.706s
+user	0m24.968s
+sys	0m12.734s
++ du -sb /pmem/db512/
+2939670236	/pmem/db512/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=512 --db=/pmem/db512/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FastCDC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:53:48 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     512 bytes each (256 bytes after compression)
+Entries:    1000000
+RawSize:    503.5 MB (estimated)
+FileSize:   259.4 MB (estimated)
+------------------------------------------------
+fillrandom   :      19.426 micros/op;   25.9 MB/s     
+MSG(F:fini L:594):duplicate size: 208930587
+MSG(F:fini L:595):write size: 3379777957
+MSG(F:fini L:596):duplicate percentage: 6.18%
+MSG(F:fini L:597):chunk number:  2058465, average chunk size: 1641
+MSG(F:fini L:599):hash number:  1924803
+
+real	0m19.771s
+user	0m18.480s
+sys	0m10.194s
++ du -sb /pmem/db512/
+2831984350	/pmem/db512/
++ set +o xtrace
+
+
++ /home/xzjin/leveldb_modified/build/db_bench --benchmarks=fillrandom --value_size=512 --db=/pmem/db512/
+MSG(F:init L:489):Initializing the libawn.so, .
+MSG(F:initMemory L:148):Allocate 5990304 bytes memory.
+MSG(F:init L:594):init: END
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:54:12 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     512 bytes each (256 bytes after compression)
+Entries:    1000000
+RawSize:    503.5 MB (estimated)
+FileSize:   259.4 MB (estimated)
+------------------------------------------------
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1500, RECTREENODEPOOLIDX: 1499
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:292
+fillrandom   :      13.498 micros/op;   37.3 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:1440
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:1440
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:4940
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:4940
+MSG(F:ts_print_statistics L:27): Really used memory:135680
+MSG(F:ts_print_statistics L:28): Total allocated memory:5990304
+MSG(F:ts_print_statistics L:29): ts_write bytes :2398585716
+MSG(F:ts_print_statistics L:31): ts_write same bytes :2160972324, occupy 90.09%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f8331d9c3a0, pid:12610, ppid:39502
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :22359397, occupy 0.93%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :2298300, metadata occupy 3.07% write data.
+
+MSG(F:fini L:1925):compare_mem_t: timing = 620421 us
+MSG(F:fini L:1925):fileMap_t: timing = 2017 us
+MSG(F:fini L:1925):fileUnmap_t: timing = 4847 us
+MSG(F:fini L:1925):memcmp_asm_t: timing = 171301 us
+MSG(F:fini L:1925):mem_from_mem_trace_t: timing = 520518 us
+MSG(F:fini L:1925):memcpy_from_mapped_trace_t: timing = 1814437 us
+MSG(F:fini L:1925):ts_write_t: timing = 2196067 us
+MSG(F:fini L:1925):compare occupy ts_write: 28.25%
+
+
+real	0m13.576s
+user	0m10.424s
+sys	0m6.787s
++ set +o xtrace
+2933618631	/pmem/db512/
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=1024 --db=/pmem/db1024/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FSC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:54:31 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     1024 bytes each (512 bytes after compression)
+Entries:    1000000
+RawSize:    991.8 MB (estimated)
+FileSize:   503.5 MB (estimated)
+------------------------------------------------
+fillrandom   :      43.108 micros/op;   23.0 MB/s     
+MSG(F:fini L:594):duplicate size: 991536373
+MSG(F:fini L:595):write size: 7858823554
+MSG(F:fini L:596):duplicate percentage: 12.62%
+MSG(F:fini L:597):chunk number:  4274060, average chunk size: 1838
+MSG(F:fini L:599):hash number:  3799821
+
+real	0m43.659s
+user	0m32.184s
+sys	0m24.240s
++ du -sb /pmem/db1024/
+6800308207	/pmem/db1024/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=1024 --db=/pmem/db1024/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: TTTD.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:55:23 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     1024 bytes each (512 bytes after compression)
+Entries:    1000000
+RawSize:    991.8 MB (estimated)
+FileSize:   503.5 MB (estimated)
+------------------------------------------------
+fillrandom   :      62.753 micros/op;   15.8 MB/s     
+MSG(F:fini L:594):duplicate size: 1325697050
+MSG(F:fini L:595):write size: 7885248046
+MSG(F:fini L:596):duplicate percentage: 16.81%
+MSG(F:fini L:597):chunk number:  4828183, average chunk size: 1633
+MSG(F:fini L:599):hash number:  3816370
+
+real	1m3.363s
+user	0m54.542s
+sys	0m26.459s
++ du -sb /pmem/db1024/
+6826549583	/pmem/db1024/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=1024 --db=/pmem/db1024/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: AE.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:56:35 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     1024 bytes each (512 bytes after compression)
+Entries:    1000000
+RawSize:    991.8 MB (estimated)
+FileSize:   503.5 MB (estimated)
+------------------------------------------------
+fillrandom   :      48.709 micros/op;   20.4 MB/s     
+MSG(F:fini L:594):duplicate size: 980436170
+MSG(F:fini L:595):write size: 7774591357
+MSG(F:fini L:596):duplicate percentage: 12.61%
+MSG(F:fini L:597):chunk number:  3568500, average chunk size: 2178
+MSG(F:fini L:599):hash number:  3195799
+
+real	0m49.150s
+user	0m36.946s
+sys	0m24.769s
++ du -sb /pmem/db1024/
+6715995660	/pmem/db1024/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=1024 --db=/pmem/db1024/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: Rabin.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:57:31 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     1024 bytes each (512 bytes after compression)
+Entries:    1000000
+RawSize:    991.8 MB (estimated)
+FileSize:   503.5 MB (estimated)
+------------------------------------------------
+fillrandom   :      58.860 micros/op;   16.9 MB/s     
+MSG(F:fini L:594):duplicate size: 1279055440
+MSG(F:fini L:595):write size: 7985636066
+MSG(F:fini L:596):duplicate percentage: 16.02%
+MSG(F:fini L:597):chunk number:  4184015, average chunk size: 1908
+MSG(F:fini L:599):hash number:  3395770
+
+real	0m59.420s
+user	0m54.230s
+sys	0m23.182s
++ du -sb /pmem/db1024/
+6926974207	/pmem/db1024/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=1024 --db=/pmem/db1024/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FastCDC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:58:39 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     1024 bytes each (512 bytes after compression)
+Entries:    1000000
+RawSize:    991.8 MB (estimated)
+FileSize:   503.5 MB (estimated)
+------------------------------------------------
+fillrandom   :      45.282 micros/op;   21.9 MB/s     
+MSG(F:fini L:594):duplicate size: 1148412230
+MSG(F:fini L:595):write size: 7937280044
+MSG(F:fini L:596):duplicate percentage: 14.47%
+MSG(F:fini L:597):chunk number:  3565445, average chunk size: 2226
+MSG(F:fini L:599):hash number:  2992283
+
+real	0m45.834s
+user	0m37.536s
+sys	0m22.408s
++ du -sb /pmem/db1024/
+6878716042	/pmem/db1024/
++ set +o xtrace
+
+
++ /home/xzjin/leveldb_modified/build/db_bench --benchmarks=fillrandom --value_size=1024 --db=/pmem/db1024/
+MSG(F:init L:489):Initializing the libawn.so, .
+MSG(F:initMemory L:148):Allocate 5990304 bytes memory.
+MSG(F:init L:594):init: END
+LevelDB:    version 1.22
+Date:       Tue Dec 28 11:59:34 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     1024 bytes each (512 bytes after compression)
+Entries:    1000000
+RawSize:    991.8 MB (estimated)
+FileSize:   503.5 MB (estimated)
+------------------------------------------------
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1500, RECTREENODEPOOLIDX: 1499
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:255
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1052, RECTREENODEPOOLIDX: 1051
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:534
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 951, RECTREENODEPOOLIDX: 950
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:688
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 982, RECTREENODEPOOLIDX: 981
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:680
+fillrandom   :      26.897 micros/op;   36.9 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:1567
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:1567
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:5067
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:5067
+MSG(F:ts_print_statistics L:27): Really used memory:119424
+MSG(F:ts_print_statistics L:28): Total allocated memory:5990304
+MSG(F:ts_print_statistics L:29): ts_write bytes :5647806435
+MSG(F:ts_print_statistics L:31): ts_write same bytes :5284577147, occupy 93.57%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f8c4b3353a0, pid:32869, ppid:39502
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :45318703, occupy 0.80%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :3335322, metadata occupy 1.89% write data.
+
+MSG(F:fini L:1925):compare_mem_t: timing = 1143318 us
+MSG(F:fini L:1925):fileMap_t: timing = 5471 us
+MSG(F:fini L:1925):fileUnmap_t: timing = 16382 us
+MSG(F:fini L:1925):memcmp_asm_t: timing = 325946 us
+MSG(F:fini L:1925):mem_from_mem_trace_t: timing = 1002991 us
+MSG(F:fini L:1925):memcpy_from_mapped_trace_t: timing = 2709358 us
+MSG(F:fini L:1925):ts_write_t: timing = 6028380 us
+MSG(F:fini L:1925):compare occupy ts_write: 18.97%
+
+
+real	0m27.013s
+user	0m16.438s
+sys	0m14.882s
++ set +o xtrace
+6703183209	/pmem/db1024/
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=2048 --db=/pmem/db2048/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FSC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:00:16 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     2048 bytes each (1024 bytes after compression)
+Entries:    1000000
+RawSize:    1968.4 MB (estimated)
+FileSize:   991.8 MB (estimated)
+------------------------------------------------
+fillrandom   :     107.085 micros/op;   18.4 MB/s     
+MSG(F:fini L:594):duplicate size: 6624164409
+MSG(F:fini L:595):write size: 18860925230
+MSG(F:fini L:596):duplicate percentage: 35.12%
+MSG(F:fini L:597):chunk number:  9116897, average chunk size: 2068
+MSG(F:fini L:599):hash number:  5903476
+
+real	1m47.826s
+user	1m6.446s
+sys	1m0.691s
++ du -sb /pmem/db2048/
+16779321402	/pmem/db2048/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=2048 --db=/pmem/db2048/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: TTTD.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:02:26 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     2048 bytes each (1024 bytes after compression)
+Entries:    1000000
+RawSize:    1968.4 MB (estimated)
+FileSize:   991.8 MB (estimated)
+------------------------------------------------
+fillrandom   :     139.519 micros/op;   14.1 MB/s     
+MSG(F:fini L:594):duplicate size: 8088183700
+MSG(F:fini L:595):write size: 18942334580
+MSG(F:fini L:596):duplicate percentage: 42.70%
+MSG(F:fini L:597):chunk number: 10495053, average chunk size: 1804
+MSG(F:fini L:599):hash number:  5465192
+
+real	2m20.134s
+user	2m4.519s
+sys	0m44.838s
++ du -sb /pmem/db2048/
+16860711071	/pmem/db2048/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=2048 --db=/pmem/db2048/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: AE.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:05:07 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     2048 bytes each (1024 bytes after compression)
+Entries:    1000000
+RawSize:    1968.4 MB (estimated)
+FileSize:   991.8 MB (estimated)
+------------------------------------------------
+fillrandom   :     101.301 micros/op;   19.4 MB/s     
+MSG(F:fini L:594):duplicate size: 6623147719
+MSG(F:fini L:595):write size: 18858555635
+MSG(F:fini L:596):duplicate percentage: 35.12%
+MSG(F:fini L:597):chunk number:  7111138, average chunk size: 2651
+MSG(F:fini L:599):hash number:  4689537
+
+real	1m41.938s
+user	1m20.382s
+sys	0m41.571s
++ du -sb /pmem/db2048/
+16776938138	/pmem/db2048/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=2048 --db=/pmem/db2048/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: Rabin.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:07:10 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     2048 bytes each (1024 bytes after compression)
+Entries:    1000000
+RawSize:    1968.4 MB (estimated)
+FileSize:   991.8 MB (estimated)
+------------------------------------------------
+fillrandom   :     133.393 micros/op;   14.8 MB/s     
+MSG(F:fini L:594):duplicate size: 7718875815
+MSG(F:fini L:595):write size: 19027437025
+MSG(F:fini L:596):duplicate percentage: 40.57%
+MSG(F:fini L:597):chunk number:  8844971, average chunk size: 2151
+MSG(F:fini L:599):hash number:  4823163
+
+real	2m14.011s
+user	1m56.038s
+sys	0m42.951s
++ du -sb /pmem/db2048/
+16945749658	/pmem/db2048/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=2048 --db=/pmem/db2048/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FastCDC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:09:46 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     2048 bytes each (1024 bytes after compression)
+Entries:    1000000
+RawSize:    1968.4 MB (estimated)
+FileSize:   991.8 MB (estimated)
+------------------------------------------------
+fillrandom   :      98.731 micros/op;   19.9 MB/s     
+MSG(F:fini L:594):duplicate size: 7255024134
+MSG(F:fini L:595):write size: 19062186067
+MSG(F:fini L:596):duplicate percentage: 38.06%
+MSG(F:fini L:597):chunk number:  7198160, average chunk size: 2648
+MSG(F:fini L:599):hash number:  4231318
+
+real	1m39.337s
+user	1m18.390s
+sys	0m42.309s
++ du -sb /pmem/db2048/
+16980554645	/pmem/db2048/
++ set +o xtrace
+
+
++ /home/xzjin/leveldb_modified/build/db_bench --benchmarks=fillrandom --value_size=2048 --db=/pmem/db2048/
+MSG(F:init L:489):Initializing the libawn.so, .
+MSG(F:initMemory L:148):Allocate 5990304 bytes memory.
+MSG(F:init L:594):init: END
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:11:46 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     2048 bytes each (1024 bytes after compression)
+Entries:    1000000
+RawSize:    1968.4 MB (estimated)
+FileSize:   991.8 MB (estimated)
+------------------------------------------------
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1500, RECTREENODEPOOLIDX: 1499
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:312
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1086, RECTREENODEPOOLIDX: 1085
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:521
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 963, RECTREENODEPOOLIDX: 962
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:548
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 906, RECTREENODEPOOLIDX: 905
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:762
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1000, RECTREENODEPOOLIDX: 999
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:389
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 832, RECTREENODEPOOLIDX: 831
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:449
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 768, RECTREENODEPOOLIDX: 767
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:873
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 984, RECTREENODEPOOLIDX: 983
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:575
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 934, RECTREENODEPOOLIDX: 933
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:601
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 920, RECTREENODEPOOLIDX: 919
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:446
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 819, RECTREENODEPOOLIDX: 818
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:526
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 806, RECTREENODEPOOLIDX: 805
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:834
+fillrandom   :      58.090 micros/op;   33.9 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:1150
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:1150
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:4650
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:4650
+MSG(F:ts_print_statistics L:27): Really used memory:172800
+MSG(F:ts_print_statistics L:28): Total allocated memory:5990304
+MSG(F:ts_print_statistics L:29): ts_write bytes :14676572446
+MSG(F:ts_print_statistics L:31): ts_write same bytes :14238720878, occupy 97.02%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7ff0b4bc83a0, pid:4148, ppid:39502
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :103064861, occupy 0.70%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :5708253, metadata occupy 1.24% write data.
+
+MSG(F:fini L:1925):compare_mem_t: timing = 2448502 us
+MSG(F:fini L:1925):fileMap_t: timing = 14389 us
+MSG(F:fini L:1925):fileUnmap_t: timing = 29805 us
+MSG(F:fini L:1925):memcmp_asm_t: timing = 732743 us
+MSG(F:fini L:1925):mem_from_mem_trace_t: timing = 2197939 us
+MSG(F:fini L:1925):memcpy_from_mapped_trace_t: timing = 4411310 us
+MSG(F:fini L:1925):ts_write_t: timing = 12745513 us
+MSG(F:fini L:1925):compare occupy ts_write: 19.21%
+
+
+real	0m58.181s
+user	0m31.888s
+sys	0m31.795s
++ set +o xtrace
+16776969286	/pmem/db2048/
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=4096 --db=/pmem/db4096/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FSC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:13:36 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     4096 bytes each (2048 bytes after compression)
+Entries:    1000000
+RawSize:    3921.5 MB (estimated)
+FileSize:   1968.4 MB (estimated)
+------------------------------------------------
+fillrandom   :     213.958 micros/op;   18.3 MB/s     
+MSG(F:fini L:594):duplicate size: 36362509577
+MSG(F:fini L:595):write size: 44753571107
+MSG(F:fini L:596):duplicate percentage: 81.25%
+MSG(F:fini L:597):chunk number: 21571632, average chunk size: 2074
+MSG(F:fini L:599):hash number:  3131243
+
+real	3m34.596s
+user	2m27.300s
+sys	1m43.842s
++ du -sb /pmem/db4096/
+40626561490	/pmem/db4096/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=4096 --db=/pmem/db4096/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: TTTD.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:18:11 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     4096 bytes each (2048 bytes after compression)
+Entries:    1000000
+RawSize:    3921.5 MB (estimated)
+FileSize:   1968.4 MB (estimated)
+------------------------------------------------
+fillrandom   :     356.740 micros/op;   11.0 MB/s     
+MSG(F:fini L:594):duplicate size: 36635995675
+MSG(F:fini L:595):write size: 43086783990
+MSG(F:fini L:596):duplicate percentage: 85.03%
+MSG(F:fini L:597):chunk number: 22862341, average chunk size: 1884
+MSG(F:fini L:599):hash number:  2990903
+
+real	5m57.306s
+user	4m45.545s
+sys	2m16.584s
++ du -sb /pmem/db4096/
+38955110581	/pmem/db4096/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=4096 --db=/pmem/db4096/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: AE.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:25:05 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     4096 bytes each (2048 bytes after compression)
+Entries:    1000000
+RawSize:    3921.5 MB (estimated)
+FileSize:   1968.4 MB (estimated)
+------------------------------------------------
+fillrandom   :     239.753 micros/op;   16.4 MB/s     
+MSG(F:fini L:594):duplicate size: 37767161471
+MSG(F:fini L:595):write size: 44634497055
+MSG(F:fini L:596):duplicate percentage: 84.61%
+MSG(F:fini L:597):chunk number: 21624447, average chunk size: 2064
+MSG(F:fini L:599):hash number:  3168579
+
+real	4m0.328s
+user	3m1.631s
+sys	1m41.617s
++ du -sb /pmem/db4096/
+40507115932	/pmem/db4096/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=4096 --db=/pmem/db4096/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: Rabin.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:30:05 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     4096 bytes each (2048 bytes after compression)
+Entries:    1000000
+RawSize:    3921.5 MB (estimated)
+FileSize:   1968.4 MB (estimated)
+------------------------------------------------
+fillrandom   :     346.201 micros/op;   11.3 MB/s     
+MSG(F:fini L:594):duplicate size: 36195641976
+MSG(F:fini L:595):write size: 43243605123
+MSG(F:fini L:596):duplicate percentage: 83.70%
+MSG(F:fini L:597):chunk number: 18840126, average chunk size: 2295
+MSG(F:fini L:599):hash number:  2712514
+
+real	5m46.688s
+user	4m23.513s
+sys	2m16.283s
++ du -sb /pmem/db4096/
+39116093198	/pmem/db4096/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=4096 --db=/pmem/db4096/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FastCDC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:36:48 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     4096 bytes each (2048 bytes after compression)
+Entries:    1000000
+RawSize:    3921.5 MB (estimated)
+FileSize:   1968.4 MB (estimated)
+------------------------------------------------
+fillrandom   :     230.689 micros/op;   17.0 MB/s     
+MSG(F:fini L:594):duplicate size: 36976479516
+MSG(F:fini L:595):write size: 44626229171
+MSG(F:fini L:596):duplicate percentage: 82.86%
+MSG(F:fini L:597):chunk number: 15716295, average chunk size: 2839
+MSG(F:fini L:599):hash number:  2486328
+
+real	3m51.267s
+user	2m51.149s
+sys	1m40.270s
++ du -sb /pmem/db4096/
+40499181757	/pmem/db4096/
++ set +o xtrace
+
+
++ /home/xzjin/leveldb_modified/build/db_bench --benchmarks=fillrandom --value_size=4096 --db=/pmem/db4096/
+MSG(F:init L:489):Initializing the libawn.so, .
+MSG(F:initMemory L:148):Allocate 5990304 bytes memory.
+MSG(F:init L:594):init: END
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:41:39 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     4096 bytes each (2048 bytes after compression)
+Entries:    1000000
+RawSize:    3921.5 MB (estimated)
+FileSize:   1968.4 MB (estimated)
+------------------------------------------------
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1500, RECTREENODEPOOLIDX: 1499
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:289
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1072, RECTREENODEPOOLIDX: 1071
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:694
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1059, RECTREENODEPOOLIDX: 1058
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:636
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1016, RECTREENODEPOOLIDX: 1015
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:446
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 876, RECTREENODEPOOLIDX: 875
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:803
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1006, RECTREENODEPOOLIDX: 1005
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:738
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1045, RECTREENODEPOOLIDX: 1044
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:536
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 948, RECTREENODEPOOLIDX: 947
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:742
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1013, RECTREENODEPOOLIDX: 1012
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:557
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 941, RECTREENODEPOOLIDX: 940
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:384
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 794, RECTREENODEPOOLIDX: 793
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:760
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 931, RECTREENODEPOOLIDX: 930
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:575
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 903, RECTREENODEPOOLIDX: 902
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:623
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 915, RECTREENODEPOOLIDX: 914
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:710
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 974, RECTREENODEPOOLIDX: 973
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:550
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 913, RECTREENODEPOOLIDX: 912
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:622
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 920, RECTREENODEPOOLIDX: 919
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:787
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1023, RECTREENODEPOOLIDX: 1022
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:741
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1057, RECTREENODEPOOLIDX: 1056
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:560
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 969, RECTREENODEPOOLIDX: 968
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:591
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 935, RECTREENODEPOOLIDX: 934
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:735
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1001, RECTREENODEPOOLIDX: 1000
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:588
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 952, RECTREENODEPOOLIDX: 951
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:345
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 777, RECTREENODEPOOLIDX: 776
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:490
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 759, RECTREENODEPOOLIDX: 758
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:875
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 979, RECTREENODEPOOLIDX: 978
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:753
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1038, RECTREENODEPOOLIDX: 1037
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:726
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1057, RECTREENODEPOOLIDX: 1056
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:723
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1067, RECTREENODEPOOLIDX: 1066
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:518
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 950, RECTREENODEPOOLIDX: 949
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:780
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1037, RECTREENODEPOOLIDX: 1036
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:682
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1030, RECTREENODEPOOLIDX: 1029
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:546
+fillrandom   :     145.793 micros/op;   26.9 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:1310
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:1310
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:4810
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:4810
+MSG(F:ts_print_statistics L:27): Really used memory:152320
+MSG(F:ts_print_statistics L:28): Total allocated memory:5990304
+MSG(F:ts_print_statistics L:29): ts_write bytes :36892951602
+MSG(F:ts_print_statistics L:31): ts_write same bytes :36513332124, occupy 98.97%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f5800e623a0, pid:12705, ppid:39502
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :235843662, occupy 0.64%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :8847262, metadata occupy 0.77% write data.
+
+MSG(F:fini L:1925):compare_mem_t: timing = 5081113 us
+MSG(F:fini L:1925):fileMap_t: timing = 43878 us
+MSG(F:fini L:1925):fileUnmap_t: timing = 80109 us
+MSG(F:fini L:1925):memcmp_asm_t: timing = 1542792 us
+MSG(F:fini L:1925):mem_from_mem_trace_t: timing = 4726367 us
+MSG(F:fini L:1925):memcpy_from_mapped_trace_t: timing = 5567323 us
+MSG(F:fini L:1925):ts_write_t: timing = 35103645 us
+MSG(F:fini L:1925):compare occupy ts_write: 14.47%
+
+
+real	2m25.961s
+user	1m5.713s
+sys	1m30.830s
++ set +o xtrace
+41075055041	/pmem/db4096/
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=8192 --db=/pmem/db8192/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FSC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:46:34 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     8192 bytes each (4096 bytes after compression)
+Entries:    1000000
+RawSize:    7827.8 MB (estimated)
+FileSize:   3921.5 MB (estimated)
+------------------------------------------------
+fillrandom   :     472.749 micros/op;   16.6 MB/s     
+MSG(F:fini L:594):duplicate size: 88244914902
+MSG(F:fini L:595):write size: 96722050776
+MSG(F:fini L:596):duplicate percentage: 91.24%
+MSG(F:fini L:597):chunk number: 35242462, average chunk size: 2744
+MSG(F:fini L:599):hash number:  3161689
+
+real	7m53.453s
+user	5m4.818s
+sys	4m4.225s
++ du -sb /pmem/db8192/
+88502972650	/pmem/db8192/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=8192 --db=/pmem/db8192/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: TTTD.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 12:57:05 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     8192 bytes each (4096 bytes after compression)
+Entries:    1000000
+RawSize:    7827.8 MB (estimated)
+FileSize:   3921.5 MB (estimated)
+------------------------------------------------
+fillrandom   :     742.079 micros/op;   10.5 MB/s     
+MSG(F:fini L:594):duplicate size: 87592827506
+MSG(F:fini L:595):write size: 96720027645
+MSG(F:fini L:596):duplicate percentage: 90.56%
+MSG(F:fini L:597):chunk number: 37345324, average chunk size: 2589
+MSG(F:fini L:599):hash number:  3172412
+
+real	12m22.966s
+user	10m10.654s
+sys	4m15.867s
++ du -sb /pmem/db8192/
+88498662701	/pmem/db8192/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=8192 --db=/pmem/db8192/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: AE.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 13:12:06 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     8192 bytes each (4096 bytes after compression)
+Entries:    1000000
+RawSize:    7827.8 MB (estimated)
+FileSize:   3921.5 MB (estimated)
+------------------------------------------------
+fillrandom   :     564.960 micros/op;   13.9 MB/s     
+MSG(F:fini L:594):duplicate size: 88692218809
+MSG(F:fini L:595):write size: 96478571160
+MSG(F:fini L:596):duplicate percentage: 91.93%
+MSG(F:fini L:597):chunk number: 33947188, average chunk size: 2842
+MSG(F:fini L:599):hash number:  3178280
+
+real	9m25.567s
+user	7m6.992s
+sys	4m4.502s
++ du -sb /pmem/db8192/
+88261873918	/pmem/db8192/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=8192 --db=/pmem/db8192/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: Rabin.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 13:24:07 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     8192 bytes each (4096 bytes after compression)
+Entries:    1000000
+RawSize:    7827.8 MB (estimated)
+FileSize:   3921.5 MB (estimated)
+------------------------------------------------
+fillrandom   :     789.623 micros/op;    9.9 MB/s     
+MSG(F:fini L:594):duplicate size: 86336740843
+MSG(F:fini L:595):write size: 96768819908
+MSG(F:fini L:596):duplicate percentage: 89.22%
+MSG(F:fini L:597):chunk number: 32170607, average chunk size: 3007
+MSG(F:fini L:599):hash number:  3054625
+
+real	13m10.307s
+user	9m30.123s
+sys	5m20.192s
++ du -sb /pmem/db8192/
+88551583615	/pmem/db8192/
++ set +o xtrace
+
+
++ LD_PRELOAD=/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0
++ /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=8192 --db=/pmem/db8192/
+init library.
+Prokey with read allocated.
+Current working directory: /home/xzjin/awn/expriment/leveldb
+chunck algorithm: FastCDC.
+backup dir: 
+
+==== backup begin ====
+Read 0 inherited sparse containers
+MSG(F:init L:589):Dedup level: dedup.
+LevelDB:    version 1.22
+Date:       Tue Dec 28 13:39:55 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     8192 bytes each (4096 bytes after compression)
+Entries:    1000000
+RawSize:    7827.8 MB (estimated)
+FileSize:   3921.5 MB (estimated)
+------------------------------------------------
+fillrandom   :     524.041 micros/op;   14.9 MB/s     
+MSG(F:fini L:594):duplicate size: 85298219181
+MSG(F:fini L:595):write size: 97039330215
+MSG(F:fini L:596):duplicate percentage: 87.90%
+MSG(F:fini L:597):chunk number: 28673873, average chunk size: 3384
+MSG(F:fini L:599):hash number:  3056678
+
+real	8m44.837s
+user	6m15.211s
+sys	4m3.626s
++ du -sb /pmem/db8192/
+88818204111	/pmem/db8192/
++ set +o xtrace
+
+
++ /home/xzjin/leveldb_modified/build/db_bench --benchmarks=fillrandom --value_size=8192 --db=/pmem/db8192/
+MSG(F:init L:489):Initializing the libawn.so, .
+MSG(F:initMemory L:148):Allocate 5990304 bytes memory.
+MSG(F:init L:594):init: END
+LevelDB:    version 1.22
+Date:       Tue Dec 28 13:51:19 2021
+CPU:        40 * Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz
+CPUCache:   28160 KB
+Keys:       16 bytes each
+Values:     8192 bytes each (4096 bytes after compression)
+Entries:    1000000
+RawSize:    7827.8 MB (estimated)
+FileSize:   3921.5 MB (estimated)
+------------------------------------------------
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1500, RECTREENODEPOOLIDX: 1499
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:273
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1063, RECTREENODEPOOLIDX: 1062
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:531
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 955, RECTREENODEPOOLIDX: 954
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:730
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1010, RECTREENODEPOOLIDX: 1009
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:700
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1025, RECTREENODEPOOLIDX: 1024
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:746
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1062, RECTREENODEPOOLIDX: 1061
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:389
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 870, RECTREENODEPOOLIDX: 869
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:817
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1011, RECTREENODEPOOLIDX: 1010
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:405
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 849, RECTREENODEPOOLIDX: 848
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:457
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 783, RECTREENODEPOOLIDX: 782
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:662
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 866, RECTREENODEPOOLIDX: 865
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:521
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 831, RECTREENODEPOOLIDX: 830
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:646
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 885, RECTREENODEPOOLIDX: 884
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:645
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 917, RECTREENODEPOOLIDX: 916
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:622
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 922, RECTREENODEPOOLIDX: 921
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:795
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1029, RECTREENODEPOOLIDX: 1028
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:743
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1062, RECTREENODEPOOLIDX: 1061
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:721
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1069, RECTREENODEPOOLIDX: 1068
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:385
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 871, RECTREENODEPOOLIDX: 870
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:688
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 934, RECTREENODEPOOLIDX: 933
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:786
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1031, RECTREENODEPOOLIDX: 1030
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:571
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 960, RECTREENODEPOOLIDX: 959
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:588
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 928, RECTREENODEPOOLIDX: 927
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:768
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1017, RECTREENODEPOOLIDX: 1016
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:389
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 843, RECTREENODEPOOLIDX: 842
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:449
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 774, RECTREENODEPOOLIDX: 773
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:866
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 983, RECTREENODEPOOLIDX: 982
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:584
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 939, RECTREENODEPOOLIDX: 938
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:354
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 775, RECTREENODEPOOLIDX: 774
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:464
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 742, RECTREENODEPOOLIDX: 741
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:882
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 973, RECTREENODEPOOLIDX: 972
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:759
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1038, RECTREENODEPOOLIDX: 1037
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:735
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1063, RECTREENODEPOOLIDX: 1062
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:384
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 867, RECTREENODEPOOLIDX: 866
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:829
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1017, RECTREENODEPOOLIDX: 1016
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:647
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 997, RECTREENODEPOOLIDX: 996
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:582
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 946, RECTREENODEPOOLIDX: 945
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:625
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 942, RECTREENODEPOOLIDX: 941
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:711
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 991, RECTREENODEPOOLIDX: 990
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:582
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 943, RECTREENODEPOOLIDX: 942
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:580
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 913, RECTREENODEPOOLIDX: 912
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:805
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1030, RECTREENODEPOOLIDX: 1029
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:596
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 975, RECTREENODEPOOLIDX: 974
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:423
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 838, RECTREENODEPOOLIDX: 837
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:837
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1004, RECTREENODEPOOLIDX: 1003
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:549
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 931, RECTREENODEPOOLIDX: 930
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:589
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 911, RECTREENODEPOOLIDX: 910
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:626
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 921, RECTREENODEPOOLIDX: 920
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:730
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 990, RECTREENODEPOOLIDX: 989
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:527
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 909, RECTREENODEPOOLIDX: 908
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:512
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 852, RECTREENODEPOOLIDX: 851
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:461
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 787, RECTREENODEPOOLIDX: 786
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:685
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 882, RECTREENODEPOOLIDX: 881
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:705
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 951, RECTREENODEPOOLIDX: 950
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:505
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 873, RECTREENODEPOOLIDX: 872
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:820
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1015, RECTREENODEPOOLIDX: 1014
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:649
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 997, RECTREENODEPOOLIDX: 996
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:757
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1051, RECTREENODEPOOLIDX: 1050
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:535
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 951, RECTREENODEPOOLIDX: 950
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:777
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1036, RECTREENODEPOOLIDX: 1035
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:743
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1066, RECTREENODEPOOLIDX: 1065
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:392
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 874, RECTREENODEPOOLIDX: 873
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:632
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 903, RECTREENODEPOOLIDX: 902
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:690
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 955, RECTREENODEPOOLIDX: 954
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:583
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 922, RECTREENODEPOOLIDX: 921
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:654
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 945, RECTREENODEPOOLIDX: 944
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:679
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 973, RECTREENODEPOOLIDX: 972
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:586
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 934, RECTREENODEPOOLIDX: 933
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:578
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 906, RECTREENODEPOOLIDX: 905
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:798
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1021, RECTREENODEPOOLIDX: 1020
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:698
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1030, RECTREENODEPOOLIDX: 1029
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:587
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 969, RECTREENODEPOOLIDX: 968
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:770
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1042, RECTREENODEPOOLIDX: 1041
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:727
+MSG(F:addTreeNode L:329):RECTREENODETHRESHOLD: 1060, RECTREENODEPOOLIDX: 1059
+MSG(F:recTreeNodeGrabageReclaim L:534):Reclaimed recNode:716
+fillrandom   :     332.990 micros/op;   23.5 MB/s     
+MSG(F:ts_print_statistics L:9):====================== IO statistics: ======================
+MSG(F:ts_print_statistics L:10): mmap 0
+MSG(F:ts_print_statistics L:13): memcpy READ: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:16): memcpy WRITE: count 0, size 0, average 0
+MSG(F:ts_print_statistics L:18): RECTREENODEPOOLIDX:1092
+MSG(F:ts_print_statistics L:20): TAILHEADPOOLIDX:1092
+MSG(F:ts_print_statistics L:21): RECBLOCKENTRYPOOLIDX:4592
+MSG(F:ts_print_statistics L:22): RECARRPOOLIDX:4592
+MSG(F:ts_print_statistics L:27): Really used memory:180224
+MSG(F:ts_print_statistics L:28): Total allocated memory:5990304
+MSG(F:ts_print_statistics L:29): ts_write bytes :81809146473
+MSG(F:ts_print_statistics L:31): ts_write same bytes :81222124699, occupy 99.28%
+MSG(F:ts_print_statistics L:32):ts_write_same_size addr :0x7f29e0f3e3a0, pid:23861, ppid:39502
+MSG(F:ts_print_statistics L:34): ts_write not found bytes :294842709, occupy 0.36%
+MSG(F:ts_print_statistics L:36): ts_write new metadata item :9913175, metadata occupy 0.39% write data.
+
+MSG(F:fini L:1925):compare_mem_t: timing = 7726069 us
+MSG(F:fini L:1925):fileMap_t: timing = 113863 us
+MSG(F:fini L:1925):fileUnmap_t: timing = 193872 us
+MSG(F:fini L:1925):memcmp_asm_t: timing = 3309510 us
+MSG(F:fini L:1925):mem_from_mem_trace_t: timing = 6307731 us
+MSG(F:fini L:1925):memcpy_from_mapped_trace_t: timing = 6641302 us
+MSG(F:fini L:1925):ts_write_t: timing = 66255195 us
+MSG(F:fini L:1925):compare occupy ts_write: 11.66%
+
+
+real	5m33.230s
+user	2m1.093s
+sys	3m49.990s
++ set +o xtrace
+90094050323	/pmem/db8192/
+
