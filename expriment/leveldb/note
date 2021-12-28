@@ -26,6 +26,6 @@ get throughput
 dedup ratio
 | awk '/duplicate percentage/{print $(NF)} /ts_write same bytes/{print $(NF)}' | awk -F'%' '{print $1}'
 time cost
-| awk '/real/{print $(NF)} '
+| awk '/real/{print $(NF)}' | awk -F'[ms]' '{time=$1*60+$2; print time }'
 hash/meta num
 | awk '/hash number/{print $(NF)} /new metadata item/{print substr($7, 2, length($7)-2)} '
