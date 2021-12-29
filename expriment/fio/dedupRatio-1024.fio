@@ -1,0 +1,9 @@
+[global]
+size=2G
+loops=1
+dedupe_percentage=40
+directory=/dbtmp/
+
+[SSD-rand]
+rw=randwrite
+bs=1024
