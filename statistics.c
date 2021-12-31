@@ -1,5 +1,6 @@
 #include "common.h"
 #include "statistics.h"
+#include "mem.h"
 #include "tree.h"
 
 void ts_print_statistics(void){

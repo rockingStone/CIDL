@@ -4,6 +4,7 @@
 
 void initMemory(){
 	unsigned long long allocSize;
+	RECTREENODEPOOLSIZE = 5000;
 	totalAllocSize = 0;
 	RECARRPOOLSIZE = 6000;
 	TAILHEADPOOLSIZE = RECTREENODEPOOLSIZE;

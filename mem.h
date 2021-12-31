@@ -74,12 +74,42 @@ inline struct memRec *allocateMemRecArr() __attribute__((always_inline));
 void withdrawMemRecArr(struct memRec *ptr);
 
 struct recTreeNode* RECTREENODEPOOL;
-#define RECTREENODEPOOLSIZE 2500
+int RECTREENODEPOOLSIZE;
 int RECTREENODEPOOLIDX;
 int RECTREENODETHRESHOLD;
 struct recTreeNode** RECTREENODEPOOLPTR;
 //xzjin 因为IDX开始存放的是缓存大小，所以先减后返回
 inline struct recTreeNode *allocateRecTreeNode(){
+//	if(UNLIKELY(RECTREENODEPOOLIDX<=0)){
+//		unsigned long long allocSize;
+//        struct recTreeNode** recTreeNodeDepot;
+//
+//		allocSize = sizeof(struct tailhead)*RECTREENODEPOOLSIZE;
+//		totalAllocSize += allocSize;
+//		RECTREENODEPOOL = malloc(allocSize);
+//		if(!RECTREENODEPOOL){
+//			ERROR("Could not allocate space for RECTREENODEPOOL.\n");
+//			assert(0);
+//		}
+//
+//        recTreeNodeDepot = malloc(sizeof(struct tailhead*)*RECTREENODEPOOLSIZE*2);
+//		totalAllocSize += sizeof(struct tailhead*)*RECTREENODEPOOLSIZE;
+//		if(!totalAllocSize){
+//			ERROR("Could not allocate space for RECTREENODEPOOLPTR.\n");
+//			assert(0);
+//		}
+//        memcpy(recTreeNodeDepot, RECTREENODEPOOLPTR, RECTREENODEPOOLIDX*sizeof(struct tailhead*));
+//        free(RECTREENODEPOOLPTR);
+//        RECTREENODEPOOLPTR = recTreeNodeDepot;
+//		RECTREENODEPOOLPTR[RECTREENODEPOOLIDX] = RECTREENODEPOOL;
+//		for(int i=RECTREENODEPOOLIDX+1, end = RECTREENODEPOOLIDX+RECTREENODEPOOLSIZE; i< end; i++){
+//			RECTREENODEPOOLPTR[i] = RECTREENODEPOOLPTR[i-1] + 1;
+//		}
+//		RECTREENODEPOOLIDX += RECTREENODEPOOLSIZE;
+//        RECTREENODEPOOLSIZE += RECTREENODEPOOLSIZE;
+//
+//	}
+
 	assert(RECTREENODEPOOLIDX>0);
 	RECTREENODEPOOLIDX--;
 	return RECTREENODEPOOLPTR[RECTREENODEPOOLIDX];
