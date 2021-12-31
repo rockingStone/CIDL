@@ -774,18 +774,18 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 	int curWriteSameLen = 0;
 	//xzjin 因为是比较连续的地址，所以不用在开始重新初始化diffPos变量
 	for(int i=0; start<=end; start++,i++){
-//		int writeLenCurPage = 4096;
+		int writeLenCurPage = 4096;
 		int sameLenCurPage = 0;
 		int notFoundLen;
 		toTailLen = length-((unsigned long)getAddr((void*)start,0)-(unsigned long)buf);
 //		float samePercent;
 //		DEBUG("compare, Page num:%lu.\n", start);
 		if((unsigned long)getAddr((void*)start, 0)<(unsigned long)diffPos) continue;
-//		if(startPageNum == start){
-//			writeLenCurPage = 4096-addr2PageOffset(buf);
-//		}else if(end == start){
-//			writeLenCurPage = addr2PageOffset((void*)tail);
-//		}
+		if(start == addr2PageNum(buf)){
+			writeLenCurPage = 4096-addr2PageOffset(buf);
+		}else if(end == start){
+			writeLenCurPage = addr2PageOffset((void*)tail);
+		}
 		searchNode.pageNum = (void*)start;
 //		START_TIMING(tfind_t, tfind_time);
 		struct recTreeNode **res = tfind(&searchNode, &recTreeRoot, recCompare);
@@ -822,10 +822,9 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 			}
 
 //delTail:
-//			samePercent = ((double)sameLenCurPage/writeLenCurPage)*100;
-//			printf("same percentage this page: %.2f%%, pageLen:%d, samelen:%d, writePageNum:%lu, curPageNum:%lu.\n",
-//				samePercent, writeLenCurPage, sameLenCurPage,
-//				addr2PageNum(buf), start);
+			float samePercent = ((double)sameLenCurPage/writeLenCurPage)*100;
+			MSG("same percentage this page: %.2f%%, pageLen:%d, samelen:%d, writePageNum:%lu, curPageNum:%lu.\n", samePercent, writeLenCurPage, sameLenCurPage,
+				addr2PageNum(buf), start);
 			//xzjin 写完一个页就删除对应的映射结构
 			//xzjin TODO这里是不是可以等到写对比不同的时候再删除，不是写完就删除
 			//对一个地址多次写入的情况会有好处
