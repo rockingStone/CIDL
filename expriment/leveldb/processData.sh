@@ -2,7 +2,8 @@
 
 category=(128 256 512 1024 2048 4096 8192)
 column=("FSC" "TTTD" "AE" "RABIN" "FastCDC" "CIDL")
-
+#use array?
+#lineNum="$(grep -n "needle" haystack.txt | head -n 1 | cut -d: -f1)"
 
 for a in "${category[@]}"
 do
@@ -38,3 +39,10 @@ do
 	awk "BEGIN{line=\"hash/meta num\"} /hash number/{line=line\",\"\$(NF)} /new metadata item/{metaNum=substr(\$7, 2, length(\$7)-2); line=line\",\"metaNum} END{print line}" tmp/grepedData >> $a.csv
 
 done
+
+#merge files
+for a in "${category[@]}"
+do
+	mergePara=$mergePara$a".csv "
+done
+paste -d"," $mergePara > 4K.csv
