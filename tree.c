@@ -325,8 +325,7 @@ void listRecTreeNode(void *pageNum){
 struct recTreeNode* addTreeNode(void* pageNum){
 
 	if(UNLIKELY(RECTREENODETHRESHOLD > RECTREENODEPOOLIDX || RECTREENODEPOOLIDX==0)){
-		MSG("RECTREENODETHRESHOLD: %d, RECTREENODEPOOLIDX: %d\n",
-			RECTREENODETHRESHOLD, RECTREENODEPOOLIDX);
+//		MSG("RECTREENODETHRESHOLD: %d, RECTREENODEPOOLIDX: %d\n", RECTREENODETHRESHOLD, RECTREENODEPOOLIDX);
 		recTreeNodeGrabageReclaim();
 	}
 	//xzjin 因为tdelete会在函数内部释放空间，所以在这里暂时用单独的malloc 
@@ -531,5 +530,5 @@ void recTreeNodeGrabageReclaim(){
 
 	twalk(recTreeRoot, reclaimRecTreeNode);
 	RECTREENODETHRESHOLD = RECTREENODEPOOLIDX* RECTREENODETHRESHOLDRATIO;
-	MSG("Reclaimed recNode:%lu\n", reclamedRecNode);
+//	MSG("Reclaimed recNode:%lu\n", reclamedRecNode);
 }

@@ -112,7 +112,7 @@ inline void writeRec(unsigned long fileOffset, void* src, void* dest,
 		*(lastRec.lastIdx) = 1;
 //		checkEmptyRecTreeNode();
 	}
-//	MSG("PageNum: %p, idx:%d\n", lastRec.lastPageNum, *(lastRec.lastIdx));
+	//MSG("Insert into page: %p, idx:%d, offset:%lu\n", lastRec.lastPageNum, *(lastRec.lastIdx), pageOffset);
 }
 
 //xzjin src is UNUSED and UNCHECKED
@@ -155,7 +155,8 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 				//	2. memcpy treced 的dest的树节点之前是空的，现在刚插入内容
 				//NOTE: bigger or equal, equal is important in some cases
 				if(idx>0 && lastMenRec[idx-1].pageOffset>=addr2PageOffset(dest)){
-					DEBUG("\nDeleting memory record list, pageNum:%p.\n", pageNum);
+//					MSG("\nDeleting memory record list, pageNum:%p, intents to offset:%d\n",
+//						 pageNum, addr2PageOffset(dest));
 //					listRecTreeNode(pageNum);
 					TAILQ_FOREACH(ent, head, entries){
 //						DEBUG("delete list head:%p, element:%p\n", head, ent);
@@ -766,7 +767,7 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 	START_TIMING(compare_mem_t, compare_mem_time);
 	int toTailLen, idx; 
 	struct recTreeNode searchNode;
-	void* diffPos = 0;
+	void* diffPos = buf;
 	void* bufCmpStart;
 	struct memRec *mrp;
 	unsigned long sameLen;
@@ -774,23 +775,25 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 	int curWriteSameLen = 0;
 	//xzjin 因为是比较连续的地址，所以不用在开始重新初始化diffPos变量
 	for(int i=0; start<=end; start++,i++){
-		int writeLenCurPage = 4096;
+//		MSG("compare page: %p\n", (void*)start);
+//		int writeLenCurPage = 4096;
 		int sameLenCurPage = 0;
 		int notFoundLen;
 		toTailLen = length-((unsigned long)getAddr((void*)start,0)-(unsigned long)buf);
 //		float samePercent;
 //		DEBUG("compare, Page num:%lu.\n", start);
-		if((unsigned long)getAddr((void*)start, 0)<(unsigned long)diffPos) continue;
-		if(start == addr2PageNum(buf)){
-			writeLenCurPage = 4096-addr2PageOffset(buf);
-		}else if(end == start){
-			writeLenCurPage = addr2PageOffset((void*)tail);
-		}
+		if((unsigned long)getAddr((void*)start, 4095)<(unsigned long)diffPos) continue;
+//		if(start == (unsigned long long)addr2PageNum(buf)){
+//			writeLenCurPage = 4096-addr2PageOffset(buf);
+//		}else if(end == start){
+//			writeLenCurPage = addr2PageOffset((void*)tail);
+//		}
 		searchNode.pageNum = (void*)start;
 //		START_TIMING(tfind_t, tfind_time);
 		struct recTreeNode **res = tfind(&searchNode, &recTreeRoot, recCompare);
 //		END_TIMING(tfind_t, tfind_time);
 		if(res){
+//			MSG("inside page: %p\n", (void*)start);
 //			listRecTreeNode((void*)start);
 			struct recBlockEntry *blockEntry = TAILQ_LAST(res[0]->listHead, tailhead);
 			//xzjin 注意这里有个foreach，这个有效吗？正确吗?
@@ -803,7 +806,9 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 					idx = MEMRECPERENTRY;
 				}					
 				//xzjin 过滤掉比buf小的地址
-				while (((unsigned long)getAddr((void*)start, mrp->pageOffset) < (unsigned long) buf) &&
+//				while (((unsigned long)getAddr((void*)start, mrp->pageOffset) < (unsigned long) buf) &&
+				//xzjin 过滤掉比diffPos小的地址
+				while (((unsigned long)getAddr((void*)start, mrp->pageOffset) < (unsigned long) diffPos) &&
 					i<idx ) {
 					mrp++; i++;
 				}
@@ -812,7 +817,7 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 					DEBUG("i=%d, mrp:%p.\n", i, mrp);
 					bufCmpStart = getAddr((void*)start, mrp->pageOffset);
 					if((unsigned long)bufCmpStart < (unsigned long) diffPos) continue;
-					if((unsigned long)bufCmpStart > (unsigned long) tail) break;
+					if((unsigned long)bufCmpStart > (unsigned long) tail) ;
 					sameLen = cmpWrite((unsigned long)bufCmpStart, mrp, buf, tail, &diffPos, file);
 					sameContentTimes += sameLen?1:0;
 					sameLenCurPage += sameLen;
@@ -822,9 +827,10 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 			}
 
 //delTail:
-			float samePercent = ((double)sameLenCurPage/writeLenCurPage)*100;
-			MSG("same percentage this page: %.2f%%, pageLen:%d, samelen:%d, writePageNum:%lu, curPageNum:%lu.\n", samePercent, writeLenCurPage, sameLenCurPage,
-				addr2PageNum(buf), start);
+//			float samePercent = ((double)sameLenCurPage/writeLenCurPage)*100;
+//			MSG("same percentage this page: %.2f%%, pageLen:%d, samelen:%d, writePageNum:%p, curCmpPageNum:%p\n", samePercent, writeLenCurPage, sameLenCurPage, addr2PageNum(buf), (void*)start);
+//			listRecTreeNode((void*)start);
+//			MSG("\n");
 			//xzjin 写完一个页就删除对应的映射结构
 			//xzjin TODO这里是不是可以等到写对比不同的时候再删除，不是写完就删除
 			//对一个地址多次写入的情况会有好处
@@ -849,15 +855,15 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 			*/
 //			checkEmptyRecTreeNode();
 		}else{
+//			MSG("page:%p not found, size:%d.\n", (void*)start, notFoundLen);
 			notFoundLen = MIN(PAGESIZE, toTailLen);
 			//TODO 这里打印出来没有找到的内容，是不是可以分析一下模式
-//			MSG("buf: %p not found, size:%d.\n", (void*)start, notFoundLen);
 			ts_write_not_found_size += notFoundLen;
 //			checkEmptyRecTreeNode();
 		}
 	}
-//	MSG("ts_write buf:%p, tail:%p, length:%lu, same time:%d, same len:%d, same occupy:%d%%\n\n\n",
-//		 buf, tail, length, sameContentTimes, curWriteSameLen, (int)(curWriteSameLen*100/length));
+//	double samePercent = curWriteSameLen*100/length;
+//	MSG("ts_write buf:%p, tail:%p, length:%lu, same time:%d, same len:%d, same occupy:%.2f\n", buf, (void*)tail, length, sameContentTimes, curWriteSameLen, samePercent);
 	END_TIMING(compare_mem_t, compare_mem_time);
 }
 
@@ -974,13 +980,13 @@ void do_ts_write(int file, void *buf, size_t length, unsigned long tail,
 #endif	//BASE_VERSION
 
 ssize_t ts_write(int file, void *buf, size_t length){
-	//MSG("%s, start.\n", __func__);
 	ts_writeTime++;
 	ts_writeTime = ts_writeTime%0xFFFFFF;
 	void *t = buf;
 	unsigned long tail = (unsigned long)buf+length;
 	unsigned long long start = (unsigned long long)addr2PageNum(t);
 	unsigned long long end = (unsigned long long)addr2PageNum((void*)((unsigned long long)buf+length));
+//	MSG("\n\n\n\n\n\npage: %llx, tail page:%llx, buf:%p, len:%lu\n", start, end, buf, length);
 
 	//TODO xzjin 这个是不是要在用户空间维护一下，太耗时了
 	//off_t fpos = lseek(file, 0, SEEK_CUR);
@@ -1249,6 +1255,8 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 		struct recTreeNode **srcRes = tfind(&searchNode, &recTreeRoot, recCompare);
 		//src address is in tree and dest address is not
 		if(srcRes){
+			//MSG("\n\n------------xzjin-list-tree-node:%p-------------\n\n", (void*)start);
+			//listRecTreeNode((void*)start);
 			struct recBlockEntry *srcLastEntry = srcRes[0]->recModEntry;
 			struct recBlockEntry *blockEntry = TAILQ_LAST(srcRes[0]->listHead, tailhead);
 //			struct recBlockEntry *delBlockEntry;
@@ -1290,6 +1298,8 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 						break;
 					}
 				}
+			}else{
+				uplimit = srcRes[0]->memRecIdx;
 			}
 
 //			int destOffset = addr2PageOffset(dest);
@@ -1315,6 +1325,7 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 			//Copy record item to dest
 			for(; idx < uplimit; idx++){
 				struct memRec *curMemRec = rec+idx;
+//				MSG("curMemRec:%p, rec:%p, idx:%d\n", curMemRec, rec, idx);
 				void* copySrc = getAddr((void*)start, curMemRec->pageOffset);
 				void* copyDest;
  				copyDest = dest+(copySrc-src);
