@@ -10,6 +10,8 @@
 #define USE_TS_FUNC 1
 #define USE_FMAP_CACHE 0
 #define REC_INSERT_TEST 0
+#define DELETE_TREENODE 1
+#define BYTE_COMPARE 0
 #define CMPWRITE
 #undef TS_MEMCPY_CMPWRITE
 
@@ -43,13 +45,11 @@ instrumentation_type ts_memcpy_tfind_file_time;
 pthread_mutex_t recTreeMutex;
 
 unsigned long long totalAllocSize = 0;
-#ifndef BASE_VERSION
-extern int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void** firstDiffPos);
-#else
+#if defined(BASE_VERSION) || BYTE_COMPARE 
 int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void** firstDiffPos);
 int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void** firstDiffPos){
-	char *c1 = s1;
-	char *c2 = s2;
+	char *c1 = (char*) s1;
+	char *c2 = (char*) s2;
 	for(int i=0; i<n; i++){
 		if(*c1-*c2 != 0){
 			*firstDiffPos = c1;
@@ -60,6 +60,8 @@ int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void** firstDiffPo
 	}
 	return 0;
 }
+#else
+extern int memcmp_avx2_asm(const void *s1, const void *s2, size_t n, void** firstDiffPos);
 #endif //BASE_VERSION
 
 #ifndef BASE_VERSION
@@ -144,6 +146,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 			lastRec.lastIdx = &(nodePtr->memRecIdx);
 			//Check whether new address is smaller than older
 			//If true, delete node content
+#if DELETE_TREENODE
 			{
 				struct memRec* lastMenRec = lastRec.lastMemRec;
 				int idx = *lastRec.lastIdx;
@@ -171,6 +174,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 					*(lastRec.lastIdx) = 0;
 				}
 			}
+#endif	//DELETE_TREENODE
 			//DEBUG("insterRec if\n");
 			writeRec(fileOffset, src, dest, pageNum, fileName, fd);
 //		    struct tailhead *head = pt[0]->listHead;
@@ -332,8 +336,8 @@ void segvhandler(int signum, siginfo_t *info, void *context) {
 		if(pkey_mprotect(pageStart, PAGESIZE, getPro(pageStart),
 				 nonProKey)){
 			ERROR("Fault in mprotect.\n");
-		   perror("Couldn’t mprotect\n");
-		   exit(errno);
+			perror("Couldn’t mprotect\n");
+			exit(errno);
 		}
 //		deleteMapExtent(pageStart, PAGESIZE);
 		DEBUG("PKU segv err processed\n",info->si_addr);
@@ -361,120 +365,6 @@ void segvhandler(int signum, siginfo_t *info, void *context) {
   		sigaction(SIGSEGV, &defaction, NULL);
 		break;
   	}
-//	p2f = findmap2f(info->si_addr);
-//	if(p2f){
-//		if (mprotect(p2f->start, (p2f->end)-(p2f->start), 
-//					PROT_READ|PROT_WRITE)) {
-//			ERROR("Fault in mprotect.\n");
-//		    perror("Couldn’t mprotect\n");
-//		    exit(errno);
-//		}else{
-//			MSG("Change addr %p~%p to read|write.\n",
-//					p2f->start,p2f->end);
-//			delMap(p2f);
-//		}
-//	}
- 	/* unregister and let the default action occur */
-//  	sigaction(SIGSEGV, &defaction, NULL);
-}
-
-//void p2fAppend(void *processAddr, long long fileoffset, long long length,
-//				 char* absolutePath, short keyId){
-//	DEBUG("Entering p2fAppend, processAddr:%p.\n", processAddr);
-//	insertMapExtent( processAddr, processAddr + length, fileoffset,
-//					 absolutePath, keyId);
-//	void *pageNum = addr2PageNum(processAddr);
-//	//xzjin 不同的页有不同的子树，这里是以页为搜索单位的
-//	RBNodePtr search = searchTree(pageNum2Tree, addr2PageNum(processAddr));
-//	if(! search){
-//		DEBUG("process Addr is not in tree\n");
-//		RBNodePtr root = creatRBTree();
-//		insertMapExtent(&root, processAddr, processAddr + length, 
-//		       fileoffset, absolutePath, keyId);
-//
-//		insertMapTree(&pageNum2Tree, addr2PageNum(processAddr), root);
-//	}else{
-//		//TODO xzjin 增加重复地址检测的内容
-//		insertMapExtent(&(search->innerMapTree), processAddr, processAddr + length, 
-//		       fileoffset, absolutePath, keyId);
-//	}
-//	DEBUG("process Addr:%p is added to tree\n", processAddr);
-//	return;
-//}
-//xzjin 这个函数没有写完
-//xzjin TODO add lock
-//xzjin 和下面函数不一样的地方在于这里是搜索在一个范围里的第一个映射
-//RBNodePtr findmapExte2f(void *addr,unsigned long long len,
-//		int *protected, int *proKey){
-//	DEBUG("Entering find findmap2 function.\n",addr);
-//	void *end = addr + len;
-//	struct p2fmap *pos = NULL;
-//	*protected =0;
-//
-//	RBNodePtr search = NULL;
-//	//xzjin Find mapTree and update start to first page where overlap may exists.
-//	for(;(!search || !search->innerMapTree || search->innerMapTree == TNULL)&& addr<end;
-//			addr = (void *)(((unsigned long long )addr & PAGENUMMASK)+4096)){
-//		search = searchTree(pageNum2Tree, addr2PageNum(addr));
-//	}
-//
-//	if(search){
-//		if(!isEmpty(search->innerMapTree)){
-//			*protected = 1;
-//			*proKey = search->innerMapTree->keyid;
-//		}
-////		DEBUG("Found page tree\n");
-//		search = searchContainer(search->innerMapTree, addr);
-//		if(search && search->end > addr){
-//			DEBUG("Found in tree, start:%p,end:%p,keyid:%d\n",
-//				search->start,search->end,search->keyid);
-//			return search;
-//		}
-//	}
-////	DEBUG("process Addr:%p is not in map\n",addr);
-//	return NULL;
-//}
-
-//xzjin TODO add lock
-/** Here pageMapTree is first level node, when delete it's 
- * second level node ,use &(*pageMapTree->innerMap) */
-//RBNodePtr findmap2f(void *addr, RBNodePtr *pageMapTree, int *protected, int *proKey){
-////	DEBUG("Entering find findmap2f function.\n",addr);
-//	struct p2fmap *pos = NULL;
-//	*protected =0;
-//
-//	RBNodePtr search = searchTree(pageNum2Tree, addr2PageNum(addr));
-//	*pageMapTree = search;
-//	if(search){
-//		if(!isEmpty(search->innerMapTree)){
-//			*protected = 1;
-//			*proKey = search->innerMapTree->keyid;
-//		}
-////		DEBUG("Found page tree\n");
-//		search = searchContainer(search->innerMapTree, addr);
-//		if(search && search->end > addr){
-//			DEBUG("Found in tree, start:%p,end:%p,keyid:%d\n",
-//				search->start, search->end, search->keyid);
-//			return search;
-//		}
-//	}
-////	DEBUG("process Addr:%p is not in map\n",addr);
-//	return NULL;
-//}
-//xzjin TODO Add lock
-//xzjin TODO 这个delMap是不是要先释放所有子树的内容，然后再删除和释放本身
-void delMap(RBNodePtr *root, RBNodePtr addr){
-//	DEBUG("Delete map start:%p,end:%p,file:%s,keyId:%d\n",
-//				node->start,node->end,node->abp,node->keyid);
-//	deleteNodeFromAddr(root, addr);
-//	RBNodePtr search = searchTree(pageNum2Tree, addr2PageNum(node->start));
-//	if(!search){
-//		ERROR("Here is no tree for addr:%p\n",node->start);
-//		exit(-1);
-//	}
-//
-//	deleteNode(&(search->innerMapTree), node->start);
-	return;
 }
 
 // Creates the set of standard posix functions as a module.
@@ -2040,7 +1930,7 @@ FILE *ts_fopen (const char *filename, const char *modes){
 	char *abpath = NULL;
     struct stat st;
 	FILE* result;
-	int err, fd;
+	int err, fd = 0;
 	long mmapRet __attribute__((unused));
 
 	result = fopen(filename, modes);

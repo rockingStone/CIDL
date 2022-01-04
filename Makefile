@@ -15,7 +15,7 @@ HEADINSTALLDIR = /usr/local/include/awn
 
 .PHONY: all
 all: CCFLAGS += -O3 -UBASE_VERSION
-all: LDFLAGS	= -ldl -fcommon
+all: LDFLAGS = -ldl -fcommon
 all: SSOURCES = memcmp-avx2-addr.S
 #all: $(OUTPUTFILE)
 all: compile
@@ -34,6 +34,11 @@ base: baseCompile
 .PHONY: basedebug
 basedebug: CCFLAGS += -ggdb -DBASE_VERSION 
 basedebug:  baseCompile
+
+#performange Gain, no memcmp
+.PHONY: pg
+pg: CCFLAGS += -O3 -UBASE_VERSION
+pg: baseCompile
 # Build libgeorgeringo.so from george.o, ringo.o, 
 # and georgeringo.o; subst is the search-and-replace 
 # function demonstrated in Recipe 1.16
