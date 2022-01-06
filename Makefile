@@ -14,14 +14,14 @@ HEADINSTALLDIR = /usr/local/include/awn
 #CC = /usr/bin/gcc-7
 
 .PHONY: all
-all: CCFLAGS += -O3 -UBASE_VERSION
+all: CCFLAGS += -O3 -UBASE_VERSION -DDELETE_TREENODE=1 -DBYTE_COMPARE=0
 all: LDFLAGS = -ldl -fcommon
 all: SSOURCES = memcmp-avx2-addr.S
 #all: $(OUTPUTFILE)
 all: compile
 
 .PHONY: debug
-debug: CCFLAGS += -ggdb -UBASE_VERSION
+debug: CCFLAGS += -ggdb -UBASE_VERSION -DDELETE_TREENODE=1 -DBYTE_COMPARE=0
 debug: LDFLAGS	= -ldl
 debug: SSOURCES = memcmp-avx2-addr.S
 #debug: $(OUTPUTFILE)
@@ -33,12 +33,16 @@ base: baseCompile
 
 .PHONY: basedebug
 basedebug: CCFLAGS += -ggdb -DBASE_VERSION 
-basedebug:  baseCompile
+basedebug: baseCompile
 
 #performange Gain, no memcmp
-.PHONY: pg
-pg: CCFLAGS += -O3 -UBASE_VERSION
-pg: baseCompile
+.PHONY: pg_threelevel
+pg_threelevel: CCFLAGS += -O3 -UBASE_VERSION -DDELETE_TREENODE=0 -DBYTE_COMPARE=1
+pg_threelevel: baseCompile
+
+.PHONY: pg_threelevel_delNode
+pg_threelevel_delNode: CCFLAGS += -O3 -UBASE_VERSION -DDELETE_TREENODE=1 -DBYTE_COMPARE=1
+pg_threelevel_delNode: baseCompile
 # Build libgeorgeringo.so from george.o, ringo.o, 
 # and georgeringo.o; subst is the search-and-replace 
 # function demonstrated in Recipe 1.16
