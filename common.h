@@ -141,8 +141,7 @@ struct{
 
 //xzjin TODO 添加对多个锁的支持
 //xzjin this Key is always allow all operation
-int nonProKey;
-int execv_done,proKey;
+int execv_done;
 int PAGESIZE,PAGENUMSHIFT;
 long long PAGEOFFMASK;
 long long PAGENUMMASK;

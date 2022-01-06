@@ -10,8 +10,8 @@
 #define USE_TS_FUNC 1
 #define USE_FMAP_CACHE 0
 #define REC_INSERT_TEST 0
-#define DELETE_TREENODE 1
-#define BYTE_COMPARE 0
+//#define DELETE_TREENODE 0
+//#define BYTE_COMPARE 1
 #define CMPWRITE
 #undef TS_MEMCPY_CMPWRITE
 
@@ -174,6 +174,9 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 					*(lastRec.lastIdx) = 0;
 				}
 			}
+#else
+//TODO add search tree node and traverse the node, delete and reorder
+
 #endif	//DELETE_TREENODE
 			//DEBUG("insterRec if\n");
 			writeRec(fileOffset, src, dest, pageNum, fileName, fd);
@@ -206,13 +209,13 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 
 #else
 
-void deleteRec(void* src, unsigned long length){
+void deleteRec(void* src, void* dest, unsigned long length){
 	struct memRec *rec, **searchRes = NULL;
 	//g_hash_table_remove_all(searchedMemRec);
 	rec = allocateMemRecArr();
 	//MSG("alloc rec:%p\n", rec);
-	rec->startMemory = (unsigned long long)src;
-	rec->tailMemory = (unsigned long long)src + length;
+	rec->startMemory = (unsigned long long)dest;
+	rec->tailMemory = (unsigned long long)dest + length;
 	rec->fileName = NULL;
 	rec->fileOffset = 0;
 	if(rec->startMemory >= rec->tailMemory){
@@ -235,30 +238,31 @@ void deleteRec(void* src, unsigned long length){
 		//MSG("Modify/delete record.\n");
 		//gpointer hashEntry = malloc(sizeof(struct memRec*));
 		struct memRec *b = *searchRes;
-		if(b==rec)	listRecTreeDetail();
-		//printRec(b);
-		//hashEntry = b;
-		//TODO This assumes the tfind searchs from head to tail.
-		rec->startMemory = b->tailMemory + 1;
-		//g_hash_table_add(searchedMemRec, hashEntry);
-
-		if(b->startMemory<rec->startMemory){	//b.2, b.3
-			b->tailMemory = rec->startMemory -1;
-			//xzjin assert
-			assertRec(b);
-		}else if(b->tailMemory <= rec->startMemory){		//b.4
-			tdelete(rec, &recTreeRoot, overlapRec);
-			MSG("b:%p\n", b);
-			withdrawMemRecArr(b);
-		}else{	//b.5
-			b->tailMemory = rec->startMemory;
-			//xzjin assert
-			assertRec(b);
-		}
-		if(rec->startMemory >= rec->tailMemory) break;
-		//xzjin assert
-		assert(rec->startMemory<rec->tailMemory);
-		assert(rec->startMemory>343596402010 && rec->tailMemory>343596402010);
+		tdelete(rec, &recTreeRoot, overlapRec);
+//		if(b==rec)	listRecTreeDetail();
+//		//printRec(b);
+//		//hashEntry = b;
+//		//TODO This assumes the tfind searchs from head to tail.
+//		rec->startMemory = b->tailMemory + 1;
+//		//g_hash_table_add(searchedMemRec, hashEntry);
+//
+//		if(b->startMemory<rec->startMemory){	//b.2, b.3
+//			b->tailMemory = rec->startMemory -1;
+//			//xzjin assert
+//			assertRec(b);
+//		}else if(b->tailMemory <= rec->startMemory){		//b.4
+//			tdelete(rec, &recTreeRoot, overlapRec);
+//			MSG("b:%p\n", b);
+//			withdrawMemRecArr(b);
+//		}else{	//b.5
+//			b->tailMemory = rec->startMemory;
+//			//xzjin assert
+//			assertRec(b);
+//		}
+//		if(rec->startMemory >= rec->tailMemory) break;
+//		//xzjin assert
+//		assert(rec->startMemory<rec->tailMemory);
+//		assert(rec->startMemory>343596402010 && rec->tailMemory>343596402010);
 		searchRes = tfind(rec, &recTreeRoot, overlapRec);
 	}
 
@@ -275,7 +279,7 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 	//MSG("%s: START\n", __func__);
 	rec = allocateMemRecArr();
 	//MSG("length:%lu, fileOffset:%lu\n", length, fileOffset);
-	deleteRec(src, length);
+	deleteRec(src, dest, length);
 	rec->fileName= fileName;
 	rec->fileOffset = fileOffset;
 	rec->startMemory = (unsigned long long)dest;
@@ -294,79 +298,6 @@ inline void insertRec(unsigned long fileOffset, void* src, void* dest,
 }
 #endif //BASE_VERSION
 
-void insertPro(void *addr,int pro){
-//	void * pageNum = addr2PageNum(addr);
-//	int index =((unsigned long)pageNum) %PROMAPPERSIZE;
-//	struct protRec p;
-//	p.pageNum = pageNum;
-//	p.pro = pro;
-//	p.next = proMapper[index];
-//	MSG("p.next=%p\n",p.next);
-//	proMapper[index] = &p;
-}
-
-int getPro(void *addr){
-//	void * pageNum = addr2PageNum(addr);
-//	int index =((unsigned long)pageNum) %PROMAPPERSIZE;
-//	struct protRec *p = proMapper[index];
-//	while(p){
-//		if(p->pageNum == pageNum) return p->pro;
-//		p = p->next;
-//	}
-	return PROT_READ|PROT_WRITE;
-}
-
-int segvCounter=0;
-void segvhandler(int signum, siginfo_t *info, void *context) {
-//	struct p2fmap *p2f;
-	DEBUG("Fault address: %p\n", info->si_addr);
-	switch (info->si_code) {
-
-	case SEGV_PKUERR:
-//		segvCounter++;
-	/** xzjin For PKU protected mamory , we change current page protect 
-	 * to non and delete entire current page map.*/
-		DEBUG("Address %p PKU protected.\n",info->si_addr);
-//		printTwoLevel();
-		/** 这里设置完pkey不管用,下次执行依然是pkey=1,是不是因为handler的
-		 * 处理是在内核态或者不是同一个执行线程*/
-		DEBUG("set Unprotected key for mem addr:%p\n",info->si_addr);
-#if USE_PKEY
-		void *pageStart = (void*)(((unsigned long long)(info->si_addr))&PAGENUMMASK);
-		if(pkey_mprotect(pageStart, PAGESIZE, getPro(pageStart),
-				 nonProKey)){
-			ERROR("Fault in mprotect.\n");
-			perror("Couldn’t mprotect\n");
-			exit(errno);
-		}
-//		deleteMapExtent(pageStart, PAGESIZE);
-		DEBUG("PKU segv err processed\n",info->si_addr);
-//		if(segvCounter>9) sigaction(SIGSEGV, &defaction, NULL);
-#endif //USE_PKEY
-		break;
-
-	case SEGV_BNDERR:
-		MSG("Address %p failed bound checks.\n",info->si_addr);
-  		sigaction(SIGSEGV, &defaction, NULL);
-		break;
-
-	case SEGV_MAPERR:
-		MSG("Address %p not mapped.\n",info->si_addr);
-  		sigaction(SIGSEGV, &defaction, NULL);
-		break;
-
-	case SEGV_ACCERR:
-		MSG("Access to this address is not allowed.\n");
-  		sigaction(SIGSEGV, &defaction, NULL);
-		break;
-
-	default:
-		MSG("Unknown reason.\n");
-  		sigaction(SIGSEGV, &defaction, NULL);
-		break;
-  	}
-}
-
 // Creates the set of standard posix functions as a module.
 __attribute__((constructor))void init(void) {
 #ifndef BASE_VERSION
@@ -378,6 +309,18 @@ __attribute__((constructor))void init(void) {
 	int tmp;
 	int err __attribute__((unused));
 	MSG("Initializing the libawn.so, %s.\n", version);
+
+#if DELETE_TREENODE
+	MSG("DELETE_TREENODE.\n");
+#else
+	MSG("NOT DELETE_TREENODE.\n");
+#endif	//DELETE_TREENODE
+
+#if BYTE_COMPARE
+	MSG("BYTE_COMPARE.\n");
+#else
+	MSG("NOT BYTE_COMPARE.\n");
+#endif	//DELETE_TREENODE
 	 
 	if (pthread_mutex_init(&recTreeMutex, 0)){
         ERROR("Failed to init mutex!");
@@ -403,29 +346,9 @@ __attribute__((constructor))void init(void) {
 		MSG("open log file error, %s.\n", strerror(err));
 	}
 
-//	lastDestInMap = NULL;
-//	lastSrcInMap = NULL;
-//	lastSrcInMapKey = 0;
-//	lastDestInMapKey = 0;
-	proKey = nonProKey = -1;
 	lastTs_memcpyFmNode = NULL;
 	leastRecFCache.idx=-1;
 	leastRecFCache.leastUsedTime = INT32_MAX;
-
-//	RBPool = (RBNodePtr)malloc(sizeof(struct RBNode)*RBPOOLSIZE);
-//	if(!RBPool){
-//		ERROR("Could not allocate space for RBPool.\n");
-//		assert(0);
-//	}
-//	RBPoolPointer = (RBNodePtr* )malloc(sizeof(RBNodePtr)*RBPOOLSIZE);
-//	if(!RBPoolPointer){
-//		ERROR("Could not allocate space for RBPoolPointer.\n");
-//		assert(0);
-//	}
-//	for(RBPPIdx=0; RBPPIdx<RBPOOLSIZE; RBPPIdx++){
-//		RBPoolPointer[RBPPIdx] = RBPool+RBPPIdx;
-//	}
-//	RBPPIdx = RBPOOLSIZE-1;
 
 	//xzjin Allocate pool for node
 	initMemory();
@@ -522,27 +445,6 @@ RETT_MMAP ts_mmap(INTF_MMAP) {
 		openFileArray[file%MAX_FILE_NUM] = treeNode;
 		tsearch(treeNode, &fileMapTreeRoot, fileMapTreeInsDelCompare);
 		tsearch(treeNode, &fileMapNameTreeRoot, fileMapNameTreeInsDelCompare);
-//		MSG("_hub_mmap fileName:%s, start:%p, tail:%p, offset:%llu\n",
-//			treeNode->fileName, treeNode->start, treeNode->tail,
-//			treeNode->offset);
-		//listFileMapTree();
-		//xzjin TODO add to search tree
-		/*
-		insertPro(ret, pro);
-		MSG("set:%p,len:%lld unwritable pkeys\n",ret,len);
-		//	Mark the buffer read-only use proKey, but does not change pro,
-		//  PROT_NONE is 0x0, so we do need to treat it as a special case. 
-		if(pkey_mprotect((void*)((unsigned long long)ret&PAGENUMMASK),
-				 len, pro, proKey)){
-			ERROR("Fault in mprotect.\n");
-		    perror("Couldn’t mprotect\n");
-		    exit(errno);
-		}
-		p2fAppend(ret, off, len, fd2path[file], proKey);
-		DEBUG_FILE("xzjin add mmap protect from file %s, offset %lu, length %lu, "
-			"map pos: %lu, added to linked list and is mprotected.\n", 
-			fd2path[file], off, len, ret);
-		*/
 	}
 	END_TIMING(fileMap_t, fileMap_time);
 out:
