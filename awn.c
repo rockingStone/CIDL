@@ -1249,12 +1249,12 @@ void* ts_memcpy_traced(void *dest, void *src, size_t n){
 		//	 copyLen, (unsigned long long)insertDest, end);
 		//copyLen = copyLen - (unsigned long long)insertDest;
 		copyLen = copyLen - (unsigned long long)src;
-		if(copyLen>32768){
-			printRec(b);
-			MSG("length:%lu, insertDest:%llu, end:%llu\n",
-				 copyLen, (unsigned long long)insertDest, end);
-			MSG("123\n");
-		}
+//		if(copyLen>32768){
+//			printRec(b);
+//			MSG("length:%lu, insertDest:%llu, end:%llu\n",
+//				 copyLen, (unsigned long long)insertDest, end);
+//			MSG("123\n");
+//		}
 		//memcpy require src, dest not overlap
 		//Insert only delete the record overlapped with memcpy dest range
 		//b is the memory record in memcpy src, thus will not be deleted

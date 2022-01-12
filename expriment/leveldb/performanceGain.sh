@@ -3,8 +3,8 @@
 dbBash=/pmem/ 
 valueSize=(128 256 512 1024 2048 4096 8192)
 #valueSize=(1024)
-blockSize="4096"
-#blockSize="32768"
+#blockSize="4096"
+blockSize="32768"
 
 function runDB(){
 	for s in "${valueSize[@]}"
@@ -16,7 +16,7 @@ function runDB(){
 	#	find $dbPath -type f -exec rm {} \;
 		set -o xtrace
 #		time LD_PRELOAD=/home/xzjin/awn/libawn.so /home/xzjin/leveldb_modified/build/db_bench --benchmarks=fillrandom --value_size=$s --db=$dbPath --block_size=$blockSize 
-		time /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=$s --db=$dbPath --block_size=$blockSize 
+#		time /home/xzjin/leveldb/build/db_bench --benchmarks=fillrandom --value_size=$s --db=$dbPath --block_size=$blockSize 
 		echo; echo; 
 		time /home/xzjin/leveldb_modified/build/db_bench --benchmarks=fillrandom --value_size=$s --db=$dbPath --block_size=$blockSize 
 		set +o xtrace
@@ -53,5 +53,5 @@ function normal(){
 }
 
 base
-AVX
-normal
+#AVX
+#normal
