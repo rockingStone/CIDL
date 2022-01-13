@@ -29,10 +29,12 @@ debug: compile
 
 .PHONY: base
 base: CCFLAGS += -O3 -DBASE_VERSION 
+base: LDFLAGS	= -ldl -fcommon
 base: baseCompile
 
 .PHONY: basedebug
-basedebug: CCFLAGS += -ggdb -DBASE_VERSION 
+basedebug: CCFLAGS += -ggdb -DBASE_VERSION -fcommon
+base: LDFLAGS	= -ldl -fcommon
 basedebug: baseCompile
 
 #performange Gain, no memcmp
