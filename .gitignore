@@ -8,3 +8,10 @@ expriment/leveldb/destor.stat
 expriment/leveldb/leveldb.log
 expriment/leveldb/leveldb1.log
 log
+expriment/leveldb/1024.csv
+expriment/leveldb/128.csv
+expriment/leveldb/2048.csv
+expriment/leveldb/256.csv
+expriment/leveldb/4096.csv
+expriment/leveldb/512.csv
+expriment/leveldb/8192.csv
