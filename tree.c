@@ -227,10 +227,10 @@ int overlapRec(const void *pa, const void *pb){
     const struct memRec* a = pa;
     const struct memRec* b = pb;
     if ((unsigned long)(a->startMemory) > (unsigned long)(b->startMemory)&&
-            (unsigned long)(a->startMemory) > (unsigned long)(b->tailMemory))
+            (unsigned long)(a->startMemory) >= (unsigned long)(b->tailMemory))
         return 1;
     if ((unsigned long)(a->startMemory) < (unsigned long)(b->startMemory)&&
-            (unsigned long)(a->tailMemory) < (unsigned long)(b->startMemory))
+            (unsigned long)(a->tailMemory) <= (unsigned long)(b->startMemory))
         return -1;
     return 0;
 }

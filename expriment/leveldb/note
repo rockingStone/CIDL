@@ -29,3 +29,8 @@ time cost
 | awk '/real/{print $(NF)}' | awk -F'[ms]' '{time=$1*60+$2; print time }'
 hash/meta num
 | awk '/hash number/{print $(NF)} /new metadata item/{print substr($7, 2, length($7)-2)} '
+
+
+process PerformanceImprovement
+grep -e "--value_size" -e "real" -e "ts_write same bytes" performanceGain.sh_log_2 | awk -F'[:,]' '/same bytes/{print $5}'
+grep -e "--value_size" -e "real" -e "ts_write same bytes" performanceGain.sh_log_2 | awk '/real/{print $(NF)}' | awk -F'[ms]' '{time=$1*60+$2; print time }'
