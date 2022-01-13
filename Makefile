@@ -22,7 +22,7 @@ all: compile
 
 .PHONY: debug
 debug: CCFLAGS += -ggdb -UBASE_VERSION
-debug: LDFLAGS	= -ldl
+debug: LDFLAGS	= -ldl -fcommon
 debug: SSOURCES = memcmp-avx2-addr.S
 #debug: $(OUTPUTFILE)
 debug: compile
