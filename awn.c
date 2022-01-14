@@ -26,15 +26,34 @@ void listRecTreeDetail();
 
 //exported function
 int ts_open(const char *path, int oflag, ...);
+int CIDL_open(const char *path, int oflag, ...) __attribute__ ((weak, alias ("ts_open")));
 int ts_openat(char* dirName, int dirfd, const char *path, int oflag, ...);
+int CIDL_openat(char* dirName, int dirfd, const char *path, int oflag, ...) __attribute__ ((weak, alias ("ts_openat")));
 FILE *ts_fopen(const char *filename, const char *modes);
+FILE *CIDL_fopen(const char *filename, const char *modes) __attribute__ ((weak, alias ("ts_fopen")));
 int ts_close (int fd);
+int CIDL_close(int fd) __attribute__ ((weak, alias ("ts_close")));
 ssize_t ts_write(int file, void *buf, size_t length);
+ssize_t CIDL_write(int file, void *buf, size_t length) __attribute__ ((weak, alias ("ts_write")));
 size_t ts_fwrite (const void *buf, size_t size, size_t n, FILE *s);
+size_t CIDL_fwrite(const void *buf, size_t size, size_t n, FILE *s) __attribute__ ((weak, alias ("ts_fwrite")));
+ssize_t ts_pwrite(int file, void *buf, size_t length, off64_t offset);
+ssize_t CIDL_pwrite(int file, void *buf, size_t length, off64_t offset) __attribute__ ((weak, alias ("ts_pwrite")));
 void* ts_memcpy_traced(void *dest, void *src, size_t n);
+void* CIDL_memcpy_traced(void *dest, void *src, size_t n) __attribute__ ((weak, alias ("ts_memcpy_traced")));
 void* ts_memcpy(void *dest, void *src, size_t n);
+void* CIDL_memcpy(void *dest, void *src, size_t n) __attribute__ ((weak, alias ("ts_memcpy")));
+RETT_MMAP ts_mmap(INTF_MMAP);
+RETT_MMAP CIDL_mmap(INTF_MMAP) __attribute__ ((weak, alias ("ts_mmap")));
+RETT_MUNMAP ts_munmap(INTF_MUNMAP);
+RETT_MUNMAP CIDL_munmap(INTF_MUNMAP) __attribute__ ((weak, alias ("ts_munmap")));
 ssize_t ts_read(int fd, void *buf, size_t nbytes);
+ssize_t CIDL_read(int fd, void *buf, size_t nbytes) __attribute__ ((weak, alias ("ts_read")));
 void* ts_realloc(void *ptr, size_t size, void* tail);
+void* CIDL_realloc(void *ptr, size_t size, void* tail) __attribute__ ((weak, alias ("ts_realloc")));
+void ts_free(void* ptr, void* tail);
+void CIDL_free(void* ptr, void* tail) __attribute__ ((weak, alias ("ts_free")));
+
 
 instrumentation_type compare_mem_time, remap_mem_rec_time, ts_write_time;
 instrumentation_type mem_from_file_trace_time, mem_from_mem_trace_time;

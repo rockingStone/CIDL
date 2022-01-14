@@ -87,3 +87,4 @@ const char *Instruprint[INSTRUMENT_NUM] = {
 	"unlink_t",
 	"write_t",
 };
+void CIDL_print_statistics() __attribute__ ((weak, alias ("ts_print_statistics")));

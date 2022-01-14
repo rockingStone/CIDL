@@ -25,6 +25,7 @@ unsigned long long total_syscalls __attribute__((unused));
 unsigned long long deleted_size __attribute__((unused));
 
 void ts_print_statistics(void);
+void CIDL_print_statistics(void);
 
 enum instrumentation_vars {
 	appends_t,
