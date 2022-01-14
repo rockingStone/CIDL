@@ -1,9 +1,0 @@
-[global]
-size=2G
-loops=1
-dedupe_percentage=40
-directory=/pmem/
-
-[SSD-rand]
-rw=randwrite
-bs=2048
